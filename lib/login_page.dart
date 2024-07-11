@@ -1,69 +1,16 @@
 import 'package:flutter/material.dart';
 
 
-class EntryPage extends StatefulWidget
-{
-  const EntryPage({super.key});
 
-  @override
+final enableborder=OutlineInputBorder(
+  borderSide:const BorderSide(width:3,color:Color.fromARGB(255, 175, 178, 175)),
+  borderRadius:BorderRadius.circular(12)
+);
 
-  State createState()
-  {
-    return WelcomePage();
-  }
-}
-
-
-class WelcomePage extends State
-{
-
-  @override
-  Widget build(BuildContext context)
-  {
-    double height=MediaQuery.sizeOf(context).height;
-
-    return Scaffold(
-      backgroundColor:Colors.white,   
-      body:Center(
-        child:Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children:[
-            SizedBox
-            (
-              width:400,
-              height:300,
-              child:Image.asset('assets/images/nss_logo.png')
-            ),
-
-              const Text("Not Me But You",
-              style:TextStyle(
-                color:Color.fromARGB(255, 238, 103, 13),
-                fontWeight: FontWeight.w400,
-                fontSize: 17,
-              ),
-              ) ,
-
-            Padding( 
-            padding:EdgeInsets.fromLTRB(0, height/4, 0, 0),
-            child:FractionallySizedBox(
-              widthFactor: 0.89,
-            child:TextButton(
-              style:const ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(Color.fromARGB(255, 54, 28, 129)),
-                foregroundColor:WidgetStatePropertyAll(Colors.white),
-              ),
-              onPressed:()=>{Navigator.push(context,MaterialPageRoute(builder:(context) => const LoginPage(),))},
-              child:const Text("Get Started"),
-            )
-            )
-            ),
-            ]
-          )
-      )
-    );
-  }
-}
-
+final focusborder=OutlineInputBorder(
+  borderSide:const BorderSide(width:3,color:Colors.blue),
+  borderRadius:BorderRadius.circular(12)
+);
 
 class LoginPage extends StatefulWidget
 {
@@ -78,18 +25,105 @@ class LoginPage extends StatefulWidget
 
 class LoginPageState extends State
 {
+  TextEditingController emailinput=TextEditingController();
+  TextEditingController passwordinput=TextEditingController();
+
+
+  bool _encryptionState=false;
+  var passwordicon=Icons.enhanced_encryption;
+
+
   @override
   Widget build(BuildContext context)
   {
-    return const Scaffold(
+
+    double width=MediaQuery.sizeOf(context).width;
+    double height=MediaQuery.sizeOf(context).height;
+
+
+    return Scaffold(
+      //resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      body:Center(
-        child:Column(
+      body:SingleChildScrollView(
+          padding:EdgeInsets.fromLTRB(0, height/10, 0, 0),
+          child:Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:[]
+          children:[
+          SizedBox(
+            width:400,
+            height:300,
+            child:Image.asset("assets/images/nss_logo.png")
+          ),
+
+          Padding( padding:EdgeInsets.fromLTRB(0,20,width*0.45,20),
+          child:const Text("Welcome!",style:TextStyle(fontSize:30,fontWeight:FontWeight.w900))
+          ),
+
+          Padding( 
+            padding:EdgeInsets.fromLTRB(width/10,0,width/10,0),
+            child:TextField(
+              controller:emailinput,
+              decoration: InputDecoration(
+              enabledBorder: enableborder,
+              focusedBorder: focusborder,
+              labelText:"Enter Email",
+            ),
+          )
+          ),
+
+           Padding( 
+            padding:EdgeInsets.fromLTRB(width/10,20,width/10,0),
+            child:TextField(
+              obscuringCharacter: '*',
+              obscureText: _encryptionState,
+              controller:passwordinput,
+              decoration: InputDecoration(
+              suffixIcon:IconButton(
+                icon:Icon(passwordicon),
+                onPressed:()=>{setState((){
+                  if(_encryptionState==false)
+                   {
+                  _encryptionState=true;
+                  passwordicon=Icons.no_encryption;
+                   }
+                  else
+                  {
+                    _encryptionState=false;
+                    passwordicon=Icons.enhanced_encryption;
+                  }
+                  }
+                 )
+               },
+
+              ),
+              enabledBorder: enableborder,
+              focusedBorder: focusborder,
+              labelText:"Enter Password",
+            ),
+          )
+          ),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+            child: SizedBox(
+              width:width/3,
+              height:50,
+              child:TextButton(
+                onPressed: (){},
+                style:const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.blue),
+                  foregroundColor:WidgetStatePropertyAll(Colors.white),
+                ),
+                child:const Text("Submit"),
+              )
+              ),
+          )
+
+          ]
         )
       ),
-    );
+     )
+;
   }
 
 }
