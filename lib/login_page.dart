@@ -1,5 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nss_project/student_home_page.dart';
 
 final enableborder=OutlineInputBorder(
   borderSide:const BorderSide(width:3,color:Color.fromARGB(255, 175, 178, 175)),
@@ -31,6 +31,18 @@ class LoginPageState extends State
   bool _encryptionState=false;
   var passwordicon=Icons.enhanced_encryption;
 
+  Future signIn() async
+  {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email:emailinput.text.trim() , password: passwordinput.text.trim());
+  }
+
+  @override
+  void dispose()
+  {
+    super.dispose();
+    emailinput.dispose();
+    passwordinput.dispose();
+  }
 
   @override
   Widget build(BuildContext context)
@@ -109,7 +121,8 @@ class LoginPageState extends State
               height:50,
               child:TextButton(
                 onPressed: (){
-                  Navigator.push(context,MaterialPageRoute(builder: (context)=>const StudentHomePage()));
+                  signIn();
+                  //Navigator.push(context,MaterialPageRoute(builder: (context)=>const StudentHomePage()));
                 },
                 style:const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(Colors.blue),

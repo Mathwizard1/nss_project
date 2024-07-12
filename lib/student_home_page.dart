@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:nss_project/sprofile_page.dart';
@@ -70,6 +71,8 @@ class SHomePageState extends State<SHomePage> with SingleTickerProviderStateMixi
                 Navigator.push(context,MaterialPageRoute(builder: (context)=>const ProfilePage()));
             },
           ),
+
+          IconButton(onPressed: (){FirebaseAuth.instance.signOut();}, icon:const Icon(Icons.exit_to_app)),
         ],
         bottom: TabBar(
           controller: _tabController,

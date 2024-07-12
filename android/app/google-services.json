@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "774529955505",
+    "project_id": "nss-event-management-app-c040f",
+    "storage_bucket": "nss-event-management-app-c040f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:774529955505:android:241d5244bee3e8ec299490",
+        "android_client_info": {
+          "package_name": "com.example.nss_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-TI-j5jU3y7bQGPWvhNt4Jjk3K_QjtY8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
