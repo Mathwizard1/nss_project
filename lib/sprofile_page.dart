@@ -119,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         style: TextStyle(fontSize: 17.0),
                       )),
                   onChanged: (text) {
-                    this.name = text;
+                    name = text;
                   },
                 )),
           ],
