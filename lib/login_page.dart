@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nss_project/settings.dart';
 
 
 
@@ -109,7 +110,9 @@ class LoginPageState extends State
               width:width/3,
               height:50,
               child:TextButton(
-                onPressed: (){},
+                onPressed: (){
+                  Navigator.push(context,MaterialPageRoute(builder: (context)=>const ProfilePage()));
+                },
                 style:const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(Colors.blue),
                   foregroundColor:WidgetStatePropertyAll(Colors.white),
