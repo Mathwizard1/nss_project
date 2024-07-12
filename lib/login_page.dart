@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nss_project/settings.dart';
-
-
+import 'package:nss_project/student_home_page.dart';
 
 final enableborder=OutlineInputBorder(
   borderSide:const BorderSide(width:3,color:Color.fromARGB(255, 175, 178, 175)),
@@ -111,7 +109,7 @@ class LoginPageState extends State
               height:50,
               child:TextButton(
                 onPressed: (){
-                  Navigator.push(context,MaterialPageRoute(builder: (context)=>const ProfilePage()));
+                  Navigator.push(context,MaterialPageRoute(builder: (context)=>const StudentHomePage()));
                 },
                 style:const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(Colors.blue),
