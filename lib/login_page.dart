@@ -13,7 +13,8 @@ final focusborder=OutlineInputBorder(
 
 class LoginPage extends StatefulWidget
 {
-  const LoginPage({super.key});
+  final VoidCallback showregisterpage;
+  const LoginPage({super.key,required this.showregisterpage});
 
   @override
     State createState()
@@ -22,7 +23,7 @@ class LoginPage extends StatefulWidget
     }
 }
 
-class LoginPageState extends State
+class LoginPageState extends State<LoginPage>
 {
   TextEditingController emailinput=TextEditingController();
   TextEditingController passwordinput=TextEditingController();
@@ -114,6 +115,8 @@ class LoginPageState extends State
           )
           ),
 
+          
+
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
             child: SizedBox(
@@ -122,7 +125,6 @@ class LoginPageState extends State
               child:TextButton(
                 onPressed: (){
                   signIn();
-                  //Navigator.push(context,MaterialPageRoute(builder: (context)=>const StudentHomePage()));
                 },
                 style:const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(Colors.blue),
@@ -131,8 +133,13 @@ class LoginPageState extends State
                 child:const Text("Submit"),
               )
               ),
-          )
+          ),
 
+           Padding(
+             padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
+             child: Row(mainAxisAlignment: MainAxisAlignment.center,
+             children: [const Text("Dont have an account? "),GestureDetector(onTap:widget.showregisterpage,child: const Text("Sign Up",style:TextStyle(color:Colors.blue)))],),
+           )
           ]
         )
       ),
