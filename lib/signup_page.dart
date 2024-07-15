@@ -260,7 +260,7 @@ class SignUpPageState extends State<SignUpPage>
           Padding(
              padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
              child: Row(mainAxisAlignment: MainAxisAlignment.center,
-             children: [const Text("Dont have an account? "),GestureDetector(onTap:widget.showloginpage,child: const Text("Sign Up",style:TextStyle(color:Colors.blue)))],),
+             children: [const Text("Have an account? "),GestureDetector(onTap:widget.showloginpage,child: const Text("Login",style:TextStyle(color:Colors.blue)))],),
            )
 
           ]
