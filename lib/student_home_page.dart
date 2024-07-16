@@ -430,10 +430,19 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { // TODO make this smooth (every rebuild waits on calls to snapshots())
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection('wings').snapshots(),
       builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Expanded(
+            child: Align(
+              alignment: Alignment(0, -0.25),
+              child: const Text('Loading...') // TODO replace all 'Loading...' with spinkit
+            )
+          );
+	}
+
 	final wingOptions = ['All'] + snapshot.data!.docs[0]['names'].map<String>((dyn) { String ret = dyn; return ret; }).toList();
 	final events = FirebaseFirestore.instance.collection('events');
 
@@ -464,8 +473,13 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
             StreamBuilder(
               stream: _selectedWing == 'All' ? events.snapshots() : events.where('wings', arrayContains: _selectedWing).snapshots(),
               builder: (context, snapshot) {
-                if (snapshot.data == null) {
-                  return const Text('Loading...');
+                if (!snapshot.hasData) {
+                  return Expanded(
+                    child: Align(
+                      alignment: Alignment(0, -0.25),
+                      child: const Text('Loading...')
+                    )
+                  );
                 }
 
                 if (snapshot.data!.docs.length == 0) {
