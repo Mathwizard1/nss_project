@@ -28,19 +28,19 @@ class DisplayEventPageState extends State<DisplayEventPage> {
   // List of wings for editing
   List<String> wingsList = [
     "Technology",
-    "Buffalo",
-    "Pigeon",
-    "duck",
+    "Science",
+    "Arts",
+    "Sports",
     "Community Service",
   ];
 
   Event event = Event(
-    name: "Take blood",
+    name: "Flutter Workshop",
     date: "2024-08-01",
-    time: "10:00 FM",
-    venue: "Room 10101",
-    longDescription: "A comprehensive workshop on development.",
-    wing: "chicken",
+    time: "10:00 AM",
+    venue: "Room 101",
+    longDescription: "A comprehensive workshop on Flutter development.",
+    wing: "Technology",
     hours: 5,
   );
 
@@ -394,10 +394,11 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                             width: double.infinity,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white, backgroundColor: Colors.blue[900],
+                                foregroundColor: _isEditing ? Colors.blue[900] : Colors.white, 
+                                backgroundColor: _isEditing ? Colors.white : Colors.blue[900],
                                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                               ),
-                              onPressed: () {
+                              onPressed: _isEditing ? null : () {
                                 // Implement your onPressed functionality here
                               },
                               child: const Text(
