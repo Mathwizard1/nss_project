@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'student_view_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -19,32 +20,12 @@ class PeoplePage extends StatefulWidget {
 class _PeoplePageState extends State<PeoplePage> {
   @override
   Widget build(BuildContext context) {
-    int numberoftabs = 2;
-    List<String> tabnames = ['Students', 'Mentor'];
-    List<String> students = [
-      'student1',
-      'student2',
-      'student3',
-      'student4',
-      'student2',
-      'student3',
-      'student4'
-    ];
-    List<String> events = [
-      'mentor1',
-      'mentor2',
-      'mentor3',
-      'mentor4',
-      'mentor2',
-      'mentor3',
-      'mentor4'
-    ];
     String mentorname = "Pranjal";
-    double width = MediaQuery.sizeOf(context).width;
-    double height = MediaQuery.sizeOf(context).height;
+    //double width = MediaQuery.sizeOf(context).width;
+    //double height = MediaQuery.sizeOf(context).height;
     return DefaultTabController(
       initialIndex: 0,
-      length: numberoftabs,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Hey $mentorname'),
@@ -67,96 +48,64 @@ class _PeoplePageState extends State<PeoplePage> {
                 },
                 icon: const Icon(Icons.exit_to_app)),
           ],
-          bottom: TabBar(tabs: tabnames.map((title) => Text(title)).toList()),
+          bottom: const TabBar(tabs: [Tab(text: 'students'),Tab(text: 'mentors')],labelStyle: TextStyle(fontSize: 22
+          ,height: 1.8),),
         ),
         body: Container(
           margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           child: TabBarView(
             children: <Widget>[
-              ListView.builder(
-                itemCount: students.length,
-                itemBuilder: (context, index) => Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(40.0)),
-                      child: Container(
-                        // margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                        padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                        color: Colors.lightBlueAccent,
-                        width: width / 1.2,
-                        height: height / 8,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const StudentViewPage()));
-                                },
-                                child: Text(
-                                  students[index],
-                                  style: TextStyle(
-                                      fontSize: height / 14,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w800),
-                                )),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20.0,
-                    )
-                  ],
-                ),
-              ),
-              ListView.builder(
-                itemCount: events.length,
-                itemBuilder: (context, index) => Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(40.0)),
-                      child: Container(
-                        // margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                        padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                        color: Colors.lightBlueAccent,
-                        width: width / 1.2,
-                        height: height / 8,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            TextButton(
-                                onPressed: () {
-                                  // GOES TO EVENT PAGE
-                                },
-                                child: Text(
-                                  students[index],
-                                  style: TextStyle(
-                                      fontSize: height / 14,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w800),
-                                )),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20.0,
-                    )
-                  ],
-                ),
-              )
+              StreamBuilder(stream: FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'volunteer').snapshots(), 
+              builder: (context,snapshot){
+                if(snapshot.hasData){
+                  List<QueryDocumentSnapshot<Map<String, dynamic>>> stdlist = 
+                  [for (var i in snapshot.data!.docs) i];   // FIX CAUSE DEV IS A ASSHOLE   if(i['first name'] != 'dev') if(i['role'] == 'volunteer')
+                  //print(stdlist.length);
+                  return ListView.builder(itemCount: stdlist.length,
+                  itemBuilder: (context,index){
+                    return _buildPerson(stdlist[index],context);
+                  }
+                  );
+                }
+                return const Text('Hello Darkness my ..');
+              }),
+              StreamBuilder(stream: FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'mentor').snapshots(), 
+              builder: (context,snapshot){
+                if(snapshot.hasData){
+                  List<QueryDocumentSnapshot<Map<String, dynamic>>> stdlist = 
+                  [for (var i in snapshot.data!.docs) i]; // FIX CAUSE DEV IS A ASSHOLE  if(i['first name'] != 'dev') if(i['role'] == 'mentor')
+                  //print(stdlist.length);
+                  return ListView.builder(itemCount: stdlist.length,
+                  itemBuilder: (context,index){
+                    return _buildPerson(stdlist[index],context);
+                  }
+                  );
+                }
+                return const Text('Hello Darkness my ..');
+              })
+
             ],
           ),
         ),
       ),
     );
   }
+}
+
+Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person,BuildContext context){
+  print(person.id.toString());
+  return Card.outlined(
+    elevation: 0.5,
+    color: Colors.white70,
+    child: ListTile(
+      horizontalTitleGap: 16,
+      
+      leading: Icon(Icons.account_circle,size: 50,),
+      title: Text('${(person['first name']).substring(0,1).toUpperCase()}${person['first name'].substring(1,)} ${(person['last name']).substring(0,1).toUpperCase()}${person['last name'].substring(1,)}',style:const TextStyle(fontWeight: FontWeight.w600,fontSize: 22),),
+      subtitle: Text('${person['roll number']}',style:const TextStyle(fontSize: 14),),
+      onTap: (){
+        Navigator.push(context,MaterialPageRoute(builder: (context) => StudentViewPage(person: person)));
+      },
+    ),
+  );
 }
