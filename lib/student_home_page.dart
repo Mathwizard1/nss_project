@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:nss_project/sprofile_page.dart';
+import 'package:nss_project/people_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StudentHomePage extends StatelessWidget {
@@ -134,6 +135,10 @@ class HoursCompletedState extends State {
 
 
     return Scaffold( 
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const PeoplePage()));
+      } ,),
       resizeToAvoidBottomInset: true,
       body:Center(
       child: Column(
