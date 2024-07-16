@@ -424,7 +424,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
           IconData(document['icon']['codepoint'], fontFamily: 'MaterialIcons'),
           color: Color(document['icon']['color'])
         ),
-        trailing: Text(document['hours'].toString() + ' Hrs'),
+        trailing: Text('${document['hours']} Hrs'),
       )
     );
   }
@@ -435,10 +435,10 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
       stream: FirebaseFirestore.instance.collection('wings').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Expanded(
+          return const Expanded(
             child: Align(
               alignment: Alignment(0, -0.25),
-              child: const Text('Loading...') // TODO replace all 'Loading...' with spinkit
+              child: Text('Loading...') // TODO replace all 'Loading...' with spinkit
             )
           );
 	}
@@ -451,9 +451,9 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
 	    Card(
               child: DropdownMenu<String>(
                 label: const Text('NSS Wing'),
-	        leadingIcon: Icon(Icons.category),
-	        expandedInsets: EdgeInsets.only(top: 64.0, bottom: 8.0),
-		inputDecorationTheme: InputDecorationTheme(),
+	        leadingIcon: const Icon(Icons.category),
+	        expandedInsets: const EdgeInsets.only(top: 64.0, bottom: 8.0),
+		inputDecorationTheme: const InputDecorationTheme(),
 	        initialSelection: 'All',
                 onSelected: (selectedWing) {
                   setState(() {
@@ -474,19 +474,19 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
               stream: _selectedWing == 'All' ? events.snapshots() : events.where('wings', arrayContains: _selectedWing).snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return Expanded(
+                  return const Expanded(
                     child: Align(
                       alignment: Alignment(0, -0.25),
-                      child: const Text('Loading...')
+                      child: Text('Loading...')
                     )
                   );
                 }
 
-                if (snapshot.data!.docs.length == 0) {
-                  return Expanded(
+                if (snapshot.data!.docs.isEmpty) {
+                  return const Expanded(
                     child: Align(
                       alignment: Alignment(0, -0.25),
-                      child: const Text('Nothing to see here ._.')
+                      child: Text('Nothing to see here ._.')
                     )
                   );
                 }
