@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:nss_project/sprofile_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StudentHomePage extends StatelessWidget {
   const StudentHomePage({super.key});
@@ -404,13 +405,90 @@ class HourDetailState extends State with SingleTickerProviderStateMixin
   }
 }
 
-class UpcomingEventsTab extends StatelessWidget {
+class UpcomingEventsTab extends StatefulWidget {
   const UpcomingEventsTab({super.key});
 
   @override
+  State<UpcomingEventsTab> createState() => _UpcomingEventsTabState();
+}
+
+class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
+  String _selectedWing = 'All';
+
+  Widget _buildUpcomingEvent(BuildContext context, QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    return Card(
+      child: ExpansionTile(
+        title: Text(document['title']),
+        subtitle: Text(document['subtitle']),
+        leading: Icon(
+          IconData(document['icon']['codepoint'], fontFamily: 'MaterialIcons'),
+          color: Color(document['icon']['color'])
+        ),
+        trailing: Text(document['hours'].toString() + ' Hrs'),
+      )
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Upcoming Events Content'),
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collection('wings').snapshots(),
+      builder: (context, snapshot) {
+	final wingOptions = ['All'] + snapshot.data!.docs[0]['names'].map<String>((dyn) { String ret = dyn; return ret; }).toList();
+	final events = FirebaseFirestore.instance.collection('events');
+
+        return Column(
+          children: <Widget>[
+	    Card(
+              child: DropdownMenu<String>(
+                label: const Text('NSS Wing'),
+	        leadingIcon: Icon(Icons.category),
+	        expandedInsets: EdgeInsets.only(top: 64.0, bottom: 8.0),
+		inputDecorationTheme: InputDecorationTheme(),
+	        initialSelection: 'All',
+                onSelected: (selectedWing) {
+                  setState(() {
+                    if (selectedWing != null) {
+                      _selectedWing = selectedWing;
+                    }
+                  });
+                },
+                dropdownMenuEntries: wingOptions.map<DropdownMenuEntry<String>>((option) {
+                  return DropdownMenuEntry<String>(
+                    value: option,
+                    label: option,
+                  );
+                }).toList()
+              )
+	    ),
+            StreamBuilder(
+              stream: _selectedWing == 'All' ? events.snapshots() : events.where('wings', arrayContains: _selectedWing).snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.data == null) {
+                  return const Text('Loading...');
+                }
+
+                if (snapshot.data!.docs.length == 0) {
+                  return Expanded(
+                    child: Align(
+                      alignment: Alignment(0, -0.25),
+                      child: const Text('Nothing to see here ._.')
+                    )
+                  );
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    return _buildUpcomingEvent(context, snapshot.data!.docs[index]);
+                  }
+                );
+              }
+            )
+          ]
+        );
+      }
     );
   }
 }
@@ -425,4 +503,3 @@ class AttendedEventsTab extends StatelessWidget {
     );
   }
 }
-
