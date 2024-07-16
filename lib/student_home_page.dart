@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nss_project/event_page.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -214,79 +215,6 @@ class HoursCompletedState extends State {
                     child: const Text("Details",style:TextStyle(color:Colors.white)),
                     ),
                 )
-
-            /*Row(
-              children: <Widget>[
-                  SfRadialGauge(
-                    axes: <RadialAxis>[
-                      RadialAxis(
-                        minimum: 0,
-                        maximum: 30,
-                        showLabels: false,
-                        showTicks: false,
-                        radiusFactor: 0.5,
-                        axisLineStyle: const AxisLineStyle(
-                          thickness: 0.2,
-                          cornerStyle: CornerStyle.bothCurve,
-                          color: Color.fromARGB(30, 0, 169, 181),
-                          thicknessUnit: GaugeSizeUnit.factor,
-                        ),
-                        pointers: <GaugePointer>[
-                          RangePointer(
-                            value: sem1Hours.toDouble(),
-                            cornerStyle: CornerStyle.bothCurve,
-                            width: 0.2,
-                            sizeUnit: GaugeSizeUnit.factor,
-                          ),
-                        ],
-                        annotations: <GaugeAnnotation>[
-                          GaugeAnnotation(
-                            positionFactor: 0,
-                            widget: Text(
-                              '${sem1Hours.toStringAsFixed(0)} Hours\n(Sem 1)',
-                              style: const TextStyle(fontSize: 22),
-                            ),
-                          ),
-                        ],
-                      ),
-                                  ]),
-
-
-                  SfRadialGauge(
-                    axes: <RadialAxis>[
-                      RadialAxis(
-                        minimum: 0,
-                        maximum: 30,
-                        showLabels: false,
-                        showTicks: false,
-                        radiusFactor: 0.5,
-                        axisLineStyle: const AxisLineStyle(
-                          thickness: 0.2,
-                          cornerStyle: CornerStyle.bothCurve,
-                          color: Color.fromARGB(30, 0, 169, 181),
-                          thicknessUnit: GaugeSizeUnit.factor,
-                        ),
-                        pointers: <GaugePointer>[
-                          RangePointer(
-                            value: sem2Hours.toDouble(),
-                            cornerStyle: CornerStyle.bothCurve,
-                            width: 0.2,
-                            sizeUnit: GaugeSizeUnit.factor,
-                          ),
-                        ],
-                        annotations: <GaugeAnnotation>[
-                          GaugeAnnotation(
-                            positionFactor: 0,
-                            widget: Text(
-                              '${sem2Hours.toStringAsFixed(0)} Hours\n(Sem 2)',
-                              style: const TextStyle(fontSize: 22),
-                            ),
-                          ),
-                        ],
-                      ),
-                                  ]),
-              ],
-            ),*/
           ],
       ),
     )
@@ -412,25 +340,47 @@ class UpcomingEventsTab extends StatefulWidget {
   State<UpcomingEventsTab> createState() => _UpcomingEventsTabState();
 }
 
+
 class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   String _selectedWing = 'All';
 
+  ExpansionTileController tilecontroller=ExpansionTileController();
+
   Widget _buildUpcomingEvent(BuildContext context, QueryDocumentSnapshot<Map<String, dynamic>> document) {
+
     return Card(
-      child: ExpansionTile(
-        title: Text(document['title']),
-        subtitle: Text(document['subtitle']),
-        leading: Icon(
-          IconData(document['icon']['codepoint'], fontFamily: 'MaterialIcons'),
-          color: Color(document['icon']['color'])
+      child: InkWell(
+          onTap:(){
+            Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: document)));
+            },
+            child:Container(
+              decoration:const BoxDecoration(
+                gradient: LinearGradient(begin:Alignment.topLeft,end:Alignment.topRight,colors: [Color.fromARGB(255, 151, 236, 154),Colors.white,Colors.white])
+              ),
+              child: ListTile( 
+                tileColor:const Color.fromARGB(255, 251, 250, 250),
+              title: Text(document['title']),
+                        subtitle: Text(document['subtitle']),
+                        leading: Icon(
+              IconData(document['icon']['codepoint'], fontFamily: 'MaterialIcons'),
+              color: Color(document['icon']['color'])
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('${document['hours']} Hrs'),const Text('Active',style:TextStyle(color:Colors.green))
+                          ],
+                        ),
+                      ),
+            )
         ),
-        trailing: Text('${document['hours']} Hrs'),
-      )
     );
   }
 
   @override
   Widget build(BuildContext context) { // TODO make this smooth (every rebuild waits on calls to snapshots())
+
+
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection('wings').snapshots(),
       builder: (context, snapshot) {
@@ -448,30 +398,40 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
 
         return Column(
           children: <Widget>[
-	    Card(
-              child: DropdownMenu<String>(
-                label: const Text('NSS Wing'),
-	        leadingIcon: const Icon(Icons.category),
-	        expandedInsets: const EdgeInsets.only(top: 64.0, bottom: 8.0),
-		inputDecorationTheme: const InputDecorationTheme(),
-	        initialSelection: 'All',
-                onSelected: (selectedWing) {
-                  setState(() {
-                    if (selectedWing != null) {
-                      _selectedWing = selectedWing;
-                    }
-                  });
-                },
-                dropdownMenuEntries: wingOptions.map<DropdownMenuEntry<String>>((option) {
-                  return DropdownMenuEntry<String>(
-                    value: option,
-                    label: option,
-                  );
-                }).toList()
-              )
-	    ),
+
+	          Card(
+              borderOnForeground: false,
+	            child: DropdownMenu<String>(
+                textStyle: const TextStyle(color: Colors.white),
+	            label: const Padding(
+                              padding:  EdgeInsets.fromLTRB(0,5,0,0),
+                              child: Text('NSS Wing',style: TextStyle(color:Colors.white ),),
+                            ),
+	            leadingIcon: const Icon(Icons.category_outlined,color:Colors.white),
+	            expandedInsets: const EdgeInsets.only(top: 64.0, bottom: 8.0),
+	            inputDecorationTheme: const InputDecorationTheme(
+	              fillColor:Color.fromARGB(255, 128, 112, 185),
+	              filled:true,
+	            ),
+	            initialSelection: 'All',
+	                        onSelected: (selectedWing) {
+	                          setState(() {
+	                            if (selectedWing != null) {
+	                              _selectedWing = selectedWing;
+	                            }
+	                          });
+	                        },
+	                        dropdownMenuEntries: wingOptions.map<DropdownMenuEntry<String>>((option) {
+	                          return DropdownMenuEntry<String>(
+	                            value: option,
+	                            label: option,
+	                            
+	                          );
+	                        }).toList()
+	                      )
+	                        ),
             StreamBuilder(
-              stream: _selectedWing == 'All' ? events.snapshots() : events.where('wings', arrayContains: _selectedWing).snapshots(),
+              stream: _selectedWing == 'All' ? events.snapshots() : events.where('wing', isEqualTo: _selectedWing).snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Expanded(

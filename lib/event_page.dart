@@ -1,34 +1,31 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: DisplayEventPage(),
-    );
-  }
-}
 
 class DisplayEventPage extends StatefulWidget {
-  const DisplayEventPage({super.key});
+  final QueryDocumentSnapshot document;
+
+  const DisplayEventPage({super.key,required this.document});
 
   @override
-  DisplayEventPageState createState() => DisplayEventPageState();
+  // ignore: no_logic_in_create_state
+  DisplayEventPageState createState() => DisplayEventPageState(document: document);
 }
 
 class DisplayEventPageState extends State<DisplayEventPage> {
+
+
+QueryDocumentSnapshot document;
+
+
+DisplayEventPageState({required this.document});
+
   final String _selectedRole = "pic"; // Change this value to test different roles
 
   // List of wings for editing
   List<String> wingsList = [
-    "Technology",
-    "Science",
+    "Buffalo Wings",
+    "Chicken Wings",
     "Arts",
     "Sports",
     "Community Service",
@@ -55,9 +52,16 @@ class DisplayEventPageState extends State<DisplayEventPage> {
   late TextEditingController _hoursController;
   late String _selectedWing;
 
-  @override
-  void initState() {
+  @override 
+  void initState()
+  {
     super.initState();
+    syncdetails();
+    initEdit();
+  }
+
+  void initEdit()
+  {
     _nameController = TextEditingController(text: event.name);
     _dateController = TextEditingController(text: event.date);
     _timeController = TextEditingController(text: event.time);
@@ -78,7 +82,21 @@ class DisplayEventPageState extends State<DisplayEventPage> {
     super.dispose();
   }
 
-  void _toggleEdit() {
+
+Future updateDoc() async
+{
+  var docpath=FirebaseFirestore.instance.collection('events').doc(document.reference.id);
+  docpath.update({'description':event.longDescription});
+  docpath.update({'hours':event.hours});
+  docpath.update({'venue':event.venue});
+  docpath.update({'title':event.name});
+  docpath.update({'wing':event.wing});
+  docpath.update({'timestamp':event.time});
+}
+
+
+  void _toggleEdit() 
+  {
     if (_isEditing) {
       if (_formKey.currentState!.validate()) {
         setState(() {
@@ -89,6 +107,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
           event.longDescription = _descriptionController.text;
           event.wing = _selectedWing;
           event.hours = int.parse(_hoursController.text);
+          updateDoc();
           _isEditing = false;
         });
       }
@@ -103,19 +122,24 @@ class DisplayEventPageState extends State<DisplayEventPage> {
     // Implement delete functionality here
   }
 
+  void syncdetails()
+  {
+    event.time=document['timestamp'].toString();
+    event.name=document['title'];
+    event.venue=document['venue'];
+    event.longDescription=document['description'];
+    event.hours=document['hours'];
+    event.wing=document['wing'];
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
             Expanded(
               child: Center(
                 child: Text(
@@ -163,6 +187,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                                   Expanded(
                                     child: TextFormField(
                                       controller: _dateController,
+                                      keyboardType: TextInputType.datetime,
                                       decoration: const InputDecoration(labelText: 'Date'),
                                       validator: (value) {
                                         if (value!.isEmpty) {
@@ -176,6 +201,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                                   Expanded(
                                     child: TextFormField(
                                       controller: _timeController,
+                                      keyboardType: TextInputType.text,
                                       decoration: const InputDecoration(labelText: 'Time'),
                                       validator: (value) {
                                         if (value!.isEmpty) {
