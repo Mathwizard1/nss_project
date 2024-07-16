@@ -48,17 +48,18 @@ class _PeoplePageState extends State<PeoplePage> {
                 },
                 icon: const Icon(Icons.exit_to_app)),
           ],
-          bottom: const TabBar(tabs: [Tab(text: 'students'),Tab(text: 'mentors')]),
+          bottom: const TabBar(tabs: [Tab(text: 'students'),Tab(text: 'mentors')],labelStyle: TextStyle(fontSize: 22
+          ,height: 1.8),),
         ),
         body: Container(
           margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           child: TabBarView(
             children: <Widget>[
-              StreamBuilder(stream: FirebaseFirestore.instance.collection("users").snapshots(), 
+              StreamBuilder(stream: FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'volunteer').snapshots(), 
               builder: (context,snapshot){
                 if(snapshot.hasData){
                   List<QueryDocumentSnapshot<Map<String, dynamic>>> stdlist = 
-                  [for (var i in snapshot.data!.docs) if(i['first name'] != 'dev') if(i['role'] == 'volunteer') i];   // FIX CAUSE DEV IS A ASSHOLE
+                  [for (var i in snapshot.data!.docs) i];   // FIX CAUSE DEV IS A ASSHOLE   if(i['first name'] != 'dev') if(i['role'] == 'volunteer')
                   //print(stdlist.length);
                   return ListView.builder(itemCount: stdlist.length,
                   itemBuilder: (context,index){
@@ -68,11 +69,11 @@ class _PeoplePageState extends State<PeoplePage> {
                 }
                 return const Text('Hello Darkness my ..');
               }),
-              StreamBuilder(stream: FirebaseFirestore.instance.collection("users").snapshots(), 
+              StreamBuilder(stream: FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'mentor').snapshots(), 
               builder: (context,snapshot){
                 if(snapshot.hasData){
                   List<QueryDocumentSnapshot<Map<String, dynamic>>> stdlist = 
-                  [for (var i in snapshot.data!.docs) if(i['first name'] != 'dev') if(i['role'] == 'mentor') i];   // FIX CAUSE DEV IS A ASSHOLE
+                  [for (var i in snapshot.data!.docs) i]; // FIX CAUSE DEV IS A ASSHOLE  if(i['first name'] != 'dev') if(i['role'] == 'mentor')
                   //print(stdlist.length);
                   return ListView.builder(itemCount: stdlist.length,
                   itemBuilder: (context,index){
@@ -92,11 +93,13 @@ class _PeoplePageState extends State<PeoplePage> {
 }
 
 Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person,BuildContext context){
-  return Card(
+  print(person.id.toString());
+  return Card.outlined(
     elevation: 0.5,
     color: Colors.white70,
     child: ListTile(
       horizontalTitleGap: 16,
+      
       leading: Icon(Icons.account_circle,size: 50,),
       title: Text('${(person['first name']).substring(0,1).toUpperCase()}${person['first name'].substring(1,)} ${(person['last name']).substring(0,1).toUpperCase()}${person['last name'].substring(1,)}',style:const TextStyle(fontWeight: FontWeight.w600,fontSize: 22),),
       subtitle: Text('${person['roll number']}',style:const TextStyle(fontSize: 14),),
