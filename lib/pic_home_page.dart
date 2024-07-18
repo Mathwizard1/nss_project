@@ -55,13 +55,22 @@ class _PeoplePageState extends State<PicHomePage> {
       body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            const Card.filled(
-              margin: EdgeInsets.fromLTRB(0,0,90,4),
-              color: Color.fromARGB(255, 128, 112, 225),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(16,5,16,5),
-                child: Text('View events',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w400,color: Colors.white),),
-              ),
+            const Row(
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: Padding(
+                    padding:EdgeInsets.fromLTRB(0,12,0,0),
+                    child: Divider(color: Colors.black,indent: 10,),),
+                ),
+                Text('View events',style: TextStyle(fontSize: 22,fontWeight: FontWeight.w400,color: Color.fromARGB(255, 0, 0, 0),),),
+                Flexible(
+                  flex: 3,
+                  child: Padding(
+                    padding:EdgeInsets.fromLTRB(0,12,0,0),
+                    child: Divider(color: Colors.black,indent: 4, endIndent: 10,),),
+                ),
+              ],
             ),
             StreamBuilder(
                 stream:
