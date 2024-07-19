@@ -28,16 +28,17 @@ DisplayEventPageState();
   ];
 
   Event event = Event(
-    name: "Flutter Workshop",
-    date: "2024-08-01",
+    name: "Sample event",
+    date: "2024",
     time: "10:00 AM",
     venue: "Room 101",
-    longDescription: "A comprehensive workshop on Flutter development.",
+    longDescription: "Sample description",
     wing: "Technology",
     hours: 5,
   );
 
   bool _isEditing = false;
+  bool _ismentorEditing = false;
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _nameController;
@@ -93,24 +94,43 @@ Future updateDoc() async
 
   void _toggleEdit() 
   {
-    if (_isEditing) {
-      if (_formKey.currentState!.validate()) {
+    if(widget.selectedRole == "pic"){
+      if (_isEditing) {
+        if (_formKey.currentState!.validate()) {
+          setState(() {
+            event.name = _nameController.text;
+            event.date = _dateController.text;
+            event.time = _timeController.text;
+            event.venue = _venueController.text;
+            event.longDescription = _descriptionController.text;
+            event.wing = _selectedWing;
+            event.hours = int.parse(_hoursController.text);
+            updateDoc();
+            _isEditing = false;
+          });
+        }
+      } else {
         setState(() {
-          event.name = _nameController.text;
-          event.date = _dateController.text;
-          event.time = _timeController.text;
-          event.venue = _venueController.text;
-          event.longDescription = _descriptionController.text;
-          event.wing = _selectedWing;
-          event.hours = int.parse(_hoursController.text);
-          updateDoc();
-          _isEditing = false;
+          _isEditing = true;
         });
       }
-    } else {
-      setState(() {
-        _isEditing = true;
-      });
+    }
+    if(widget.selectedRole == "mentor"){
+      if (_ismentorEditing) {
+        if (_formKey.currentState!.validate()) {
+          setState(() {
+            event.date = _dateController.text;
+            event.time = _timeController.text;
+            event.venue = _venueController.text;
+            updateDoc();
+            _ismentorEditing = false;
+          });
+        }
+      } else {
+        setState(() {
+          _ismentorEditing = true;
+        });
+      }
     }
   }
 
@@ -177,7 +197,7 @@ Future updateDoc() async
                               )
                             : Container(),
                         const SizedBox(height: 20),
-                        _isEditing
+                        (_isEditing || _ismentorEditing)
                             ? Row(
                                 children: [
                                   Expanded(
@@ -219,14 +239,14 @@ Future updateDoc() async
                                 child: Text(
                                   '${event.date} at ${event.time}',
                                   style: const TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 20,
                                     color: Colors.blue,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
                         const SizedBox(height: 20),
-                        _isEditing
+                        (_isEditing || _ismentorEditing)
                             ? TextFormField(
                                 controller: _venueController,
                                 decoration: const InputDecoration(labelText: 'Venue'),
@@ -243,7 +263,7 @@ Future updateDoc() async
                                   Text(
                                     event.venue,
                                     style: const TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.green,
                                     ),
@@ -252,8 +272,8 @@ Future updateDoc() async
                                   Text(
                                     'Wing: $_selectedWing',
                                     style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black54,
+                                      fontSize: 18,
+                                      color: Colors.black,
                                     ),
                                   ),
                                 ],
@@ -335,7 +355,7 @@ Future updateDoc() async
                                   child: Text(
                                     '${event.hours} hours',
                                     style: const TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 20,
                                       color: Colors.red,
                                     ),
                                   ),
@@ -371,25 +391,6 @@ Future updateDoc() async
                     : widget.selectedRole == "mentor"
                         ? Column(
                             children: [
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: Colors.white, backgroundColor: Colors.blue[900],
-                                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                                  ),
-                                  onPressed: () {
-                                    // Implement your onPressed functionality here
-                                  },
-                                  child: const Text(
-                                    'Upload Gallery',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
                               const SizedBox(height: 10),
                               SizedBox(
                                 width: double.infinity,
@@ -435,13 +436,13 @@ Future updateDoc() async
               ),
             ],
           ),
-          if (widget.selectedRole == "pic")
+          if (widget.selectedRole == "pic" || widget.selectedRole == "mentor")
             Positioned(
               bottom: 90.0,
               right: 16.0,
               child: FloatingActionButton(
                 onPressed: _toggleEdit,
-                child: Icon(_isEditing ? Icons.check : Icons.edit),
+                child: Icon((_isEditing || _ismentorEditing) ? Icons.check : Icons.edit),
               ),
             ),
           if (widget.selectedRole == "pic" && _isEditing)

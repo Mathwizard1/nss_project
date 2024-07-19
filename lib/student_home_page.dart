@@ -70,7 +70,7 @@ class SHomePageState extends State<SHomePage> with SingleTickerProviderStateMixi
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Student Home'),
+        title: const Text('Student'),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
