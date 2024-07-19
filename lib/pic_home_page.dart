@@ -154,7 +154,7 @@ Widget _buildEvent(
         ],
       ),
       onTap: () {
-        Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: event)));
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: event,selectedRole: "pic",)));
       },
     ),
   );
