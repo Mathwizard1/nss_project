@@ -360,7 +360,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
     return Card(
       child: InkWell(
           onTap:(){
-            Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: document)));
+            Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: document,selectedRole: "volunteer",)));
             },
             child:Container(
               decoration:const BoxDecoration(

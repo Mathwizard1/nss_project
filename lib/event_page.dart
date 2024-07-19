@@ -4,23 +4,24 @@ import 'package:flutter/material.dart';
 
 class DisplayEventPage extends StatefulWidget {
   final QueryDocumentSnapshot document;
+  final String selectedRole ;
 
-  const DisplayEventPage({super.key,required this.document});
+  const DisplayEventPage({super.key,required this.document,required this.selectedRole});
 
   @override
   // ignore: no_logic_in_create_state
-  DisplayEventPageState createState() => DisplayEventPageState(document: document);
+  DisplayEventPageState createState() => DisplayEventPageState();
 }
 
 class DisplayEventPageState extends State<DisplayEventPage> {
 
 
-QueryDocumentSnapshot document;
 
 
-DisplayEventPageState({required this.document});
 
-  final String _selectedRole = "pic"; // Change this value to test different roles
+DisplayEventPageState();
+
+ // Change this value to test different roles
 
   // List of wings for editing
   List<String> wingsList = [
@@ -85,7 +86,7 @@ DisplayEventPageState({required this.document});
 
 Future updateDoc() async
 {
-  var docpath=FirebaseFirestore.instance.collection('events').doc(document.reference.id);
+  var docpath=FirebaseFirestore.instance.collection('events').doc(widget.document.reference.id);
   docpath.update({'description':event.longDescription});
   docpath.update({'hours':event.hours});
   docpath.update({'venue':event.venue});
@@ -124,12 +125,12 @@ Future updateDoc() async
 
   void syncdetails()
   {
-    event.time=document['timestamp'].toString();
-    event.name=document['title'];
-    event.venue=document['venue'];
-    event.longDescription=document['description'];
-    event.hours=document['hours'];
-    event.wing=document['wing'];
+    event.time=widget.document['timestamp'].toString();
+    event.name=widget.document['title'];
+    event.venue=widget.document['venue'];
+    event.longDescription=widget.document['description'];
+    event.hours=widget.document['hours'];
+    event.wing=widget.document['wing'];
   }
 
   @override
@@ -352,7 +353,7 @@ Future updateDoc() async
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: _selectedRole == "students"
+                child: widget.selectedRole == "volunteer"
                     ? SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -372,7 +373,7 @@ Future updateDoc() async
                           ),
                         ),
                       )
-                    : _selectedRole == "mentors"
+                    : widget.selectedRole == "mentor"
                         ? Column(
                             children: [
                               SizedBox(
@@ -439,7 +440,7 @@ Future updateDoc() async
               ),
             ],
           ),
-          if (_selectedRole == "pic")
+          if (widget.selectedRole == "pic")
             Positioned(
               bottom: 90.0,
               right: 16.0,
@@ -448,7 +449,7 @@ Future updateDoc() async
                 child: Icon(_isEditing ? Icons.check : Icons.edit),
               ),
             ),
-          if (_selectedRole == "pic" && _isEditing)
+          if (widget.selectedRole == "pic" && _isEditing)
             Positioned(
               bottom: 90.0,
               right: 80.0,
