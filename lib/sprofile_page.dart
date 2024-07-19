@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:nss_project/leaderboard_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -110,18 +111,45 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
-                child: TextField(
-                  decoration: const InputDecoration(
-                      border: UnderlineInputBorder(),
-                      label: Text(
-                        'Change Name',
-                        style: TextStyle(fontSize: 17.0),
-                      )),
-                  onChanged: (text) {
-                    name = text;
-                  },
-                )),
+                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                child: Column(
+                  children: <Widget>[
+                    TextField(
+                    decoration: const InputDecoration(
+                        border: UnderlineInputBorder(),
+                        label: Text(
+                          'Change Name',
+                          style: TextStyle(fontSize: 17.0),
+                        )),
+                    onChanged: (text) {
+                      name = text;
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white, 
+                                backgroundColor: Colors.blue[900],
+                              ),
+                              onPressed: (){
+                                Navigator.push(context,MaterialPageRoute(builder: (context)=>LeaderboardPage()));
+                              },
+                              child: const Text(
+                                'Leaderboard',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                    ),
+                    ]
+                  ),
+              ),
           ],
         ),
       ),

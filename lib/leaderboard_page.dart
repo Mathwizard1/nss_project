@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Leaderboard App',
+      title: 'Leaderboard',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -43,7 +39,11 @@ class LeaderboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Leaderboard'),
+        title: const Row(
+          children: [
+            Text("Leaderboard"),
+          ],
+        ),
       ),
       body: ListView.builder(
         itemCount: volunteers.length,
@@ -54,9 +54,9 @@ class LeaderboardPage extends StatelessWidget {
           // Determine styling based on index (top 3, 4-10, 11-20)
           TextStyle? textStyle;
           if (index < 3) {
-            textStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.green);
+            textStyle = const TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.green, decoration: TextDecoration.underline);
           } else if (index < 10) {
-            textStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue);
+            textStyle = const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.blue);
           } else if (index < 20) {
             textStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange);
           }
@@ -66,7 +66,10 @@ class LeaderboardPage extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 2,
-                  child: Text(volunteer),
+                  child: Text(
+                    volunteer,
+                    style: textStyle,
+                    ),
                 ),
                 Expanded(
                   flex: 1,

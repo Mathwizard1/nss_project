@@ -197,7 +197,14 @@ Widget _buildEvent(
         // ON TAP IS TRIGGERED WHEN A TILE IS CLICKED 
         // PUT THE IF ELSE OF WHICH EVENT PAGE TO GO TO HERE
         // istaboneselected is aldready a arg in this function
-        Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: event,selectedRole: "mentor",)));
+        if(isFirstTabSelected){
+          // Add attendence / gallery page
+          //Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: event, selectedRole: "mentor",)));
+        }
+        else
+        {
+          Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: event, selectedRole: "mentor",)));
+        }
       },
     ),
   );
