@@ -37,7 +37,7 @@ class MentorHomePageState extends State<MentorHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mentor Homepage'),
+        title: const Text('Mentor'),
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
@@ -80,7 +80,7 @@ class MentorHomePageState extends State<MentorHomePage> {
                       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
                       alignment: Alignment.center,
                       child: const Text(
-                        'Tab 1',
+                        'Attendance or gallery',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -102,7 +102,7 @@ class MentorHomePageState extends State<MentorHomePage> {
                       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
                       alignment: Alignment.center,
                       child: const Text(
-                        'Tab 2',
+                        'Edit or Report',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -164,9 +164,8 @@ class MentorHomePageState extends State<MentorHomePage> {
                     );
                   }
                   return const Text('Hello Darkness my ..');
-                })
-          
-          
+                }
+              )
         ],
       ),
     );
