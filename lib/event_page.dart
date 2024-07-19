@@ -9,15 +9,10 @@ class DisplayEventPage extends StatefulWidget {
   const DisplayEventPage({super.key,required this.document,required this.selectedRole});
 
   @override
-  // ignore: no_logic_in_create_state
   DisplayEventPageState createState() => DisplayEventPageState();
 }
 
 class DisplayEventPageState extends State<DisplayEventPage> {
-
-
-
-
 
 DisplayEventPageState();
 
