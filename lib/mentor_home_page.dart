@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+//import 'package:nss_project/people_page.dart';
+//import 'package:nss_project/sprofile_page.dart';
+import 'package:nss_project/event_page.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 void main() {
   runApp(const MentorHomePageApp());
 }
@@ -24,24 +31,7 @@ class MentorHomePage extends StatefulWidget {
 
 class MentorHomePageState extends State<MentorHomePage> {
   bool isFirstTabSelected = true;
-  String dropdownValue = 'Option 1';
-
-  final List<String> dropdownOptions = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
-  final List<String> tiles = List.generate(30, (index) => 'Tile ${index + 1}');
-
-  void _onTileTap(String tile) {
-    if (isFirstTabSelected) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => Tab1Page(tile: tile)),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => Tab2Page(tile: tile)),
-      );
-    }
-  }
+  String selectedWing = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -121,94 +111,94 @@ class MentorHomePageState extends State<MentorHomePage> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: DropdownButton<String>(
-              value: dropdownValue,
-              onChanged: (String? newValue) {
-                setState(() {
-                  dropdownValue = newValue!;
-                });
-              },
-              items: dropdownOptions.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: tiles.map((tile) {
-                  return GestureDetector(
-                    onTap: () => _onTileTap(tile),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        border: Border.all(color: Colors.blue[800]!),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            tile,
-                            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            'Details',
-                            style: TextStyle(fontSize: 14.0, color: Colors.grey[700]),
-                          ),
-                        ],
-                      ),
+          StreamBuilder(
+                stream:
+                    FirebaseFirestore.instance.collection('wings').snapshots(),
+                builder: (context, snapshot) {
+                  List<String> WingOptions = ["All"] +
+                      snapshot.data!.docs[0]['names'].map<String>((wing) {
+                        String ret = wing;
+                        return ret;
+                      }).toList();
+                  List<DropdownMenuEntry<String>> WingMenuEntries =
+                      WingOptions.map((option) => DropdownMenuEntry<String>(
+                          value: option, label: option)).toList();
+                  return DropdownMenu<String>(
+                    initialSelection: 'All',
+                    requestFocusOnTap: false,
+                    expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    textStyle: const TextStyle(color: Colors.white),
+                    inputDecorationTheme: const InputDecorationTheme(
+                      fillColor: Color.fromARGB(255, 128, 112, 185),
+                      filled: true,
                     ),
+                    label: const Text(
+                      'NSS Wing',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onSelected: (String? wing) {
+                      setState(() {
+                        if (wing != null) {
+                          selectedWing = wing;
+                      
+                        }
+                      });
+                    },
+                    dropdownMenuEntries: WingMenuEntries,
                   );
-                }).toList(),
-              ),
-            ),
-          ),
+                }),
+            StreamBuilder(
+                stream: (selectedWing == 'All')?
+                    FirebaseFirestore.instance.collection("events").snapshots(): 
+                    FirebaseFirestore.instance.collection("events").where('wing', isEqualTo: selectedWing).snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Flexible(
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            return _buildEvent(
+                                snapshot.data!.docs[index], context,isFirstTabSelected);
+                          }),
+                    );
+                  }
+                  return const Text('Hello Darkness my ..');
+                })
+          
+          
         ],
       ),
     );
   }
 }
 
-class Tab1Page extends StatelessWidget {
-  final String tile;
-
-  const Tab1Page({super.key, required this.tile});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tab 1 Page'),
+Widget _buildEvent(
+    QueryDocumentSnapshot<Map<String, dynamic>> event, BuildContext context,bool isFirstTabSelected) {
+  return Card.outlined(
+    elevation: 0.5,
+    margin: const EdgeInsets.fromLTRB(10, 4, 10, 4),
+    color: Colors.white70,
+    child: ListTile(
+      tileColor: const Color.fromARGB(255, 251, 250, 250),
+      title: Text(event['title']),
+      subtitle: Text(event['subtitle']),
+      leading: Icon(
+          IconData(event['icon']['codepoint'], fontFamily: 'MaterialIcons'),
+          color: Color(event['icon']['color'])),
+      trailing: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('${event['hours']} Hrs'),
+          const Text('Active', style: TextStyle(color: Colors.green))
+        ],
       ),
-      body: Center(
-        child: Text('This is $tile from Tab 1'),
-      ),
-    );
-  }
-}
-
-class Tab2Page extends StatelessWidget {
-  final String tile;
-
-  const Tab2Page({super.key, required this.tile});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tab 2 Page'),
-      ),
-      body: Center(
-        child: Text('This is $tile from Tab 2'),
-      ),
-    );
-  }
+      onTap: () {
+        // ON TAP IS TRIGGERED WHEN A TILE IS CLICKED 
+        // PUT THE IF ELSE OF WHICH EVENT PAGE TO GO TO HERE
+        // istaboneselected is aldready a arg in this function
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: event)));
+      },
+    ),
+  );
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:nss_project/people_page.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:nss_project/event_page.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
