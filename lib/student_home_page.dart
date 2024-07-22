@@ -142,7 +142,7 @@ class HoursCompletedState extends State {
     return Scaffold( 
       floatingActionButton: FloatingActionButton(onPressed: () {
         Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const MentorHomePage()));
+                  MaterialPageRoute(builder: (context) => const PicHomePage()));
       } ,),
       resizeToAvoidBottomInset: true,
       body:Center(
