@@ -37,7 +37,7 @@ class _PeoplePageState extends State<PicHomePage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const PeoplePage()));
+                        builder: (context) => const PeoplePage(userRole: "pic",)));
               },
               icon: const Icon(Icons.person)),
           IconButton(
@@ -76,10 +76,10 @@ class _PeoplePageState extends State<PicHomePage> {
             ),
             StreamBuilder(
                 stream:
-                    FirebaseFirestore.instance.collection('wings').snapshots(),
+                    FirebaseFirestore.instance.collection('configurables').doc("document").snapshots(),
                 builder: (context, snapshot) {
                   List<String> WingOptions = ["All"] +
-                      snapshot.data!.docs[0]['names'].map<String>((wing) {
+                      snapshot.data!['wings'].map<String>((wing) {
                         String ret = wing;
                         return ret;
                       }).toList();
