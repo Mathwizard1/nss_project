@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,17 +6,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 // import 'dart:io';
 
 class StudentViewPage extends StatefulWidget {
-  const StudentViewPage({super.key, required this.person});
+  const StudentViewPage({super.key,required this.userRole ,required this.person});
   final QueryDocumentSnapshot<Map<String, dynamic>> person;
+  final String userRole;
   @override
   State<StudentViewPage> createState() => _StudentViewPageState();
 }
 
 class _StudentViewPageState extends State<StudentViewPage> {
+  String rolechange = 'volunteer';
+  
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.sizeOf(context).width;
     double height = MediaQuery.sizeOf(context).width;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -63,23 +68,18 @@ class _StudentViewPageState extends State<StudentViewPage> {
                           ),
                           children: <TextSpan>[
                             TextSpan(
-                                text:
-                                    '${(widget.person['first name']).substring(0, 1).toUpperCase()}${widget.person['first name'].substring(
-                                  1,
-                                )} ${(widget.person['last name']).substring(0, 1).toUpperCase()}${widget.person['last name'].substring(
-                                  1,
-                                )}\n',
+                                text: getCapitalizedName(widget.person['name'] + '\n'),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w700, fontSize: 26)),
                             TextSpan(
-                              text: '${widget.person['roll number']}\n',
+                              text: '${widget.person['roll-number']}\n',
                             ),
                             TextSpan(text: '${widget.person['email']}'),
                           ]),
                     ),
                   ),
                 ),
-                Expanded(child: SizedBox()),
+                const Expanded(child: SizedBox()),
                 ClipRRect(
                     borderRadius: BorderRadius.circular(40),
                     child: Image.asset(
@@ -96,24 +96,24 @@ class _StudentViewPageState extends State<StudentViewPage> {
               height: height / 8,
             ),
             RichText(
-                text: const TextSpan(
+                text: TextSpan(
                     style: const TextStyle(
                         color: Colors.black,
                         fontSize: 20,
                         height: 0.7,
                         fontStyle: FontStyle.italic),
                     children: [
-                  TextSpan(
+                  const TextSpan(
                     text: 'sem1:\n',
                   ),
                   TextSpan(
-                    text: '  16',
+                    text: '  ${widget.person['sem-1-hours']}',
                     style: const TextStyle(
                         fontSize: 120.0,
                         color: const Color.fromRGBO(200, 150, 82, 1)),
                   ),
-                  TextSpan(text: '/', style: TextStyle(fontSize: 33.0)),
-                  TextSpan(
+                  const TextSpan(text: '/', style: TextStyle(fontSize: 33.0)),
+                  const TextSpan(
                       text: '40',
                       style: TextStyle(
                           fontSize: 33.0, color: Colors.lightBlueAccent)),
@@ -133,7 +133,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                     text: 'sem2:\n',
                   ),
                   TextSpan(
-                    text: '  24',
+                    text: '  ${widget.person['sem-2-hours']}',
                     style: TextStyle(
                         fontSize: 120.0, color: Colors.deepPurple[300]),
                   ),
@@ -143,9 +143,68 @@ class _StudentViewPageState extends State<StudentViewPage> {
                       style: TextStyle(
                           fontSize: 33.0, color: Colors.lightBlueAccent)),
                 ])),
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance.collection('roles').snapshots(),
+                  builder:(context,snaphot){
+                    List<String> roles = ['pic','mentor'];
+                    int i = roles.indexOf(widget.userRole);
+              
+                    for(int j = i;j>=0;j--){
+                      roles.removeAt(j);
+                    }
+                    roles.add('volunteer');
+                  
+                    List<DropdownMenuEntry<String>> RoleEntries =
+                      roles.map((option) => DropdownMenuEntry<String>(
+                          value: option, label: option)).toList();
+                    return DropdownMenu<String>(
+                      initialSelection: 'volunteer',
+                      requestFocusOnTap: false,
+                      expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      textStyle: const TextStyle(color: Colors.white),
+                      inputDecorationTheme: const InputDecorationTheme(
+                      fillColor: Color.fromARGB(255, 128, 112, 185),
+                      filled: true,
+                      ),
+                      label: const Text('role',style: TextStyle(color: Colors.white),),
+                      onSelected: (String? role){setState(() {
+                        if(role != null){
+                          rolechange = role;
+                        }
+                      });},
+                      dropdownMenuEntries: RoleEntries,
+                    );
+                  }),
+                  ListTile(
+                    tileColor: Colors.green,
+                    onTap: () {
+                      setState(() {
+                        FirebaseFirestore.instance.collection('users').doc(widget.person.id).update({"role": rolechange}).then(
+    (value) => print("DocumentSnapshot successfully updated!"),
+    onError: (e) => print("Error updating document $e"));;
+                      });
+                    },
+                  )
           ],
         ),
       ),
     );
   }
+}
+String getCapitalizedName(String name){
+  String ret = '';
+  bool doCap = true;
+    for(int i = 0;i<name.length;i++){
+      if(doCap){
+        ret = ret + name[i].toUpperCase();
+        doCap = false;
+      }
+      else{
+        ret = ret + name[i];
+        if(name[i] == ' '){
+        doCap = true;
+        }
+      }
+    }
+  return ret;
 }
