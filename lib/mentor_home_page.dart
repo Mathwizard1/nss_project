@@ -113,10 +113,10 @@ class MentorHomePageState extends State<MentorHomePage> {
           ),
           StreamBuilder(
                 stream:
-                    FirebaseFirestore.instance.collection('wings').snapshots(),
+                    FirebaseFirestore.instance.collection('configurables').snapshots(),
                 builder: (context, snapshot) {
                   List<String> WingOptions = ["All"] +
-                      snapshot.data!.docs[0]['names'].map<String>((wing) {
+                      snapshot.data!.docs[0]['wings'].map<String>((wing) {
                         String ret = wing;
                         return ret;
                       }).toList();

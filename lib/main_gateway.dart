@@ -1,6 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
+//redundant
+//*************************************************************************
+
+/*import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nss_project/entry_gateway.dart';
 import 'package:nss_project/student_home_page.dart';
 
 // ignore: camel_case_types
@@ -24,3 +26,4 @@ class main_Gateway extends StatelessWidget
     }
 
 }
+*/

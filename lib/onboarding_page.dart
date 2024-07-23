@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:nss_project/login_page.dart';
 import 'package:nss_project/role_page.dart';
+import 'package:nss_project/signup_page.dart';
 
 
 class EntryPage extends StatefulWidget
@@ -49,7 +51,7 @@ class WelcomePage extends State
                 backgroundColor: WidgetStatePropertyAll(Color.fromARGB(255, 54, 28, 129)),
                 foregroundColor:WidgetStatePropertyAll(Colors.white),
               ),
-              onPressed:()=>{Navigator.push(context,MaterialPageRoute(builder:(context) => const RolesPage(),))},
+              onPressed:()=>{Navigator.push(context,MaterialPageRoute(builder:(context) => const LoginPage())),Navigator.push(context,MaterialPageRoute(builder:(context) => const SignUpPage()))},
               child:const Text("Get Started"),
             )
             )

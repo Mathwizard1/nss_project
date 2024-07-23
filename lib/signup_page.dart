@@ -21,9 +21,7 @@ bool confirmpasswordstate=false;
 
 class SignUpPage extends StatefulWidget
 {
-
-  final VoidCallback showloginpage;
-  const SignUpPage({super.key,required this.showloginpage});
+  const SignUpPage({super.key});
 
 
   @override  
@@ -65,7 +63,6 @@ class SignUpPageState extends State<SignUpPage>
   Future signUp() async
   {
     await FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailcontroller.text.trim(), password: passwordcontroller.text.trim());
-
     await FirebaseFirestore.instance.collection('users').add({
       'email':emailcontroller.text.trim(),
       'first name':firstnamecontroller.text.trim(),
@@ -73,6 +70,12 @@ class SignUpPageState extends State<SignUpPage>
       'roll number':rollnumbercontroller.text.trim(),
       'password':passwordcontroller.text.trim(),
     });
+
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);   //this will pop to the login page
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);  //this will pop to the onboarding page to asynchronously go to the home page
+
   }
 
 
@@ -260,7 +263,7 @@ class SignUpPageState extends State<SignUpPage>
           Padding(
              padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
              child: Row(mainAxisAlignment: MainAxisAlignment.center,
-             children: [const Text("Have an account? "),GestureDetector(onTap:widget.showloginpage,child: const Text("Login",style:TextStyle(color:Colors.blue)))],),
+             children: [const Text("Have an account? "),GestureDetector(onTap:(){Navigator.pop(context);},child: const Text("Login",style:TextStyle(color:Colors.blue)))],),
            )
 
           ]

@@ -3,12 +3,12 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import 'package:nss_project/event_page.dart';
 import 'package:nss_project/sprofile_page.dart';
-import 'package:nss_project/people_page.dart';
-import 'package:nss_project/pic_home_page.dart';
 import 'package:nss_project/mentor_home_page.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+late Map<String,Stream<QuerySnapshot>?> _wings_map;
 
 class StudentHomePage extends StatelessWidget {
   const StudentHomePage({super.key});
@@ -30,13 +30,21 @@ class SHomePage extends StatefulWidget {
 
 class SHomePageState extends State<SHomePage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late Stream<DocumentSnapshot> wings;
   int _sem1Hours = 40;
   int _sem2Hours = 20;
+
+  Future getwingdata() async
+  {
+   var wingsnap=await FirebaseFirestore.instance.collection('configurables').doc('document').get();
+   _wings_map=wingsnap['wings'];
+  }
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    getwingdata();
   }
 
   @override
@@ -351,11 +359,20 @@ class UpcomingEventsTab extends StatefulWidget {
 
 
 class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
+
+  void createStream(String wingname)
+  {
+    if(_wings_map?[wingname]==null)
+    {
+      _wings_map?[wingname]=FirebaseFirestore.instance.collection('events').where('wing', isEqualTo:wingname).snapshots();
+    }
+  }
+
   String _selectedWing = 'All';
 
   ExpansionTileController tilecontroller=ExpansionTileController();
 
-  Widget _buildUpcomingEvent(BuildContext context, QueryDocumentSnapshot<Map<String, dynamic>> document) {
+  Widget _buildUpcomingEvent(BuildContext context, QueryDocumentSnapshot<Object?> document) {
 
     return Card(
       child: InkWell(
@@ -389,21 +406,26 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   @override
   Widget build(BuildContext context) { // TODO make this smooth (every rebuild waits on calls to snapshots())
 
-
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('wings').snapshots(),
+      stream: FirebaseFirestore.instance.collection('configurables').doc("document").snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Expanded(
-            child: Align(
-              alignment: Alignment(0, -0.25),
-              child: Text('Loading...') // TODO replace all 'Loading...' with spinkit
-            )
+          return const Flex(
+            direction: Axis.horizontal,
+            children: [Expanded(
+              child: Align(
+                alignment: Alignment(0, -0.25),
+                child: Text('Loading...') // TODO replace all 'Loading...' with spinkit
+              )
+            ),]
           );
 	}
+  
 
-	final wingOptions = ['All'] + snapshot.data!.docs[0]['names'].map<String>((dyn) { String ret = dyn; return ret; }).toList();
+	final wingOptions = ['All'] + snapshot.data!['wings'].map<String>((dyn) { String ret = dyn; return ret; }).toList();
 	final events = FirebaseFirestore.instance.collection('events');
+
+
 
         return Column(
           children: <Widget>[
@@ -427,6 +449,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
 	                          setState(() {
 	                            if (selectedWing != null) {
 	                              _selectedWing = selectedWing;
+                                createStream(_selectedWing);
 	                            }
 	                          });
 	                        },
@@ -440,7 +463,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
 	                      )
 	                        ),
             StreamBuilder(
-              stream: _selectedWing == 'All' ? events.snapshots() : events.where('wing', isEqualTo: _selectedWing).snapshots(),
+              stream: _selectedWing == 'All' ? events.snapshots() :_wings_map?[_selectedWing],//events.where('wing', isEqualTo: _selectedWing).snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Expanded(

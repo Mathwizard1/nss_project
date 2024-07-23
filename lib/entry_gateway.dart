@@ -1,4 +1,8 @@
-import 'package:flutter/material.dart';
+//redundant
+//***************************************
+
+
+/*import 'package:flutter/material.dart';
 import 'package:nss_project/login_page.dart';
 import './signup_page.dart';
 
@@ -39,4 +43,4 @@ class entry_GatewayState extends State
     }
     
   }
-}
+}*/

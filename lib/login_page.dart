@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nss_project/signup_page.dart';
 
 final enableborder=OutlineInputBorder(
   borderSide:const BorderSide(width:3,color:Color.fromARGB(255, 175, 178, 175)),
@@ -13,8 +14,7 @@ final focusborder=OutlineInputBorder(
 
 class LoginPage extends StatefulWidget
 {
-  final VoidCallback showregisterpage;
-  const LoginPage({super.key,required this.showregisterpage});
+  const LoginPage({super.key});
 
   @override
     State createState()
@@ -35,7 +35,10 @@ class LoginPageState extends State<LoginPage>
   Future signIn() async
   {
     await FirebaseAuth.instance.signInWithEmailAndPassword(email:emailinput.text.trim() , password: passwordinput.text.trim());
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
   }
+
 
   @override
   void dispose()
@@ -138,7 +141,7 @@ class LoginPageState extends State<LoginPage>
            Padding(
              padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
              child: Row(mainAxisAlignment: MainAxisAlignment.center,
-             children: [const Text("Dont have an account? "),GestureDetector(onTap:widget.showregisterpage,child: const Text("Sign Up",style:TextStyle(color:Colors.blue)))],),
+             children: [const Text("Dont have an account? "),GestureDetector(onTap:(){Navigator.push(context,MaterialPageRoute(builder: (context)=>const SignUpPage()));},child: const Text("Sign Up",style:TextStyle(color:Colors.blue)))],),
            )
           ]
         )
