@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-//import 'package:nss_project/people_page.dart';
-//import 'package:nss_project/sprofile_page.dart';
+import 'package:nss_project/people_page.dart';
+import 'package:nss_project/sprofile_page.dart';
 import 'package:nss_project/event_page.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,19 +42,27 @@ class MentorHomePageState extends State<MentorHomePage> {
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
-              // Handle settings action
+           
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PeoplePage(userRole: 'mentor')));
+          
             },
           ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              // Handle settings action
+              Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProfilePage()));
             },
           ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              // Handle logout action
+              FirebaseAuth.instance.signOut();
             },
           ),
         ],
@@ -113,10 +121,10 @@ class MentorHomePageState extends State<MentorHomePage> {
           ),
           StreamBuilder(
                 stream:
-                    FirebaseFirestore.instance.collection('configurables').snapshots(),
+                    FirebaseFirestore.instance.collection('configurables').doc("document").snapshots(),
                 builder: (context, snapshot) {
                   List<String> WingOptions = ["All"] +
-                      snapshot.data!.docs[0]['wings'].map<String>((wing) {
+                      snapshot.data!['wings'].map<String>((wing) {
                         String ret = wing;
                         return ret;
                       }).toList();

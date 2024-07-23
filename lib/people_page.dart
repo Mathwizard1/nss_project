@@ -4,14 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'student_view_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    home: PeoplePage(),
-  ));
-}
-
 class PeoplePage extends StatefulWidget {
-  const PeoplePage({super.key});
+  final String userRole;
+  const PeoplePage({super.key,required this.userRole});
 
   @override
   State<PeoplePage> createState() => _PeoplePageState();
@@ -63,7 +58,7 @@ class _PeoplePageState extends State<PeoplePage> {
                   //print(stdlist.length);
                   return ListView.builder(itemCount: stdlist.length,
                   itemBuilder: (context,index){
-                    return _buildPerson(stdlist[index],context);
+                    return _buildPerson(stdlist[index],widget.userRole,context);
                   }
                   );
                 }
@@ -77,7 +72,7 @@ class _PeoplePageState extends State<PeoplePage> {
                   //print(stdlist.length);
                   return ListView.builder(itemCount: stdlist.length,
                   itemBuilder: (context,index){
-                    return _buildPerson(stdlist[index],context);
+                    return _buildPerson(stdlist[index],widget.userRole,context);
                   }
                   );
                 }
@@ -92,7 +87,7 @@ class _PeoplePageState extends State<PeoplePage> {
   }
 }
 
-Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person,BuildContext context){
+Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person, String userRole ,BuildContext context){
   print(person.id.toString());
   return Card.outlined(
     elevation: 0.5,
@@ -101,11 +96,29 @@ Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person,BuildCont
       horizontalTitleGap: 16,
       
       leading: Icon(Icons.account_circle,size: 50,),
-      title: Text('${(person['first name']).substring(0,1).toUpperCase()}${person['first name'].substring(1,)} ${(person['last name']).substring(0,1).toUpperCase()}${person['last name'].substring(1,)}',style:const TextStyle(fontWeight: FontWeight.w600,fontSize: 22),),
-      subtitle: Text('${person['roll number']}',style:const TextStyle(fontSize: 14),),
+      title: Text(getCapitalizedName(person['name']),style:const TextStyle(fontWeight: FontWeight.w600,fontSize: 22),),
+      subtitle: Text('${person['roll-number']}',style:const TextStyle(fontSize: 14),),
       onTap: (){
-        Navigator.push(context,MaterialPageRoute(builder: (context) => StudentViewPage(person: person)));
+        Navigator.push(context,MaterialPageRoute(builder: (context) => StudentViewPage(userRole: userRole,person: person)));
       },
     ),
   );
+}
+
+String getCapitalizedName(String name){
+  String ret = '';
+  bool doCap = true;
+    for(int i = 0;i<name.length;i++){
+      if(doCap){
+        ret = ret + name[i].toUpperCase();
+        doCap = false;
+      }
+      else{
+        ret = ret + name[i];
+        if(name[i] == ' '){
+        doCap = true;
+        }
+      }
+    }
+  return ret;
 }
