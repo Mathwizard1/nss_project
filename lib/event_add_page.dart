@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -21,7 +24,7 @@ class EventPage extends StatefulWidget {
 }
 
 class EventPageState extends State<EventPage> {
-  final TextEditingController _eventsController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
   final TextEditingController _venueController = TextEditingController();
@@ -30,8 +33,7 @@ class EventPageState extends State<EventPage> {
   String? dropdownValue1 = 'None';
   String? dropdownValue2 = 'None';
 
-  final List<String> dropdownOptions1 = ['None', 'Option1', 'Option2', 'Option3'];
-  final List<String> dropdownOptions2 = ['None', 'Choice1', 'Choice2', 'Choice3'];
+  final List<String> dropdownOptions2 = ['None','Non Recurring','Recurring'];
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isSubmitButtonEnabled = false;
@@ -74,7 +76,7 @@ class EventPageState extends State<EventPage> {
                     onChanged: _validateForm,
                     child: Column(
                       children: [
-                        _buildTextField(_eventsController, 'Events'),
+                        _buildTextField(_nameController, 'Name'),
                         const SizedBox(height: 10),
                         _buildTextField(_dateController, 'Date'),
                         const SizedBox(height: 10),
@@ -84,7 +86,7 @@ class EventPageState extends State<EventPage> {
                         const SizedBox(height: 10),
                         _buildTextField(_hoursController, 'Hours', inputType: TextInputType.number),
                         const SizedBox(height: 10),
-                        _buildDropdown(dropdownValue1, dropdownOptions1, (String? newValue) {
+                        _buildWingDropdown(dropdownValue1, (String? newValue) {
                           setState(() {
                             dropdownValue1 = newValue!;
                           });
@@ -108,7 +110,18 @@ class EventPageState extends State<EventPage> {
                 child: ElevatedButton(
                   onPressed: _isSubmitButtonEnabled
                       ? () {
-                          // Handle submit
+                          Map <String,dynamic> NewEvent = {
+                            "title" : _nameController.text.trim(),
+                            "date" : _dateController.text.trim(),
+                            "timestamp" : _timeController.text.trim(),
+                            "venue" : _venueController.text.trim(),
+                            "hours" : _hoursController.text.trim(),
+                            "wing" : dropdownValue1,
+                            "recurring" : dropdownValue2,
+                          };
+                          FirebaseFirestore.instance.collection("events").add(NewEvent);
+                          
+
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -187,3 +200,36 @@ class EventPageState extends State<EventPage> {
     );
   }
 }
+
+Widget _buildWingDropdown(String? value, ValueChanged<String?> onChanged) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collection('configurables').doc("document").snapshots(),
+      builder: (context, snapshot) {
+        List<String> WingOptions = ['None'] +
+                      snapshot.data!['wings'].map<String>((wing) {
+                        String ret = wing;
+                        return ret;}).toList();
+        List<DropdownMenuItem<String>> WingMenuEntries =
+          WingOptions.map((option) => DropdownMenuItem<String>(value: option, child : Text(option))).toList();
+        return DropdownButtonFormField<String>(
+          value: value,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            filled: true,
+            fillColor: Colors.grey[200],
+          ),
+          onChanged: onChanged,
+          items: WingMenuEntries,
+          validator: (value) {
+            if (value == 'None') {
+              return 'Please select an option';
+            }
+            return null;
+          },
+        );
+      }
+    );
+  }
+
