@@ -13,19 +13,9 @@ class DisplayEventPage extends StatefulWidget {
 }
 
 class DisplayEventPageState extends State<DisplayEventPage> {
-
-DisplayEventPageState();
-
- // Change this value to test different roles
-
+  DisplayEventPageState();
   // List of wings for editing
-  List<String> wingsList = [
-    "Buffalo Wings",
-    "Chicken Wings",
-    "Arts",
-    "Sports",
-    "Community Service",
-  ];
+  late final List<String> wingsList;
 
   Event event = Event(
     name: "Sample event",
@@ -150,7 +140,6 @@ Future updateDoc() async
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -380,7 +369,7 @@ Future updateDoc() async
                             // Implement your onPressed functionality here
                           },
                           child: const Text(
-                            'Upload Images',
+                            'Register',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

@@ -4,31 +4,21 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:nss_project/event_page.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:nss_project/mentor_home_page.dart';
+import 'package:nss_project/pic_home_page.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 late Map<String,Stream<QuerySnapshot>?> _wings_map;
 
-class StudentHomePage extends StatelessWidget {
+class StudentHomePage extends StatefulWidget {
   const StudentHomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: SHomePage(),
-    );
-  }
+  StudentHomePageState createState() => StudentHomePageState();
 }
 
-class SHomePage extends StatefulWidget {
-  const SHomePage({super.key});
-
-  @override
-  SHomePageState createState() => SHomePageState();
-}
-
-class SHomePageState extends State<SHomePage> with SingleTickerProviderStateMixin {
+class StudentHomePageState extends State<StudentHomePage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late Stream<DocumentSnapshot> wings;
   int _sem1Hours = 40;
@@ -377,7 +367,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
     return Card(
       child: InkWell(
           onTap:(){
-            Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: document,selectedRole: "volunteer",)));
+            Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: document, selectedRole: "pic")));
             },
             child:Container(
               decoration:const BoxDecoration(
