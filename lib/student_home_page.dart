@@ -3,8 +3,7 @@ import 'package:nss_project/dummyeventpage.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import 'package:nss_project/sprofile_page.dart';
-import 'package:nss_project/mentor_home_page.dart';
-import 'package:nss_project/pic_home_page.dart';
+import 'package:nss_project/mentordummyeventpage.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -81,7 +80,7 @@ class StudentHomePageState extends State<StudentHomePage>
         controller: _tabController,
         children: [
           HoursCompletedTab(userDocumentStream),
-          UpcomingEventsTab(),
+          UpcomingEventsTab(userDocumentStream: userDocumentStream,),
           AttendedEventsTab(),
         ],
       ),
@@ -358,7 +357,8 @@ class HourDetailState extends State<HourDetailPage>
 }
 
 class UpcomingEventsTab extends StatefulWidget {
-  const UpcomingEventsTab({super.key});
+  final Stream<DocumentSnapshot> userDocumentStream;
+  const UpcomingEventsTab({super.key,required this.userDocumentStream});
 
   @override
   State<UpcomingEventsTab> createState() => _UpcomingEventsTabState();
@@ -366,8 +366,8 @@ class UpcomingEventsTab extends StatefulWidget {
 
 class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   void createStream(String wingname) {
-    if (_wings_map?[wingname] == null) {
-      _wings_map?[wingname] = FirebaseFirestore.instance
+    if (_wings_map[wingname] == null) {
+      _wings_map[wingname] = FirebaseFirestore.instance
           .collection('events')
           .where('wing', isEqualTo: wingname)
           .snapshots();
@@ -379,43 +379,49 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   ExpansionTileController tilecontroller = ExpansionTileController();
 
   Widget _buildUpcomingEvent(
-      BuildContext context, QueryDocumentSnapshot<Object?> document) {
-    return Card(
-      child: InkWell(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => DisplayEventPage(
-                        document: document, selectedRole: "pic")));
-          },
-          child: Container(
-            decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.topRight,
-                    colors: [
-                  Color.fromARGB(255, 151, 236, 154),
-                  Colors.white,
-                  Colors.white
-                ])),
-            child: ListTile(
-              tileColor: const Color.fromARGB(255, 251, 250, 250),
-              title: Text(document['title']),
-              subtitle: Text(document['subtitle']),
-              leading: Icon(
-                  IconData(document['icon']['codepoint'],
-                      fontFamily: 'MaterialIcons'),
-                  color: Color(document['icon']['color'])),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('${document['hours']} Hrs'),
-                  const Text('Active', style: TextStyle(color: Colors.green))
-                ],
-              ),
-            ),
-          )),
+      BuildContext context, QueryDocumentSnapshot<Object?> document,Stream userDocumentStream) {
+    return StreamBuilder(
+      stream: userDocumentStream,
+      builder: (context, snapshot) {
+        return Card(
+          child: InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => (snapshot.data!['role']=='volunteer')?DummyEventPage(
+                            document: document,userDocumentStream:userDocumentStream):MentorDummyEventPage(
+                            document: document)));
+              },
+              child: Container(
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.topRight,
+                        colors: [
+                      Color.fromARGB(255, 151, 236, 154),
+                      Colors.white,
+                      Colors.white
+                    ])),
+                child: ListTile(
+                  tileColor: const Color.fromARGB(255, 251, 250, 250),
+                  title: Text(document['title']),
+                  subtitle: Text(document['subtitle']),
+                  leading: Icon(
+                      IconData(document['icon']['codepoint'],
+                          fontFamily: 'MaterialIcons'),
+                      color: Color(document['icon']['color'])),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('${document['hours']} Hrs'),
+                      const Text('Active', style: TextStyle(color: Colors.green))
+                    ],
+                  ),
+                ),
+              )),
+        );
+      }
     );
   }
 
@@ -487,7 +493,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                 StreamBuilder(
                     stream: _selectedWing == 'All'
                         ? events.snapshots()
-                        : _wings_map?[
+                        : _wings_map[
                             _selectedWing], //events.where('wing', isEqualTo: _selectedWing).snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
@@ -509,7 +515,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (context, index) {
                             return _buildUpcomingEvent(
-                                context, snapshot.data!.docs[index]);
+                                context, snapshot.data!.docs[index],widget.userDocumentStream);
                           });
                     })
               ]);

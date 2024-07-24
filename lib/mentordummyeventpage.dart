@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:nss_project/qr_page.dart';
 
-class DummyEventPage extends StatefulWidget
+class MentorDummyEventPage extends StatefulWidget
 {
   final QueryDocumentSnapshot document;
-  final Stream userDocumentStream;
-  const DummyEventPage({super.key,required this.document,required this.userDocumentStream});
+  const MentorDummyEventPage({super.key,required this.document});
   @override
   State createState()
   {
@@ -14,8 +14,24 @@ class DummyEventPage extends StatefulWidget
   }
 }
 
-class DummyEventPageState extends State<DummyEventPage>
+class DummyEventPageState extends State<MentorDummyEventPage>
 {
+
+  Future<void> UpdateAttendance(String rollnumber,QueryDocumentSnapshot eventdocument) async
+  {
+    List userID=[FirebaseFirestore.instance.collection('users').where('roll-number',isEqualTo:rollnumber).toString()];
+    await FirebaseFirestore.instance.collection('events').doc(eventdocument.id).update({"registered-volunteers":FieldValue.arrayUnion(userID)});
+  }
+
+
+  // ignore: non_constant_identifier_names
+  Future<String> ScanQr() async
+  {
+    // ignore: non_constant_identifier_names
+    String QrResult;
+    QrResult=await FlutterBarcodeScanner.scanBarcode('ff6666', 'Cancel', true, ScanMode.QR);
+    return QrResult;
+  }
 
 @override 
 Widget build(BuildContext context)
@@ -114,7 +130,7 @@ Widget build(BuildContext context)
               ),
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
-                child: FloatingActionButton.extended(onPressed: (){Navigator.push(context,MaterialPageRoute(builder: (context){return qr_code(userDocumentStream:widget.userDocumentStream);}));}, label:const Text("Register For Event"),backgroundColor:const Color.fromARGB(255, 247, 253, 245),elevation: 0,),
+                child: FloatingActionButton.extended(onPressed: (){UpdateAttendance(ScanQr().toString(),widget.document);}, label:const Text("Scan QR for Attendance"),backgroundColor:const Color.fromARGB(255, 247, 253, 245),elevation: 0,),
               )
               ),
           ),
