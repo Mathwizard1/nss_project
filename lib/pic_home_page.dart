@@ -21,6 +21,7 @@ class PicHomePage extends StatefulWidget {
 }
 
 class _PeoplePageState extends State<PicHomePage> {
+
   String selectedWing = 'All';
   @override
   Widget build(BuildContext context) {
@@ -62,14 +63,14 @@ class _PeoplePageState extends State<PicHomePage> {
                 Flexible(
                   flex: 1,
                   child: Padding(
-                    padding:EdgeInsets.fromLTRB(0,12,0,0),
+                    padding:EdgeInsets.fromLTRB(0,5,10,0),
                     child: Divider(color: Colors.black,indent: 10,),),
                 ),
                 Text('View events',style: TextStyle(fontSize: 22,fontWeight: FontWeight.w400,color: Color.fromARGB(255, 0, 0, 0),),),
                 Flexible(
                   flex: 3,
                   child: Padding(
-                    padding:EdgeInsets.fromLTRB(0,12,0,0),
+                    padding:EdgeInsets.fromLTRB(10,5,0,0),
                     child: Divider(color: Colors.black,indent: 4, endIndent: 10,),),
                 ),
               ],
@@ -103,7 +104,6 @@ class _PeoplePageState extends State<PicHomePage> {
                       setState(() {
                         if (wing != null) {
                           selectedWing = wing;
-                      
                         }
                       });
                     },
@@ -116,15 +116,13 @@ class _PeoplePageState extends State<PicHomePage> {
                     FirebaseFirestore.instance.collection("events").where('wing', isEqualTo: selectedWing).snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    return Flexible(
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (context, index) {
-                            return _buildEvent(
-                                snapshot.data!.docs[index], context);
-                          }),
-                    );
+                    return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          return _buildEvent(
+                              snapshot.data!.docs[index], context);
+                        });
                   }
                   return const Text('Hello Darkness my ..');
                 }),

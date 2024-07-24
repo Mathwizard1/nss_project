@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:nss_project/dummyeventpage.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-import 'package:nss_project/event_page.dart';
 import 'package:nss_project/sprofile_page.dart';
-import 'package:nss_project/mentor_home_page.dart';
+import './pic_home_page.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// ignore: non_constant_identifier_names
 late Map<String,Stream<QuerySnapshot>?> _wings_map;
 
 class StudentHomePage extends StatelessWidget {
@@ -151,7 +152,12 @@ class HoursCompletedState extends State {
       floatingActionButton: FloatingActionButton(onPressed: () {
         Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const PicHomePage()));
-      } ,),
+      } ,
+      
+      child: const Icon(Icons.person_outline)
+      ),
+
+
       resizeToAvoidBottomInset: true,
       body:Center(
       child: Column(
@@ -362,9 +368,9 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
 
   void createStream(String wingname)
   {
-    if(_wings_map?[wingname]==null)
+    if(_wings_map[wingname]==null)
     {
-      _wings_map?[wingname]=FirebaseFirestore.instance.collection('events').where('wing', isEqualTo:wingname).snapshots();
+      _wings_map[wingname]=FirebaseFirestore.instance.collection('events').where('wing', isEqualTo:wingname).snapshots();
     }
   }
 
@@ -376,8 +382,8 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
 
     return Card(
       child: InkWell(
-          onTap:(){
-            Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: document,selectedRole: "volunteer",)));
+          onTap:(){//////////////////////////////////
+            Navigator.push(context,MaterialPageRoute(builder: (context)=>DummyEventPage(document: document,)));
             },
             child:Container(
               decoration:const BoxDecoration(
@@ -463,7 +469,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
 	                      )
 	                        ),
             StreamBuilder(
-              stream: _selectedWing == 'All' ? events.snapshots() :_wings_map?[_selectedWing],//events.where('wing', isEqualTo: _selectedWing).snapshots(),
+              stream: _selectedWing == 'All' ? events.snapshots() :_wings_map[_selectedWing],//events.where('wing', isEqualTo: _selectedWing).snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Expanded(
