@@ -30,12 +30,14 @@ class StudentHomePageState extends State<StudentHomePage>
   void initState() {
     super.initState();
 
-    userDocumentStream = FirebaseFirestore.instance.collection('users')
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .snapshots();
-    eventsDocumentStream = FirebaseFirestore.instance.collection('events').snapshots();
-    configurablesDocumentStream = FirebaseFirestore.instance.collection('configurables')
-                .snapshots();
+    userDocumentStream = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .snapshots();
+    eventsDocumentStream =
+        FirebaseFirestore.instance.collection('events').snapshots();
+    configurablesDocumentStream =
+        FirebaseFirestore.instance.collection('configurables').snapshots();
     _tabController = TabController(length: 3, vsync: this);
   }
 
@@ -117,77 +119,83 @@ class HoursCompletedState extends State<HoursCompletedTab> {
               child: StreamBuilder(
                 stream: widget.userDocumentStream,
                 builder: (context, snapshot) {
-		  switch (snapshot.connectionState) {
-	          case ConnectionState.none:
-	          case ConnectionState.waiting:
-		    return const Text('Loading...');
-	          case ConnectionState.active:
-                    return SfRadialGauge(
-                      enableLoadingAnimation: true,
-                      axes: <RadialAxis>[
-                        RadialAxis(
-                          minimum: 0,
-                          maximum: 80,
-                          showLabels: false,
-                          showTicks: false,
-                          axisLineStyle: const AxisLineStyle(
-                            thickness: 0.2,
-                            cornerStyle: CornerStyle.bothCurve,
-                            color: Color.fromARGB(30, 0, 169, 181),
-                            thicknessUnit: GaugeSizeUnit.factor,
-                          ),
-                          pointers: <GaugePointer>[
-                            RangePointer(
-                              value: (snapshot.data!['sem-1-hours'] +
-                                  snapshot.data!['sem-2-hours']).toDouble(),
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                      return const Text('Loading...');
+                    case ConnectionState.active:
+                      return SfRadialGauge(
+                        enableLoadingAnimation: true,
+                        axes: <RadialAxis>[
+                          RadialAxis(
+                            minimum: 0,
+                            maximum: 80,
+                            showLabels: false,
+                            showTicks: false,
+                            axisLineStyle: const AxisLineStyle(
+                              thickness: 0.2,
                               cornerStyle: CornerStyle.bothCurve,
-                              width: 0.2,
-                              sizeUnit: GaugeSizeUnit.factor,
+                              color: Color.fromARGB(30, 0, 169, 181),
+                              thicknessUnit: GaugeSizeUnit.factor,
                             ),
-                          ],
-                          annotations: <GaugeAnnotation>[
-                            GaugeAnnotation(
-                              positionFactor: 0,
-                              widget: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        (snapshot.data!['sem-1-hours'] + snapshot.data!['sem-2-hours'])
-                                            .toStringAsFixed(0),
-                                        style: TextStyle(
-                                            fontSize: 40,
-                                            color: (snapshot.data!['sem-1-hours'] +
-                                                        snapshot.data!['sem-2-hours'] <
-                                                    80)
-                                                ? Colors.red
-                                                : Colors.green),
-                                      ),
-                                      const Text(
-                                        "/80",
-                                        style: TextStyle(
-                                            fontSize: 40, color: Colors.green),
-                                      )
-                                    ],
-                                  ),
-                                  const Text(
-                                    "Hours Completed",
-                                    style: TextStyle(
-                                        fontSize: 15, color: Colors.green),
-                                  )
-                                ],
+                            pointers: <GaugePointer>[
+                              RangePointer(
+                                value: (snapshot.data!['sem-1-hours'] +
+                                        snapshot.data!['sem-2-hours'])
+                                    .toDouble(),
+                                cornerStyle: CornerStyle.bothCurve,
+                                width: 0.2,
+                                sizeUnit: GaugeSizeUnit.factor,
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
+                            ],
+                            annotations: <GaugeAnnotation>[
+                              GaugeAnnotation(
+                                positionFactor: 0,
+                                widget: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          (snapshot.data!['sem-1-hours'] +
+                                                  snapshot.data!['sem-2-hours'])
+                                              .toStringAsFixed(0),
+                                          style: TextStyle(
+                                              fontSize: 40,
+                                              color: (snapshot.data![
+                                                              'sem-1-hours'] +
+                                                          snapshot.data![
+                                                              'sem-2-hours'] <
+                                                      80)
+                                                  ? Colors.red
+                                                  : Colors.green),
+                                        ),
+                                        const Text(
+                                          "/80",
+                                          style: TextStyle(
+                                              fontSize: 40,
+                                              color: Colors.green),
+                                        )
+                                      ],
+                                    ),
+                                    const Text(
+                                      "Hours Completed",
+                                      style: TextStyle(
+                                          fontSize: 15, color: Colors.green),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
 
-	          case ConnectionState.done:
-		    return const Text('Error');
-		  }
+                    case ConnectionState.done:
+                      return const Text('Error');
+                  }
                 },
               ),
             ),
@@ -245,81 +253,106 @@ class HourDetailState extends State<HourDetailPage>
             child: StreamBuilder(
                 stream: widget.userDocumentStream,
                 builder: (context, snapshot) {
-                  return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding:
-                              EdgeInsets.fromLTRB(0, 0, 0, screenheight / 10),
-                          child: Stack(children: [
-                            Center(
-                              child: SizedBox(
-                                width: screenwidth / 2,
-                                height: screenwidth / 2,
-                                child: TweenAnimationBuilder<double>(
-                                  tween: Tween(begin: 0, end: snapshot.data!['sem-1-hours'] / 40),
-                                  duration: const Duration(seconds: 2),
-                                  builder: (context, value, _) =>
-                                      CircularProgressIndicator(
-                                          strokeCap: StrokeCap.round,
-                                          strokeWidth: 10,
-                                          backgroundColor: (snapshot.data!['sem-1-hours'] < 40)
-                                              ? Colors.red
-                                              : Colors.white,
-                                          color: (snapshot.data!['sem-1-hours'] < 40)
-                                              ? Colors.green
-                                              : Colors.blue,
-                                          value: value),
-                                ),
-                              ),
-                            ),
-                            Center(
-                                child: Padding(
-                              padding:
-                                  EdgeInsets.fromLTRB(0, screenwidth / 5, 0, 0),
-                              child: Text(
-                                'Semester 1:\n     ' + snapshot.data!['sem-1-hours'] + '/40',
-                                style: const TextStyle(fontSize: 20),
-                              ),
-                            ))
-                          ]),
-                        ),
-                        const Divider(
-                          color: Color.fromARGB(255, 127, 112, 180),
-                          thickness: 4,
-                        ),
-                        Padding(
-                          padding:
-                              EdgeInsets.fromLTRB(0, screenheight / 10, 0, 0),
-                          child: Stack(children: [
-                            Center(
-                              child: SizedBox(
-                                width: screenwidth / 2,
-                                height: screenwidth / 2,
-                                child: TweenAnimationBuilder<double>(
-                                  tween: Tween(begin: 0, end: snapshot.data!['sem-2-hours'] / 40),
-                                  duration: const Duration(seconds: 2),
-                                  builder: (context, value, _) =>
-                                      CircularProgressIndicator(
-                                    strokeCap: StrokeCap.round,
-                                    strokeWidth: 10,
-                                    backgroundColor: Colors.red,
-                                    color: Colors.green,
-                                    value: value,
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                      return const Text('0Loading...');
+                    case ConnectionState.waiting:
+                      return const Text('1Loading...');
+                    case ConnectionState.active:
+                      return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                  0, 0, 0, screenheight / 10),
+                              child: Stack(children: [
+                                Center(
+                                  child: SizedBox(
+                                    width: screenwidth / 2,
+                                    height: screenwidth / 2,
+                                    child: TweenAnimationBuilder<double>(
+                                      tween: Tween(
+                                          begin: 0,
+                                          end: snapshot.data!['sem-1-hours'] /
+                                              40),
+                                      duration: const Duration(seconds: 2),
+                                      builder: (context, value, _) =>
+                                          CircularProgressIndicator(
+                                              strokeCap: StrokeCap.round,
+                                              strokeWidth: 10,
+                                              backgroundColor: (snapshot.data![
+                                                          'sem-1-hours'] <
+                                                      40)
+                                                  ? Colors.red
+                                                  : Colors.white,
+                                              color: (snapshot.data![
+                                                          'sem-1-hours'] <
+                                                      40)
+                                                  ? Colors.green
+                                                  : Colors.blue,
+                                              value: value),
+                                    ),
                                   ),
                                 ),
-                              ),
+                                Center(
+                                    child: Padding(
+                                  padding: EdgeInsets.fromLTRB(
+                                      0, screenwidth / 5, 0, 0),
+                                  child: Text(
+                                    'Semester 1:\n     ' +
+                                        snapshot.data!['sem-1-hours'] +
+                                        '/40',
+                                    style: const TextStyle(fontSize: 20),
+                                  ),
+                                ))
+                              ]),
+                            ),
+                            const Divider(
+                              color: Color.fromARGB(255, 127, 112, 180),
+                              thickness: 4,
                             ),
                             Padding(
-                              padding:
-                                  EdgeInsets.fromLTRB(0, screenwidth / 5, 0, 0),
-                              child: Center(
-                                  child: Text('Semester 2:\n     ' + snapshot.data!['sem-2-hours'] + '/40',
-                                      style: const TextStyle(fontSize: 20))),
+                              padding: EdgeInsets.fromLTRB(
+                                  0, screenheight / 10, 0, 0),
+                              child: Stack(children: [
+                                Center(
+                                  child: SizedBox(
+                                    width: screenwidth / 2,
+                                    height: screenwidth / 2,
+                                    child: TweenAnimationBuilder<double>(
+                                      tween: Tween(
+                                          begin: 0,
+                                          end: snapshot.data!['sem-2-hours'] /
+                                              40),
+                                      duration: const Duration(seconds: 2),
+                                      builder: (context, value, _) =>
+                                          CircularProgressIndicator(
+                                        strokeCap: StrokeCap.round,
+                                        strokeWidth: 10,
+                                        backgroundColor: Colors.red,
+                                        color: Colors.green,
+                                        value: value,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(
+                                      0, screenwidth / 5, 0, 0),
+                                  child: Center(
+                                      child: Text(
+                                          'Semester 2:\n     ' +
+                                              snapshot.data!['sem-2-hours'] +
+                                              '/40',
+                                          style:
+                                              const TextStyle(fontSize: 20))),
+                                )
+                              ]),
                             )
-                          ]),
-                        )
-                      ]);
+                          ]);
+                    case ConnectionState.done:
+                      return const Text('Error');
+                  }
                 })));
   }
 }
