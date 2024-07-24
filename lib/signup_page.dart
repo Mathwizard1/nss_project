@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'login_page.dart';
 
 final enableborder=OutlineInputBorder(
   borderSide:const BorderSide(width:3,color:Color.fromARGB(255, 175, 178, 175)),
@@ -13,11 +14,8 @@ final focusborder=OutlineInputBorder(
   borderRadius:BorderRadius.circular(12)
 );
 
-
 var _confirmpasswordbordercolor=const Color.fromARGB(255, 186, 185, 185);
 bool confirmpasswordstate=false;
-
-
 
 class SignUpPage extends StatefulWidget
 {
@@ -41,54 +39,40 @@ class SignUpPageState extends State<SignUpPage>
 
 
   TextEditingController emailcontroller=TextEditingController();
-  TextEditingController firstnamecontroller=TextEditingController();
-  TextEditingController lastnamecontroller=TextEditingController();
+  TextEditingController fullnamecontroller=TextEditingController();
   TextEditingController rollnumbercontroller=TextEditingController();
   TextEditingController passwordcontroller=TextEditingController();
   TextEditingController confirmpasswordcontroller=TextEditingController();
 
   bool informationcheck()
   {
-    if(emailcontroller.text.trim()!=""&&rollnumbercontroller.text.trim()!=""&&firstnamecontroller.text.trim()!=""&&lastnamecontroller.text.trim()!=""&&passwordcontroller.text.trim()!="")
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
+    return (emailcontroller.text.trim()!=""&&rollnumbercontroller.text.trim()!=""&&fullnamecontroller.text.trim()!=""&&passwordcontroller.text.trim()!="");
   }
 
 
   Future signUp() async
   {
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailcontroller.text.trim(), password: passwordcontroller.text.trim());
-    await FirebaseFirestore.instance.collection('users').add({
-      'email':emailcontroller.text.trim(),
-      'first name':firstnamecontroller.text.trim(),
-      'last name':lastnamecontroller.text.trim(),
-      'roll number':rollnumbercontroller.text.trim(),
-      'password':passwordcontroller.text.trim(),
+    final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailcontroller.text.trim(), password: passwordcontroller.text.trim());
+    await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+      'attended-events': [],
+      'email': emailcontroller.text.trim(),
+      'group': 'Undecided',
+      'hour-deductions': [],
+      'full-name': fullnamecontroller.text.trim(),
+      'role': 'volunteer',
+      'roll-number': rollnumbercontroller.text.trim(),
+      'sem-1-hours': 0,
+      'sem-2-hours': 0,
     });
 
     // ignore: use_build_context_synchronously
-    Navigator.pop(context);   //this will pop to the login page
-    // ignore: use_build_context_synchronously
-    Navigator.pop(context);  //this will pop to the onboarding page to asynchronously go to the home page
-
+    Navigator.pop(context);
   }
 
 
   bool confirmpassword(String a,String b)
   {
-    if(a==b)
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
+    return a == b;
   }
 
   @override
@@ -133,23 +117,11 @@ class SignUpPageState extends State<SignUpPage>
           Padding( 
             padding:EdgeInsets.fromLTRB(screenwidth/10,20,screenwidth/10,0),
             child:TextField(
-              controller:firstnamecontroller,
+              controller: fullnamecontroller,
               decoration: InputDecoration(
               enabledBorder: enableborder,
               focusedBorder: focusborder,
-              labelText:"Enter First Name",
-            ),
-          )
-          ),
-
-          Padding( 
-            padding:EdgeInsets.fromLTRB(screenwidth/10,20,screenwidth/10,0),
-            child:TextField(
-              controller:lastnamecontroller,
-              decoration: InputDecoration(
-              enabledBorder: enableborder,
-              focusedBorder: focusborder,
-              labelText:"Enter Last Name",
+              labelText:"Enter Full Name",
             ),
           )
           ),
@@ -211,8 +183,8 @@ class SignUpPageState extends State<SignUpPage>
                 (confirmpassword(passwordcontroller.text.trim(),confirmpasswordcontroller.text.trim()))
                 {
                   setState(() {
-                  _confirmpasswordbordercolor=Colors.green;
-                  confirmpasswordstate=true;
+                    _confirmpasswordbordercolor=Colors.green;
+                    confirmpasswordstate=true;
                   });
                 }
                 else
@@ -246,7 +218,8 @@ class SignUpPageState extends State<SignUpPage>
               height:50,
               child:TextButton(
                 onPressed: (){
-                  if(confirmpasswordstate==true&&informationcheck())
+		  debugPrint('$confirmpasswordstate');
+                  if(confirmpasswordstate && informationcheck())
                   {
                   signUp();
                   }
@@ -263,7 +236,7 @@ class SignUpPageState extends State<SignUpPage>
           Padding(
              padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
              child: Row(mainAxisAlignment: MainAxisAlignment.center,
-             children: [const Text("Have an account? "),GestureDetector(onTap:(){Navigator.pop(context);},child: const Text("Login",style:TextStyle(color:Colors.blue)))],),
+             children: [const Text("Have an account? "),GestureDetector(onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage())),child: const Text("Login",style:TextStyle(color:Colors.blue)))],),
            )
 
           ]
