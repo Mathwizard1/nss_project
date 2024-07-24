@@ -1,13 +1,20 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nss_project/student_home_page.dart';
-import 'onboarding_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'firebase_options.dart';
+import 'welcome_page.dart';
+import 'student_home_page.dart';
+import 'mentor_home_page.dart';
+import 'pic_home_page.dart';
 
 void main() async
 {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MainApp());
 }
 
@@ -15,6 +22,16 @@ class MainApp extends StatelessWidget
 {
 
   const MainApp({super.key});
+
+  Stream<DocumentSnapshot> userDocumentSnapshotOnRoleChange(Stream<DocumentSnapshot> userDocumentStream) async* {
+    String currentUserRole = '';
+    await for (final document in userDocumentStream) {
+      if (document['role'] != currentUserRole) {
+        currentUserRole = document['role'];
+        yield document;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context)
@@ -25,14 +42,46 @@ class MainApp extends StatelessWidget
       color:Colors.blue,
       home:StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(), 
-      builder: (context,snapshot)
-      {
-        if(!snapshot.hasData)
-        {return const EntryPage();}
-        else
-        {return const StudentHomePage();}
-      }
-      )
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return const Center(child: Text('Loading...'));
+          case ConnectionState.active:
+            if (snapshot.data == null) {
+              return WelcomePage();
+            }
+
+            return StreamBuilder(
+              stream: userDocumentSnapshotOnRoleChange(FirebaseFirestore.instance.collection('users').doc(snapshot.data!.uid).snapshots()),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                case ConnectionState.waiting:
+                  return const Center(child: Text('Loading...'));
+                case ConnectionState.active:
+                  switch (snapshot.data!['role']) {
+                  case 'volunteer':
+                    return const StudentHomePage(); // TODO rename to VolunteerHomePage
+                  case 'mentor':
+                    return const MentorHomePage();
+                  case 'pic':
+                    return const PicHomePage();
+                  default:
+                    return const Center(child: Text('Error')); // TODO error page
+                  }
+
+                case ConnectionState.done:
+                  return const Center(child: Text('Error')); // TODO error page
+                }
+              },
+            );
+
+          case ConnectionState.done:
+            return const Center(child: Text('Error')); // TODO error page
+          }
+        },
+      ),
     );
   }
 }

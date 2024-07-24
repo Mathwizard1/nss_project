@@ -141,7 +141,7 @@ class LoginPageState extends State<LoginPage>
            Padding(
              padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
              child: Row(mainAxisAlignment: MainAxisAlignment.center,
-             children: [const Text("Dont have an account? "),GestureDetector(onTap:(){Navigator.push(context,MaterialPageRoute(builder: (context)=>const SignUpPage()));},child: const Text("Sign Up",style:TextStyle(color:Colors.blue)))],),
+             children: [const Text("Don\'t have an account? "),GestureDetector(onTap:(){Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const SignUpPage()));},child: const Text("Sign Up",style:TextStyle(color:Colors.blue)))],),
            )
           ]
         )
