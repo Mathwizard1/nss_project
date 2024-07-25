@@ -68,7 +68,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                           ),
                           children: <TextSpan>[
                             TextSpan(
-                                text: getCapitalizedName(widget.person['name'] + '\n'),
+                                text: getCapitalizedName(widget.person['full-name'] + '\n'),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w700, fontSize: 26)),
                             TextSpan(
