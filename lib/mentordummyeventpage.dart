@@ -29,7 +29,7 @@ class DummyEventPageState extends State<MentorDummyEventPage>
   {
     // ignore: non_constant_identifier_names
     String QrResult;
-    QrResult=await FlutterBarcodeScanner.scanBarcode('ff6666', 'Cancel', true, ScanMode.QR);
+    QrResult=await FlutterBarcodeScanner.scanBarcode('#ff6666', 'Cancel', true, ScanMode.QR);
     return QrResult;
   }
 

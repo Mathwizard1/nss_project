@@ -5,8 +5,8 @@ import 'package:nss_project/qr_page.dart';
 class DummyEventPage extends StatefulWidget
 {
   final QueryDocumentSnapshot document;
-  final Stream userDocumentStream;
-  const DummyEventPage({super.key,required this.document,required this.userDocumentStream});
+  final AsyncSnapshot userSnapshot;
+  const DummyEventPage({super.key,required this.document,required this.userSnapshot});
   @override
   State createState()
   {
@@ -114,7 +114,7 @@ Widget build(BuildContext context)
               ),
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
-                child: FloatingActionButton.extended(onPressed: (){Navigator.push(context,MaterialPageRoute(builder: (context){return qr_code(userDocumentStream:widget.userDocumentStream);}));}, label:const Text("Register For Event"),backgroundColor:const Color.fromARGB(255, 247, 253, 245),elevation: 0,),
+                child: FloatingActionButton.extended(onPressed: (){Navigator.push(context,MaterialPageRoute(builder: (context){return qr_code(userSnapshot:widget.userSnapshot);}));}, label:const Text("Register For Event"),backgroundColor:const Color.fromARGB(255, 247, 253, 245),elevation: 0,),
               )
               ),
           ),

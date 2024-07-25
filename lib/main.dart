@@ -64,7 +64,7 @@ class MainApp extends StatelessWidget
                   case 'volunteer':
                     return const StudentHomePage(); // TODO rename to VolunteerHomePage
                   case 'mentor':
-                    return const MentorHomePage();
+                    return const StudentHomePage();
                   case 'pic':
                     return const PicHomePage();
                   default:

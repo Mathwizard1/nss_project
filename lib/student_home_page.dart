@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:nss_project/dummyeventpage.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -22,6 +24,7 @@ class StudentHomePageState extends State<StudentHomePage>
   late final Stream<DocumentSnapshot> userDocumentStream;
   late final Stream<QuerySnapshot> eventsDocumentStream;
   late final Stream<QuerySnapshot> configurablesDocumentStream;
+
 
   late TabController _tabController;
 
@@ -76,31 +79,43 @@ class StudentHomePageState extends State<StudentHomePage>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          HoursCompletedTab(userDocumentStream),
-          UpcomingEventsTab(userDocumentStream: userDocumentStream,),
-          AttendedEventsTab(),
-        ],
+      body: StreamBuilder<Object>(
+        stream: userDocumentStream.asBroadcastStream(),
+        builder: (context, snapshot) {
+          return TabBarView(
+            controller: _tabController,
+            children: [
+              HoursCompletedTab(snapshot),
+              UpcomingEventsTab(userSnapshot: snapshot,),
+              const AttendedEventsTab(),
+            ],
+          );
+        }
       ),
     );
   }
 }
 
 class HoursCompletedTab extends StatefulWidget {
-  final Stream<DocumentSnapshot> userDocumentStream;
-  const HoursCompletedTab(this.userDocumentStream, {super.key});
+  final AsyncSnapshot userSnapshot;
+  const HoursCompletedTab(this.userSnapshot, {super.key});
+  
 
   @override
   State createState() => HoursCompletedState();
 }
 
 class HoursCompletedState extends State<HoursCompletedTab> {
+
+
+  final userStreamController=StreamController();
+  
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.sizeOf(context).width;
     final screenheight = MediaQuery.sizeOf(context).height;
+
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -115,15 +130,7 @@ class HoursCompletedState extends State<HoursCompletedTab> {
             SizedBox(
               width: screenwidth - 50,
               height: screenheight / 2,
-              child: StreamBuilder(
-                stream: widget.userDocumentStream,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                      return const Text('Loading...');
-                    case ConnectionState.active:
-                      return SfRadialGauge(
+              child: SfRadialGauge(
                         enableLoadingAnimation: true,
                         axes: <RadialAxis>[
                           RadialAxis(
@@ -139,8 +146,8 @@ class HoursCompletedState extends State<HoursCompletedTab> {
                             ),
                             pointers: <GaugePointer>[
                               RangePointer(
-                                value: (snapshot.data!['sem-1-hours'] +
-                                        snapshot.data!['sem-2-hours'])
+                                value: (widget.userSnapshot.data!['sem-1-hours'] +
+                                        widget.userSnapshot.data!['sem-2-hours'])
                                     .toDouble(),
                                 cornerStyle: CornerStyle.bothCurve,
                                 width: 0.2,
@@ -158,14 +165,14 @@ class HoursCompletedState extends State<HoursCompletedTab> {
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          (snapshot.data!['sem-1-hours'] +
-                                                  snapshot.data!['sem-2-hours'])
+                                          (widget.userSnapshot.data!['sem-1-hours'] +
+                                                  widget.userSnapshot.data!['sem-2-hours'])
                                               .toStringAsFixed(0),
                                           style: TextStyle(
                                               fontSize: 40,
-                                              color: (snapshot.data![
+                                              color: (widget.userSnapshot.data![
                                                               'sem-1-hours'] +
-                                                          snapshot.data![
+                                                          widget.userSnapshot.data![
                                                               'sem-2-hours'] <
                                                       80)
                                                   ? Colors.red
@@ -190,13 +197,7 @@ class HoursCompletedState extends State<HoursCompletedTab> {
                             ],
                           ),
                         ],
-                      );
-
-                    case ConnectionState.done:
-                      return const Text('Error');
-                  }
-                },
-              ),
+                      )
             ),
             SizedBox(
               width: screenwidth / 2,
@@ -206,7 +207,7 @@ class HoursCompletedState extends State<HoursCompletedTab> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              HourDetailPage(widget.userDocumentStream)));
+                              HourDetailPage(widget.userSnapshot)));
                 },
                 style: const ButtonStyle(
                     backgroundColor: WidgetStatePropertyAll(
@@ -223,8 +224,8 @@ class HoursCompletedState extends State<HoursCompletedTab> {
 }
 
 class HourDetailPage extends StatefulWidget {
-  final Stream<DocumentSnapshot> userDocumentStream;
-  const HourDetailPage(this.userDocumentStream, {super.key});
+  final AsyncSnapshot userSnapshot;
+  const HourDetailPage(this.userSnapshot, {super.key});
 
   @override
   State createState() {
@@ -232,8 +233,10 @@ class HourDetailPage extends StatefulWidget {
   }
 }
 
-class HourDetailState extends State<HourDetailPage>
-    with SingleTickerProviderStateMixin {
+class HourDetailState extends State<HourDetailPage> with SingleTickerProviderStateMixin {
+
+
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.sizeOf(context).width;
@@ -249,116 +252,109 @@ class HourDetailState extends State<HourDetailPage>
           foregroundColor: Colors.white,
         ),
         body: Center(
-            child: StreamBuilder(
-                stream: widget.userDocumentStream,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                      return const Text('0Loading...');
-                    case ConnectionState.waiting:
-                      return const Text('1Loading...');
-                    case ConnectionState.active:
-                      return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                  0, 0, 0, screenheight / 10),
-                              child: Stack(children: [
-                                Center(
-                                  child: SizedBox(
-                                    width: screenwidth / 2,
-                                    height: screenwidth / 2,
-                                    child: TweenAnimationBuilder<double>(
-                                      tween: Tween(
-                                          begin: 0,
-                                          end: snapshot.data!['sem-1-hours'] /
-                                              40),
-                                      duration: const Duration(seconds: 2),
-                                      builder: (context, value, _) =>
-                                          CircularProgressIndicator(
-                                              strokeCap: StrokeCap.round,
-                                              strokeWidth: 10,
-                                              backgroundColor: (snapshot.data![
-                                                          'sem-1-hours'] <
-                                                      40)
-                                                  ? Colors.red
-                                                  : Colors.white,
-                                              color: (snapshot.data![
-                                                          'sem-1-hours'] <
-                                                      40)
-                                                  ? Colors.green
-                                                  : Colors.blue,
-                                              value: value),
-                                    ),
-                                  ),
-                                ),
-                                Center(
-                                    child: Padding(
-                                  padding: EdgeInsets.fromLTRB(
-                                      0, screenwidth / 5, 0, 0),
-                                  child: Text(
-                                    'Semester 1:\n     ' +
-                                        snapshot.data!['sem-1-hours'] +
-                                        '/40',
-                                    style: const TextStyle(fontSize: 20),
-                                  ),
-                                ))
-                              ]),
-                            ),
-                            const Divider(
-                              color: Color.fromARGB(255, 127, 112, 180),
-                              thickness: 4,
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                  0, screenheight / 10, 0, 0),
-                              child: Stack(children: [
-                                Center(
-                                  child: SizedBox(
-                                    width: screenwidth / 2,
-                                    height: screenwidth / 2,
-                                    child: TweenAnimationBuilder<double>(
-                                      tween: Tween(
-                                          begin: 0,
-                                          end: snapshot.data!['sem-2-hours'] /
-                                              40),
-                                      duration: const Duration(seconds: 2),
-                                      builder: (context, value, _) =>
-                                          CircularProgressIndicator(
-                                        strokeCap: StrokeCap.round,
-                                        strokeWidth: 10,
-                                        backgroundColor: Colors.red,
-                                        color: Colors.green,
-                                        value: value,
+            child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                    0, 0, 0, screenheight / 10),
+                                child: Stack(children: [
+                                  Center(
+                                    child: SizedBox(
+                                      width: screenwidth / 2,
+                                      height: screenwidth / 2,
+                                      child: TweenAnimationBuilder<double>(
+                                        tween: Tween(
+                                            begin: 0,
+                                            end: widget.userSnapshot.data!['sem-1-hours']/
+                                                40),
+                                        duration: const Duration(seconds: 2),
+                                        builder: (context, value, _) =>
+                                            CircularProgressIndicator(
+                                                strokeCap: StrokeCap.round,
+                                                strokeWidth: 10,
+                                                backgroundColor: (widget.userSnapshot.data!['sem-1-hours']<
+                                                        40)
+                                                    ? Colors.red
+                                                    : Colors.white,
+                                                color: (widget.userSnapshot.data!['sem-1-hours'] <
+                                                        40)
+                                                    ? Colors.green
+                                                    : Colors.blue,
+                                                value: value),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(
-                                      0, screenwidth / 5, 0, 0),
-                                  child: Center(
-                                      child: Text(
-                                          'Semester 2:\n     ' +
-                                              snapshot.data!['sem-2-hours'] +
-                                              '/40',
-                                          style:
-                                              const TextStyle(fontSize: 20))),
-                                )
-                              ]),
-                            )
-                          ]);
-                    case ConnectionState.done:
-                      return const Text('Error');
-                  }
-                })));
+                                  Center(
+                                      child: Padding(
+                                    padding: EdgeInsets.fromLTRB(
+                                        0, screenwidth / 5, 0, 0),
+                                    child: Text(
+                                      'Semester 1:\n     ' +
+                                          widget.userSnapshot.data!['sem-1-hours'].toString() +
+                                          '/40',
+                                      style: const TextStyle(fontSize: 20),
+                                    ),
+                                  ))
+                                ]),
+                              ),
+                              const Divider(
+                                color: Color.fromARGB(255, 127, 112, 180),
+                                thickness: 4,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                    0, screenheight / 10, 0, 0),
+                                child: Stack(children: [
+                                  Center(
+                                    child: SizedBox(
+                                      width: screenwidth / 2,
+                                      height: screenwidth / 2,
+                                      child: TweenAnimationBuilder<double>(
+                                        tween: Tween(
+                                            begin: 0,
+                                            end: widget.userSnapshot.data!['sem-2-hours'] /
+                                                40),
+                                        duration: const Duration(seconds: 2),
+                                        builder: (context, value, _) =>
+                                            CircularProgressIndicator(
+                                          strokeCap: StrokeCap.round,
+                                          strokeWidth: 10,
+                                          backgroundColor: (widget.userSnapshot.data!['sem-2-hours']<
+                                                        40)
+                                                    ? Colors.red
+                                                    : Colors.white,
+                                          color: (widget.userSnapshot.data!['sem-2-hours'] <
+                                                        40)
+                                                    ? Colors.green
+                                                    : Colors.blue,
+                                          value: value,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(
+                                        0, screenwidth / 5, 0, 0),
+                                    child: Center(
+                                        child: Text(
+                                            'Semester 2:\n     ' +
+                                                widget.userSnapshot.data!['sem-2-hours'].toString()+
+                                                '/40',
+                                            style:
+                                                const TextStyle(fontSize: 20))),
+                                  )
+                                ]),
+                              )
+                            ])
+                  
+                ));
   }
 }
 
 class UpcomingEventsTab extends StatefulWidget {
-  final Stream<DocumentSnapshot> userDocumentStream;
-  const UpcomingEventsTab({super.key,required this.userDocumentStream});
+  final AsyncSnapshot userSnapshot;
+  const UpcomingEventsTab({required this.userSnapshot,super.key});
 
   @override
   State<UpcomingEventsTab> createState() => _UpcomingEventsTabState();
@@ -379,18 +375,15 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   ExpansionTileController tilecontroller = ExpansionTileController();
 
   Widget _buildUpcomingEvent(
-      BuildContext context, QueryDocumentSnapshot<Object?> document,Stream userDocumentStream) {
-    return StreamBuilder(
-      stream: userDocumentStream,
-      builder: (context, snapshot) {
-        return Card(
+      BuildContext context, QueryDocumentSnapshot<Object?> document,AsyncSnapshot userSnapshot) {
+    return Card(
           child: InkWell(
               onTap: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => (snapshot.data!['role']=='volunteer')?DummyEventPage(
-                            document: document,userDocumentStream:userDocumentStream):MentorDummyEventPage(
+                        builder: (context) => (userSnapshot.data!['role']=='volunteer')?DummyEventPage(
+                            document: document,userSnapshot:userSnapshot):MentorDummyEventPage(
                             document: document)));
               },
               child: Container(
@@ -421,8 +414,6 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                 ),
               )),
         );
-      }
-    );
   }
 
   @override
@@ -515,7 +506,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (context, index) {
                             return _buildUpcomingEvent(
-                                context, snapshot.data!.docs[index],widget.userDocumentStream);
+                                context, snapshot.data!.docs[index],widget.userSnapshot);
                           });
                     })
               ]);
