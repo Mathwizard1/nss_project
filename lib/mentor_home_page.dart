@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:nss_project/new_event.dart';
 
 import 'package:nss_project/people_page.dart';
 import 'package:nss_project/sprofile_page.dart';
@@ -33,16 +35,17 @@ class MentorHomePageState extends State<MentorHomePage> {
   bool isFirstTabSelected = true;
   String selectedWing = 'All';
 
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mentor'),
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () {
-           
+            onPressed: () {   
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -132,6 +135,7 @@ class MentorHomePageState extends State<MentorHomePage> {
                       WingOptions.map((option) => DropdownMenuEntry<String>(
                           value: option, label: option)).toList();
                   return DropdownMenu<String>(
+                    
                     initialSelection: 'All',
                     requestFocusOnTap: false,
                     expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -173,6 +177,21 @@ class MentorHomePageState extends State<MentorHomePage> {
                   }
                   return const Text('Hello Darkness my ..');
                 }
+              ),
+
+              Expanded(
+                child: Align(
+                  alignment: FractionalOffset.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+                    child: CircleAvatar(
+                      radius: 25,
+                      backgroundColor: const Color.fromARGB(255, 128, 112, 185),
+                      foregroundColor: Colors.white,
+                      child: Center(child: IconButton(onPressed: (){Navigator.push(context,MaterialPageRoute(builder: (context){return NewEvent();}));},icon: const Icon(Icons.add_circle_outline),iconSize: 33,))
+                      ),
+                  ),
+                ),
               )
         ],
       ),
@@ -205,12 +224,12 @@ Widget _buildEvent(
         // PUT THE IF ELSE OF WHICH EVENT PAGE TO GO TO HERE
         // istaboneselected is aldready a arg in this function
         if(isFirstTabSelected){
+          Navigator.push(context,MaterialPageRoute(builder: (context)=>MentorDummyEventPage(document: event)));
           // Add attendence / gallery page
           //Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: event, selectedRole: "mentor",)));
         }
         else
         {
-          debugPrint("Hello\n\n\n\n\n");
           Navigator.push(context,MaterialPageRoute(builder: (context)=>MentorDummyEventPage(document: event)));
         }
       },
