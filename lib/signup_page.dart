@@ -95,7 +95,7 @@ class SignUpPageState extends State<SignUpPage>
           SizedBox(
             width:200,
             height:150,
-            child:Image.asset("assets/images/nss_logo.png")
+            child:Image.asset("assets/images/nss-iitp-logo.png")
           ),
 
           Padding( padding:EdgeInsets.fromLTRB(0,20,screenwidth*0.5,20),
