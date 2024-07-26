@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -110,7 +109,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                     text: '  ${widget.person['sem-1-hours']}',
                     style: const TextStyle(
                         fontSize: 120.0,
-                        color: const Color.fromRGBO(200, 150, 82, 1)),
+                        color: Color.fromRGBO(200, 150, 82, 1)),
                   ),
                   const TextSpan(text: '/', style: TextStyle(fontSize: 33.0)),
                   const TextSpan(
@@ -154,6 +153,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                     }
                     roles.add('volunteer');
                   
+                    // ignore: non_constant_identifier_names
                     List<DropdownMenuEntry<String>> RoleEntries =
                       roles.map((option) => DropdownMenuEntry<String>(
                           value: option, label: option)).toList();
