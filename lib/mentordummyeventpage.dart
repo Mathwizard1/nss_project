@@ -17,20 +17,21 @@ class MentorDummyEventPage extends StatefulWidget
 class DummyEventPageState extends State<MentorDummyEventPage>
 {
 
-  Future<void> UpdateAttendance(String rollnumber,QueryDocumentSnapshot eventdocument) async
+  void updateHours(String ?userID,QueryDocumentSnapshot eventdocument) async
   {
-    List userID=[FirebaseFirestore.instance.collection('users').where('roll-number',isEqualTo:rollnumber).toString()];
-    await FirebaseFirestore.instance.collection('events').doc(eventdocument.id).update({"registered-volunteers":FieldValue.arrayUnion(userID)});
+     await FirebaseFirestore.instance.collection('users').doc(userID).update({"sem-1-hours":FieldValue.increment(await FirebaseFirestore.instance.collection('events').doc(eventdocument.id).get().then((snapshot){return snapshot['hours'];}))});
   }
 
-
   // ignore: non_constant_identifier_names
-  Future<String> ScanQr() async
+  Future ScanQr(QueryDocumentSnapshot eventdocument) async
   {
     // ignore: non_constant_identifier_names
     String QrResult;
+    String ?userID;
     QrResult=await FlutterBarcodeScanner.scanBarcode('#ff6666', 'Cancel', true, ScanMode.QR);
-    return QrResult;
+    await FirebaseFirestore.instance.collection('users').where('roll-number',isEqualTo:QrResult).get().then((snapshot){snapshot.docs.forEach((document){userID=document.id;});});
+    await FirebaseFirestore.instance.collection('events').doc(eventdocument.id).update({"registered-volunteers":FieldValue.arrayUnion([userID])});
+    updateHours(userID,eventdocument);
   }
 
 @override 
@@ -130,7 +131,7 @@ Widget build(BuildContext context)
               ),
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
-                child: FloatingActionButton.extended(onPressed: (){UpdateAttendance(ScanQr().toString(),widget.document);}, label:const Text("Scan QR for Attendance"),backgroundColor:const Color.fromARGB(255, 247, 253, 245),elevation: 0,),
+                child: FloatingActionButton.extended(onPressed: (){ScanQr(widget.document);}, label:const Text("Scan QR for Attendance"),backgroundColor:const Color.fromARGB(255, 247, 253, 245),elevation: 0,),
               )
               ),
           ),
