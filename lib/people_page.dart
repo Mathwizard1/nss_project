@@ -96,7 +96,7 @@ Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person, String u
       horizontalTitleGap: 16,
       
       leading: Icon(Icons.account_circle,size: 50,),
-      title: Text(getCapitalizedName(person['name']),style:const TextStyle(fontWeight: FontWeight.w600,fontSize: 22),),
+      title: Text(getCapitalizedName(person['full-name']),style:const TextStyle(fontWeight: FontWeight.w600,fontSize: 22),),
       subtitle: Text('${person['roll-number']}',style:const TextStyle(fontSize: 14),),
       onTap: (){
         Navigator.push(context,MaterialPageRoute(builder: (context) => StudentViewPage(userRole: userRole,person: person)));
