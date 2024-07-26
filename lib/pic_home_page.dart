@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:nss_project/people_page.dart';
-import 'package:nss_project/sprofile_page.dart';
+import 'package:nss_project/picprofile_page.dart';
 import 'package:nss_project/event_page.dart';
 import 'package:nss_project/event_add_page.dart';
 
@@ -54,7 +54,7 @@ class _PeoplePageState extends State<PicHomePage> {
             icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()));
+                  MaterialPageRoute(builder: (context) => const PicProfilePage()));
             },
           ),
           IconButton(
