@@ -28,17 +28,35 @@ class LoginPageState extends State<LoginPage>
   TextEditingController emailinput=TextEditingController();
   TextEditingController passwordinput=TextEditingController();
 
-
   bool _encryptionState=true;
   var passwordicon=Icons.no_encryption;
 
-  Future signIn() async
-  {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(email:emailinput.text.trim(), password: passwordinput.text.trim());
-    // ignore: use_build_context_synchronously
-    Navigator.pop(context);
-  }
+  bool _isLoading = false;
+  String _errorMessage = '';
 
+  Future<void> _trySignIn() async {
+    if (_isLoading) {
+      return;
+    }
+
+    if (emailinput.text.trim() == '' || passwordinput.text.trim() == '') {
+      setState(() => _errorMessage = 'Can\'t leave one or more fields empty.');
+      return;
+    }
+
+    try {
+      setState(() => _isLoading = true);
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email:emailinput.text.trim(), password: passwordinput.text.trim());
+
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+    } on FirebaseException catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = e.message!;
+      });
+    }
+  }
 
   @override
   void dispose()
@@ -51,13 +69,10 @@ class LoginPageState extends State<LoginPage>
   @override
   Widget build(BuildContext context)
   {
-
     double width=MediaQuery.sizeOf(context).width;
     double height=MediaQuery.sizeOf(context).height;
 
-
     return Scaffold(
-      //resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body:SingleChildScrollView(
           padding:EdgeInsets.fromLTRB(0, height/10, 0, 0),
@@ -67,11 +82,11 @@ class LoginPageState extends State<LoginPage>
           SizedBox(
             width:400,
             height:300,
-            child:Image.asset("assets/images/nss-iitp-logo.png")
+            child:Image.asset('assets/images/nss-iitp-logo.png')
           ),
 
           Padding( padding:EdgeInsets.fromLTRB(0,20,width*0.45,20),
-          child:const Text("Welcome!",style:TextStyle(fontSize:30,fontWeight:FontWeight.w900))
+          child:const Text('Welcome!',style:TextStyle(fontSize:30,fontWeight:FontWeight.w900))
           ),
 
           Padding( 
@@ -81,7 +96,7 @@ class LoginPageState extends State<LoginPage>
               decoration: InputDecoration(
               enabledBorder: enableborder,
               focusedBorder: focusborder,
-              labelText:"Enter Email",
+              labelText:'Enter Email',
             ),
           )
           ),
@@ -113,12 +128,10 @@ class LoginPageState extends State<LoginPage>
               ),
               enabledBorder: enableborder,
               focusedBorder: focusborder,
-              labelText:"Enter Password",
+              labelText:'Enter Password',
             ),
           )
           ),
-
-          
 
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
@@ -126,22 +139,25 @@ class LoginPageState extends State<LoginPage>
               width:width/3,
               height:50,
               child:TextButton(
-                onPressed: (){
-                  signIn();
-                },
+                onPressed: _trySignIn,
                 style:const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(Colors.blue),
+                  backgroundColor: WidgetStatePropertyAll(Colors.indigo),
                   foregroundColor:WidgetStatePropertyAll(Colors.white),
                 ),
-                child:const Text("Submit"),
+                child: (_isLoading ? CircularProgressIndicator(color: Colors.white) : const Text('Submit')),
               )
-              ),
+            ),
           ),
 
+	  Padding(
+            padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+	    child: SizedBox(child: Center(child: Text((_isLoading ? '' : _errorMessage), style: TextStyle(color: Colors.red))), width: 3 * width / 4),
+	  ),
+
            Padding(
-             padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
+             padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
              child: Row(mainAxisAlignment: MainAxisAlignment.center,
-             children: [const Text("Don\'t have an account? "),GestureDetector(onTap:(){Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const SignUpPage()));},child: const Text("Sign Up",style:TextStyle(color:Colors.blue)))],),
+             children: [const Text('Don\'t have an account? '),GestureDetector(onTap:(){Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const SignUpPage()));},child: const Text('Sign Up',style:TextStyle(color:Colors.blue)))],),
            )
           ]
         )
