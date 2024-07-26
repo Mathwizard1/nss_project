@@ -29,12 +29,12 @@ class LoginPageState extends State<LoginPage>
   TextEditingController passwordinput=TextEditingController();
 
 
-  bool _encryptionState=false;
-  var passwordicon=Icons.enhanced_encryption;
+  bool _encryptionState=true;
+  var passwordicon=Icons.no_encryption;
 
   Future signIn() async
   {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(email:emailinput.text.trim() , password: passwordinput.text.trim());
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email:emailinput.text.trim(), password: passwordinput.text.trim());
     // ignore: use_build_context_synchronously
     Navigator.pop(context);
   }
@@ -67,7 +67,7 @@ class LoginPageState extends State<LoginPage>
           SizedBox(
             width:400,
             height:300,
-            child:Image.asset("assets/images/nss_logo.png")
+            child:Image.asset("assets/images/nss-iitp-logo.png")
           ),
 
           Padding( padding:EdgeInsets.fromLTRB(0,20,width*0.45,20),

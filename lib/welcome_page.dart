@@ -15,25 +15,32 @@ class WelcomePage extends StatelessWidget {
           SizedBox(
               width: 400,
               height: 300,
-              child: Image.asset('assets/images/nss_logo.png')),
-          const Text("National Social Service",
-              style: TextStyle(
-                  fontSize: 30,
-                  color: Color.fromARGB(255, 243, 118, 41),
-                  fontWeight: FontWeight.bold)),
-          const Text("IIT Patna",
-              style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold)),
+              child: Image.asset('assets/images/nss-iitp-logo.png')),
           Padding(
-              padding: EdgeInsets.fromLTRB(0, height / 4, 0, 0),
+            padding: EdgeInsets.fromLTRB(0, height / 16, 0, 0),
+            child: Column(
+              children: <Widget>[
+                const Text("National Social Service",
+                    style: TextStyle(
+                        fontSize: 30,
+    	            color: Colors.indigo,
+                        fontWeight: FontWeight.bold)),
+                const Text("IIT Patna",
+                    style: TextStyle(
+                        color: Colors.indigo,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold)),
+	      ],
+            ),
+          ),
+          Padding(
+              padding: EdgeInsets.fromLTRB(0, height / 8, 0, 0),
               child: FractionallySizedBox(
                   widthFactor: 0.89,
                   child: TextButton(
                     style: const ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(
-                          Color.fromARGB(255, 54, 28, 129)),
+                          Colors.indigo),
                       foregroundColor: WidgetStatePropertyAll(Colors.white),
                     ),
                     onPressed: () => {
