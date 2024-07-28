@@ -20,8 +20,8 @@ class DummyEventPageState extends State<MentorDummyEventPage>
 
   void updateHours(String ?userID,QueryDocumentSnapshot eventdocument) async
   {
-     List registeredevents=await FirebaseFirestore.instance.collection('users').doc(userID).get().then((snapshot){return snapshot.get('registered-events');});
-     if(!registeredevents.contains(eventdocument.id))
+     List registeredevents=await FirebaseFirestore.instance.collection('users').doc(userID).get().then((snapshot){return snapshot.get('attended-events');});
+     if(!(registeredevents.contains(eventdocument.id)))
      {
      await FirebaseFirestore.instance.collection('events').doc(eventdocument.id).update({"registered-volunteers":FieldValue.arrayUnion([userID])});
      await FirebaseFirestore.instance.collection('users').doc(userID).update({"sem-1-hours":FieldValue.increment(await FirebaseFirestore.instance.collection('events').doc(eventdocument.id).get().then((snapshot){return snapshot['hours'];}))});

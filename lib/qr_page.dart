@@ -69,7 +69,14 @@ class qrcodeState extends State<qr_code>
                 }
               }
             ),
-          ), 
+          ),
+
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(top:screenheight/2),
+              child: Text("${widget.eventdocument.get('title')}",style: const TextStyle(fontSize: 30,color: Colors.white,fontWeight: FontWeight.bold),),
+            ),
+          ),
 
 
           Center(
