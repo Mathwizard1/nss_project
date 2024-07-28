@@ -23,6 +23,11 @@ Widget build(BuildContext context)
   final width=MediaQuery.sizeOf(context).width;
   final height=MediaQuery.sizeOf(context).height;
 
+  String _formatDateTime(DateTime dateTime) {
+    return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} "
+           "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+  }
+
   return Scaffold(
     appBar: AppBar(
       backgroundColor: const Color.fromARGB(255, 127, 112, 180),
@@ -67,12 +72,12 @@ Widget build(BuildContext context)
                       ], 
                     ),
 
-                    const Row(
+                    Row(
                       children: [
-                        Padding(
+                        const Padding(
                           padding:  EdgeInsets.fromLTRB(20, 0, 0, 0),
-                          child: Text('Date: ',style: TextStyle(fontWeight: FontWeight.bold,color: Color.fromARGB(255, 1, 88, 159),fontSize: 18)),
-                        )
+                          child: Text('subtitle: ',style: TextStyle(fontWeight: FontWeight.bold,color: Color.fromARGB(255, 1, 88, 159),fontSize: 18)),
+                        ),Text(widget.document['subtitle'], style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 18))
                       ],
                     ),
 
@@ -81,7 +86,7 @@ Widget build(BuildContext context)
                         const Padding(
                           padding:  EdgeInsets.fromLTRB(20, 0, 0, 0),
                           child: Text('Time: ',style: TextStyle(fontWeight: FontWeight.bold,color: Color.fromARGB(255, 1, 88, 159),fontSize: 18)),
-                        ),Text(widget.document['timestamp'],style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 18))
+                        ),Text(_formatDateTime(widget.document['timestamp'].toDate()),style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 18))
                       ], 
                     ),
 
