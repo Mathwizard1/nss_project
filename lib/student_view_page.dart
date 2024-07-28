@@ -44,148 +44,160 @@ class _StudentViewPageState extends State<StudentViewPage> {
       ),
       body: Container(
         color: Colors.transparent,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
+        child: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('configurables').doc('document').snapshots(),
+          builder: (context, snapshot) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 const SizedBox(
-                  width: 8,
+                  height: 10,
                 ),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: RichText(
-                      text: TextSpan(
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            height: 1.3,
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                                text: getCapitalizedName(widget.person['full-name'] + '\n'),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w700, fontSize: 26)),
-                            TextSpan(
-                              text: '${widget.person['roll-number']}\n',
-                            ),
-                            TextSpan(text: '${widget.person['email']}'),
-                          ]),
-                    ),
-                  ),
-                ),
-                const Expanded(child: SizedBox()),
                 ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
-                    child: Image.asset(
-                      'assets/images/defaultprofilepic.jpg',
-                      width: width / 3.3,
-                      height: width / 3.3,
-                    )),
-                const SizedBox(
-                  width: 10,
-                )
-              ],
-            ),
-            SizedBox(
-              height: height / 8,
-            ),
-            RichText(
-                text: TextSpan(
-                    style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        height: 0.7,
-                        fontStyle: FontStyle.italic),
-                    children: [
-                  const TextSpan(
-                    text: 'sem1:\n',
+                        borderRadius: BorderRadius.circular(width),
+                        clipBehavior: Clip.hardEdge,
+                        child: Image.asset(
+                          'assets/images/defaultprofilepic.jpg',
+                          width: width / 3.3,
+                          height: width / 3.3,
+                        )),
+                Center(
+                  child: SizedBox(
+                    width: width/1.1,
+                    child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      height: 1.3,
+                                    ),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                          text: getCapitalizedName(widget.person['full-name'] + '\n'),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w700, fontSize: 26)),
+                                      TextSpan(
+                                        text: '${widget.person['roll-number']}\n',
+                                      ),
+                                      TextSpan(text: '${widget.person['email']}'),
+                                    ]),
+                              ),
+                            ),
+                          ),
                   ),
-                  TextSpan(
-                    text: '  ${widget.person['sem-1-hours']}',
-                    style: const TextStyle(
-                        fontSize: 120.0,
-                        color: Color.fromRGBO(200, 150, 82, 1)),
-                  ),
-                  const TextSpan(text: '/', style: TextStyle(fontSize: 33.0)),
-                  const TextSpan(
-                      text: '40',
-                      style: TextStyle(
-                          fontSize: 33.0, color: Colors.lightBlueAccent)),
-                ])),
-            SizedBox(
-              height: height / 8,
-            ),
-            RichText(
-                text: TextSpan(
-                    style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        height: 0.7,
-                        fontStyle: FontStyle.italic),
-                    children: [
-                  const TextSpan(
-                    text: 'sem2:\n',
-                  ),
-                  TextSpan(
-                    text: '  ${widget.person['sem-2-hours']}',
-                    style: TextStyle(
-                        fontSize: 120.0, color: Colors.deepPurple[300]),
-                  ),
-                  const TextSpan(text: '/', style: TextStyle(fontSize: 33.0)),
-                  const TextSpan(
-                      text: '40',
-                      style: TextStyle(
-                          fontSize: 33.0, color: Colors.lightBlueAccent)),
-                ])),
-                StreamBuilder(
-                  stream: FirebaseFirestore.instance.collection('roles').snapshots(),
-                  builder:(context,snaphot){
-                    List<String> roles = ['pic','mentor'];
-                    int i = roles.indexOf(widget.userRole);
-              
-                    for(int j = i;j>=0;j--){
-                      roles.removeAt(j);
-                    }
-                    roles.add('volunteer');
-                  
-                    // ignore: non_constant_identifier_names
-                    List<DropdownMenuEntry<String>> RoleEntries =
-                      roles.map((option) => DropdownMenuEntry<String>(
-                          value: option, label: option)).toList();
-                    return DropdownMenu<String>(
-                      initialSelection: 'volunteer',
-                      requestFocusOnTap: false,
-                      expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      textStyle: const TextStyle(color: Colors.white),
-                      inputDecorationTheme: const InputDecorationTheme(
-                      fillColor: Color.fromARGB(255, 128, 112, 185),
-                      filled: true,
+                ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                RichText(
+                    text: TextSpan(
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            height: 0.7,
+                            fontStyle: FontStyle.italic),
+                        children: [
+                      const TextSpan(
+                        text: 'sem1:\n',
                       ),
-                      label: const Text('role',style: TextStyle(color: Colors.white),),
-                      onSelected: (String? role){setState(() {
-                        if(role != null){
-                          rolechange = role;
-                        }
-                      });},
-                      dropdownMenuEntries: RoleEntries,
-                    );
-                  }),
-                  ListTile(
-                    tileColor: Colors.green,
-                    onTap: () {
-                      setState(() {
-                        FirebaseFirestore.instance.collection('users').doc(widget.person.id).update({"role": rolechange}).then(
-    (value) => print("DocumentSnapshot successfully updated!"),
-    onError: (e) => print("Error updating document $e"));;
-                      });
-                    },
-                  )
-          ],
+                      TextSpan(
+                        text: '  ${widget.person['sem-1-hours']}',
+                        style: const TextStyle(
+                            fontSize: 110.0,
+                            color: Color.fromRGBO(200, 150, 82, 1)),
+                      ),
+                      const TextSpan(text: '/', style: TextStyle(fontSize: 33.0)),
+                      TextSpan(
+                          text: '${(snapshot.data!['mandatory-hours'])/2}',
+                          style: const TextStyle(
+                              fontSize: 33.0, color: Colors.lightBlueAccent)),
+                    ])),
+                SizedBox(
+                  height: height / 8,
+                ),
+                RichText(
+                    text: TextSpan(
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            height: 0.7,
+                            fontStyle: FontStyle.italic),
+                        children: [
+                      const TextSpan(
+                        text: 'sem2:\n',
+                      ),
+                      TextSpan(
+                        text: '  ${widget.person['sem-2-hours']}',
+                        style: TextStyle(
+                            fontSize: 110.0, color: Colors.deepPurple[300]),
+                      ),
+                      const TextSpan(text: '/', style: TextStyle(fontSize: 33.0)),
+                      TextSpan(
+                          text: '${(snapshot.data!['mandatory-hours'])/2}',
+                          style: const TextStyle(
+                              fontSize: 33.0, color: Colors.lightBlueAccent)),
+                    ])),
+                    SizedBox(height: 20,),
+                    SizedBox(
+                      width: width/1.3,
+                      child: StreamBuilder(
+                        stream: FirebaseFirestore.instance.collection('roles').snapshots(),
+                        builder:(context,snaphot){
+                          List<String> roles = ['pic','mentor'];
+                          int i = roles.indexOf(widget.userRole);
+                                        
+                          for(int j = i;j>=0;j--){
+                            roles.removeAt(j);
+                          }
+                          roles.add('volunteer');
+                        
+                          // ignore: non_constant_identifier_names
+                          List<DropdownMenuEntry<String>> RoleEntries =
+                            roles.map((option) => DropdownMenuEntry<String>(
+                                value: option, label: option)).toList();
+                          return DropdownMenu<String>(
+                            initialSelection: 'volunteer',
+                            requestFocusOnTap: false,
+                            expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                            textStyle: const TextStyle(color: Colors.white),
+                            inputDecorationTheme: const InputDecorationTheme(
+                            fillColor: Color.fromARGB(255, 128, 112, 185),
+                            filled: true,
+                            ),
+                            label: const Text('role',style: TextStyle(color: Colors.white),),
+                            onSelected: (String? role){setState(() {
+                              if(role != null){
+                                rolechange = role;
+                              }
+                            });},
+                            dropdownMenuEntries: RoleEntries,
+                          );
+                        }),
+                    ),
+                      SizedBox(
+                        width: width /1.3,
+                        child: Card.outlined(
+                          clipBehavior: Clip.hardEdge,
+                          child: ListTile(
+                            tileColor: Colors.green,
+                            title: const Center (child: Text('Change Role')),
+                            onTap: () {
+                              setState(() {
+                                FirebaseFirestore.instance.collection('users').doc(widget.person.id).update({"role": rolechange}).then(
+                              (value) => print("DocumentSnapshot successfully updated!"),
+                              onError: (e) => print("Error updating document $e"));;
+                              });
+                            },
+                          ),
+                        ),
+                      )
+              ],
+            );
+          }
         ),
       ),
     );
