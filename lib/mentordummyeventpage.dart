@@ -37,7 +37,6 @@ class DummyEventPageState extends State<MentorDummyEventPage>
     String ?userID;
     QrResult=await FlutterBarcodeScanner.scanBarcode('#ff6666', 'Cancel', true, ScanMode.QR);
     await FirebaseFirestore.instance.collection('users').where('roll-number',isEqualTo:QrResult).get().then((snapshot){snapshot.docs.forEach((document){userID=document.id;});});
-    await FirebaseFirestore.instance.collection('events').doc(eventdocument.id).update({"registered-volunteers":FieldValue.arrayUnion([userID])});
     updateHours(userID,eventdocument);
   }
 
