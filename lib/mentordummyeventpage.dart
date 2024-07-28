@@ -15,6 +15,15 @@ class MentorDummyEventPage extends StatefulWidget
   }
 }
 
+int calculateDifferenceInMinutes(Timestamp firebaseTimestamp) {
+  DateTime currentTime = DateTime.now();
+  DateTime firebaseTime = firebaseTimestamp.toDate();
+
+  // Calculate the difference in minutes
+  int differenceInMinutes = currentTime.difference(firebaseTime).inMinutes;
+  return differenceInMinutes;
+}
+
 class DummyEventPageState extends State<MentorDummyEventPage>
 {
 
