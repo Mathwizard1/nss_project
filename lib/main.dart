@@ -57,10 +57,10 @@ class MainApp extends StatelessWidget
           switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
-            return const Center(child: Text('Loading...'));
+            return Scaffold(body: Center(child: CircularProgressIndicator()));
           case ConnectionState.active:
             if (snapshot.data == null) {
-              return const WelcomePage();
+	      return const WelcomePage();
             }
 
             return StreamBuilder(
@@ -68,7 +68,7 @@ class MainApp extends StatelessWidget
               builder: (context, snapshot) {
 	        // Don't need to switch here as there isn't any ambiguity as to where the null arises from
 	        if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
+                  return Scaffold(body: Center(child: CircularProgressIndicator()));
 		}
 
                 switch (snapshot.data!['role']) {

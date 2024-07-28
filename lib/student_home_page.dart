@@ -80,6 +80,10 @@ class StudentHomePageState extends State<StudentHomePage>
       body: StreamBuilder<Object>(
         stream: userDocumentStream.asBroadcastStream(),
         builder: (context, snapshot) {
+	  if (!snapshot.hasData) {
+	    return Center(child: CircularProgressIndicator());
+	  }
+
           return TabBarView(
             controller: _tabController,
             children: [
