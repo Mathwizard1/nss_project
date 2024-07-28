@@ -93,7 +93,7 @@ class StudentHomePageState extends State<StudentHomePage>
         stream: userDocumentStream.asBroadcastStream(),
         builder: (context, snapshot) {
 	  if (!snapshot.hasData) {
-	    return Center(child: CircularProgressIndicator());
+	    return const Center(child: CircularProgressIndicator());
 	  }
 
           return TabBarView(
@@ -120,8 +120,8 @@ class HoursCompletedTab extends StatefulWidget {
 }
 
 class HoursCompletedState extends State<HoursCompletedTab> {
-  double maxhours=0;
-  int maxhoursdisplay=0;
+  double maxhours=200;
+  int maxhoursdisplay=200;
 
   final userStreamController=StreamController();
 
@@ -129,7 +129,7 @@ class HoursCompletedState extends State<HoursCompletedTab> {
   {
     int temp=await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){return snapshot.get('mandatory-hours');});
     setState(() {
-       maxhours=temp.toDouble();
+        maxhours=temp.toDouble();
        maxhoursdisplay=temp;
     });
   }
@@ -277,8 +277,8 @@ class HourDetailState extends State<HourDetailPage> with SingleTickerProviderSta
     });
   }
 
-  late final int sem1hours;
-  late final int sem2hours;
+  int sem1hours=60;
+  int sem2hours=60;
 
 
   @override
@@ -430,7 +430,12 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance.collection('icondata').where('wing',isEqualTo: document['wing']).snapshots(),
                 builder: (context, snapshot) {
-                  return Container(
+
+                  if(!snapshot.hasData)
+                  {return const CircularProgressIndicator();}
+
+                  else
+                  {return Container(
                     decoration: const BoxDecoration(
                         gradient: LinearGradient(
                             begin: Alignment.topLeft,
@@ -457,6 +462,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                       ),
                     ),
                   );
+                  }
                 }
               )),
         );
@@ -464,6 +470,9 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
 
   @override
   Widget build(BuildContext context) {
+
+    final screenheight=MediaQuery.sizeOf(context).height;
+
     // TODO make this smooth (every rebuild waits on calls to snapshots())
     return Column(
       children: <Widget>[
@@ -474,18 +483,18 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-	        return Expanded(
-	          child: Center(child: CircularProgressIndicator()),
-	        );
+              return const Expanded(
+                child: Center(child: CircularProgressIndicator()),
+              );
               }
-
+    
               final wingOptions = ['All'] +
                   snapshot.data!['wings'].map<String>((dyn) {
                     String ret = dyn;
                     return ret;
                   }).toList();
               final events = FirebaseFirestore.instance.collection('events');
-
+    
               return Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: Column(children: <Widget>[
@@ -529,26 +538,29 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                           : events.where('wing', isEqualTo: _selectedWing).snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-			  return Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: CircularProgressIndicator());
+            return const Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: CircularProgressIndicator());
                         }
                 
                         if (snapshot.data!.docs.isEmpty) {
-			  return Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: const Text('Nothing to see here ._.'));
+            return const Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: Text('Nothing to see here ._.'));
                         }
                 
-                        return ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: snapshot.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              return TweenAnimationBuilder(
-                                tween:Tween<double>(begin: 0,end: 1),
-                                duration: const Duration(seconds: 1),
-                                child: _buildUpcomingEvent(context, snapshot.data!.docs[index],widget.userSnapshot),
-                                builder: (BuildContext context,double value,Widget? child){
-                                  return Opacity(opacity: value,child: child,);
-                                },
-                              );
-                            });
+                        return SizedBox(
+                          height: screenheight-207,
+                          child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (context, index) {
+                                return TweenAnimationBuilder(
+                                  tween:Tween<double>(begin: 0,end: 1),
+                                  duration: const Duration(seconds: 1),
+                                  child: _buildUpcomingEvent(context, snapshot.data!.docs[index],widget.userSnapshot),
+                                  builder: (BuildContext context,double value,Widget? child){
+                                    return Opacity(opacity: value,child: child,);
+                                  },
+                                );
+                              }),
+                        );
                       })
                 ]),
               );

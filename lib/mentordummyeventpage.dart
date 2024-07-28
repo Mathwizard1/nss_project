@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:nss_project/qr_page.dart';
@@ -20,6 +21,7 @@ class DummyEventPageState extends State<MentorDummyEventPage>
   void updateHours(String ?userID,QueryDocumentSnapshot eventdocument) async
   {
      await FirebaseFirestore.instance.collection('users').doc(userID).update({"sem-1-hours":FieldValue.increment(await FirebaseFirestore.instance.collection('events').doc(eventdocument.id).get().then((snapshot){return snapshot['hours'];}))});
+     await FirebaseFirestore.instance.collection('users').doc(userID).update({"attended-events":FieldValue.arrayUnion([eventdocument.id])});
   }
 
   // ignore: non_constant_identifier_names
