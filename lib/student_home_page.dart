@@ -129,7 +129,7 @@ class HoursCompletedState extends State<HoursCompletedTab> {
   {
     int temp=await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){return snapshot.get('mandatory-hours');});
     setState(() {
-       maxhours=temp.toDouble();
+        maxhours=temp.toDouble();
        maxhoursdisplay=temp;
     });
   }

@@ -23,6 +23,7 @@ class qrcodeState extends State<qr_code>
   @override 
   Widget build(BuildContext context)
   {
+    bool flag=false;
     final screenwidth=MediaQuery.sizeOf(context).width;
     final screenheight=MediaQuery.sizeOf(context).height;
 
@@ -34,13 +35,14 @@ class qrcodeState extends State<qr_code>
             child: StreamBuilder(
               stream: FirebaseFirestore.instance.collection('users').where('attended-events',arrayContains:widget.eventdocument.id).snapshots(),
               builder: (context, snapshot) {
+                if(flag==false)
                 for(var x in snapshot.data!.docs)
                 {
                   if(x.get('roll-number')==widget.userSnapshot.data!['roll-number'])
                   {
-                    setState(() {
+                      flag=true;
                       backgroundcolor=const Color.fromARGB(255, 79, 236, 84);
-                    });
+                    
                   }
                 }
 
