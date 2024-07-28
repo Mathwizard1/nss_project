@@ -277,8 +277,8 @@ class HourDetailState extends State<HourDetailPage> with SingleTickerProviderSta
     });
   }
 
-  late final int sem1hours;
-  late final int sem2hours;
+  int sem1hours=60;
+  int sem2hours=60;
 
 
   @override
