@@ -108,7 +108,7 @@ class HoursCompletedTab extends StatefulWidget {
 }
 
 class HoursCompletedState extends State<HoursCompletedTab> {
-  late final double maxhours;
+  double maxhours=0;
   late final int maxhoursdisplay;
 
   final userStreamController=StreamController();
