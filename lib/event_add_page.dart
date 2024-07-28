@@ -81,8 +81,8 @@ class EventPageState extends State<EventPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isSubmitButtonEnabled = false;
 
-  void _validateForm() {
-    final isFormValid = _formKey.currentState?.validate() ?? false;
+  void _validateForm(String intText) {
+    final isFormValid = (_formKey.currentState?.validate() ?? false) && (!intText.contains('.'));
     final isDropdownValid = dropdownValue1 != 'None' && dropdownValue2 != 'None';
     
     setState(() {
@@ -110,7 +110,7 @@ class EventPageState extends State<EventPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: Form(
                     key: _formKey,
-                    onChanged: _validateForm,
+                    onChanged: (){_validateForm(_hoursController.text.trim());},
                     child: Column(
                       children: [
                         _buildTextField(_nameController, 'Name', 1),
@@ -136,14 +136,14 @@ class EventPageState extends State<EventPage> {
                           setState(() {
                             dropdownValue1 = newValue!;
                           });
-                          _validateForm();
+                          _validateForm(_hoursController.text.trim());
                         }),
                         const SizedBox(height: 10),
                         _buildDropdown(dropdownValue2, dropdownOptions2, (String? newValue) {
                           setState(() {
                             dropdownValue2 = newValue!;
                           });
-                          _validateForm();
+                          _validateForm(_hoursController.text.trim());
                         }),
                         const SizedBox(height: 10), // Add some space to avoid overlapping with the floating button
                       ],
@@ -162,7 +162,7 @@ class EventPageState extends State<EventPage> {
                             "timestamp" : Timestamp.fromDate(_selectedDateTime),
                             "description" : _description.text.trim(),
                             "venue" : _venueController.text.trim(),
-                            "hours" : _hoursController.text.trim(),
+                            "hours" : int.parse(_hoursController.text.trim()),
                             "wing" : dropdownValue1,
                             "recurring" : dropdownValue2,
                             "registered-volunteers":[]
