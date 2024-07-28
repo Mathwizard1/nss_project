@@ -82,7 +82,7 @@ class EventPageState extends State<EventPage> {
   bool _isSubmitButtonEnabled = false;
 
   void _validateForm(String intText) {
-    final isFormValid = (_formKey.currentState?.validate() ?? false) && (!intText.contains('.'));
+    final isFormValid = (_formKey.currentState?.validate() ?? false) && (!intText.contains(RegExp(r"[., -]")));
     final isDropdownValid = dropdownValue1 != 'None' && dropdownValue2 != 'None';
     
     setState(() {
