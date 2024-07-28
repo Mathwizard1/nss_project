@@ -51,55 +51,48 @@ class _StudentViewPageState extends State<StudentViewPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 const SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
-                Row(
-                  children: <Widget>[
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    SizedBox(
-                      width: (width / 3.3)*2,
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: RichText(
-                            text: TextSpan(
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 18,
-                                  height: 1.3,
-                                ),
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: getCapitalizedName(widget.person['full-name'] + '\n'),
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w700, fontSize: 26)),
-                                  TextSpan(
-                                    text: '${widget.person['roll-number']}\n',
-                                  ),
-                                  TextSpan(text: '${widget.person['email']}'),
-                                ]),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Expanded(child: SizedBox()),
-                    ClipRRect(
-                        borderRadius: BorderRadius.circular(40),
+                ClipRRect(
+                        borderRadius: BorderRadius.circular(width),
+                        clipBehavior: Clip.hardEdge,
                         child: Image.asset(
                           'assets/images/defaultprofilepic.jpg',
                           width: width / 3.3,
                           height: width / 3.3,
                         )),
+                Center(
+                  child: SizedBox(
+                    width: width/1.1,
+                    child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      height: 1.3,
+                                    ),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                          text: getCapitalizedName(widget.person['full-name'] + '\n'),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w700, fontSize: 26)),
+                                      TextSpan(
+                                        text: '${widget.person['roll-number']}\n',
+                                      ),
+                                      TextSpan(text: '${widget.person['email']}'),
+                                    ]),
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
                     const SizedBox(
-                      width: 10,
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: height / 8,
-                ),
+                      height: 30,
+                    ),
                 RichText(
                     text: TextSpan(
                         style: const TextStyle(
@@ -148,6 +141,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                           style: const TextStyle(
                               fontSize: 33.0, color: Colors.lightBlueAccent)),
                     ])),
+                    SizedBox(height: 20,),
                     SizedBox(
                       width: width/1.3,
                       child: StreamBuilder(
@@ -185,7 +179,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                         }),
                     ),
                       SizedBox(
-                        width: width /2,
+                        width: width /1.3,
                         child: Card.outlined(
                           clipBehavior: Clip.hardEdge,
                           child: ListTile(
