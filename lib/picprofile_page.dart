@@ -189,16 +189,16 @@ class _ConfigurablesState extends State<Configurables> {
 
     late int totalhours;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (isHoursChanged) {
-            FirebaseFirestore.instance
-                .collection('configurables')
-                .doc('documen')
-                .set({'mandatory-hours': totalhours}, SetOptions(merge: true));
-          }
-        },
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     if (isHoursChanged) {
+      //       FirebaseFirestore.instance
+      //           .collection('configurables')
+      //           .doc('documen')
+      //           .set({'mandatory-hours': totalhours}, SetOptions(merge: true));
+      //     }
+      //   },
+      // ),
       body: SafeArea(
         child: Column(
           children: [
@@ -237,6 +237,27 @@ class _ConfigurablesState extends State<Configurables> {
                               onChanged: (text) {
                                 totalhours = int.parse(text);
                                 isHoursChanged = true;
+                              },
+                              onSubmitted: (value) {
+                                if(value != ''){
+                                  showDialog(context: context, builder:(BuildContext context){
+                                    return AlertDialog(
+                                      title: const Text('confirm new total hours'),
+                                      actions: [
+                                        TextButton(onPressed: (){
+                                          if (isHoursChanged) {
+                                            FirebaseFirestore.instance
+                                            .collection('configurables')
+                                            .doc('documen')
+                                            .set({'mandatory-hours': totalhours}, SetOptions(merge: true));
+                                         }
+                                         Navigator.pop(context);
+                                        }, child: const Text('confirm'))
+                                      ],
+                                    );
+                                  });
+                                }
+                                
                               },
                             ),
                             const SizedBox(
