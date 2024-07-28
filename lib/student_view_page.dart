@@ -114,7 +114,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                       TextSpan(
                         text: '  ${widget.person['sem-1-hours']}',
                         style: const TextStyle(
-                            fontSize: 120.0,
+                            fontSize: 110.0,
                             color: Color.fromRGBO(200, 150, 82, 1)),
                       ),
                       const TextSpan(text: '/', style: TextStyle(fontSize: 33.0)),
@@ -140,7 +140,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                       TextSpan(
                         text: '  ${widget.person['sem-2-hours']}',
                         style: TextStyle(
-                            fontSize: 120.0, color: Colors.deepPurple[300]),
+                            fontSize: 110.0, color: Colors.deepPurple[300]),
                       ),
                       const TextSpan(text: '/', style: TextStyle(fontSize: 33.0)),
                       TextSpan(
@@ -148,52 +148,57 @@ class _StudentViewPageState extends State<StudentViewPage> {
                           style: const TextStyle(
                               fontSize: 33.0, color: Colors.lightBlueAccent)),
                     ])),
-                    StreamBuilder(
-                      stream: FirebaseFirestore.instance.collection('roles').snapshots(),
-                      builder:(context,snaphot){
-                        List<String> roles = ['pic','mentor'];
-                        int i = roles.indexOf(widget.userRole);
-                  
-                        for(int j = i;j>=0;j--){
-                          roles.removeAt(j);
-                        }
-                        roles.add('volunteer');
-                      
-                        // ignore: non_constant_identifier_names
-                        List<DropdownMenuEntry<String>> RoleEntries =
-                          roles.map((option) => DropdownMenuEntry<String>(
-                              value: option, label: option)).toList();
-                        return DropdownMenu<String>(
-                          initialSelection: 'volunteer',
-                          requestFocusOnTap: false,
-                          expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                          textStyle: const TextStyle(color: Colors.white),
-                          inputDecorationTheme: const InputDecorationTheme(
-                          fillColor: Color.fromARGB(255, 128, 112, 185),
-                          filled: true,
+                    SizedBox(
+                      width: width/1.3,
+                      child: StreamBuilder(
+                        stream: FirebaseFirestore.instance.collection('roles').snapshots(),
+                        builder:(context,snaphot){
+                          List<String> roles = ['pic','mentor'];
+                          int i = roles.indexOf(widget.userRole);
+                                        
+                          for(int j = i;j>=0;j--){
+                            roles.removeAt(j);
+                          }
+                          roles.add('volunteer');
+                        
+                          // ignore: non_constant_identifier_names
+                          List<DropdownMenuEntry<String>> RoleEntries =
+                            roles.map((option) => DropdownMenuEntry<String>(
+                                value: option, label: option)).toList();
+                          return DropdownMenu<String>(
+                            initialSelection: 'volunteer',
+                            requestFocusOnTap: false,
+                            expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                            textStyle: const TextStyle(color: Colors.white),
+                            inputDecorationTheme: const InputDecorationTheme(
+                            fillColor: Color.fromARGB(255, 128, 112, 185),
+                            filled: true,
+                            ),
+                            label: const Text('role',style: TextStyle(color: Colors.white),),
+                            onSelected: (String? role){setState(() {
+                              if(role != null){
+                                rolechange = role;
+                              }
+                            });},
+                            dropdownMenuEntries: RoleEntries,
+                          );
+                        }),
+                    ),
+                      SizedBox(
+                        width: width /2,
+                        child: Card.outlined(
+                          clipBehavior: Clip.hardEdge,
+                          child: ListTile(
+                            tileColor: Colors.green,
+                            title: const Center (child: Text('Change Role')),
+                            onTap: () {
+                              setState(() {
+                                FirebaseFirestore.instance.collection('users').doc(widget.person.id).update({"role": rolechange}).then(
+                              (value) => print("DocumentSnapshot successfully updated!"),
+                              onError: (e) => print("Error updating document $e"));;
+                              });
+                            },
                           ),
-                          label: const Text('role',style: TextStyle(color: Colors.white),),
-                          onSelected: (String? role){setState(() {
-                            if(role != null){
-                              rolechange = role;
-                            }
-                          });},
-                          dropdownMenuEntries: RoleEntries,
-                        );
-                      }),
-                      Card.outlined(
-                        clipBehavior: Clip.hardEdge,
-                        margin: EdgeInsets.fromLTRB(width/4, 10, width/4, 0),
-                        child: ListTile(
-                          tileColor: Colors.green,
-                          title: const Center (child: Text('Change Role')),
-                          onTap: () {
-                            setState(() {
-                              FirebaseFirestore.instance.collection('users').doc(widget.person.id).update({"role": rolechange}).then(
-                            (value) => print("DocumentSnapshot successfully updated!"),
-                            onError: (e) => print("Error updating document $e"));;
-                            });
-                          },
                         ),
                       )
               ],
