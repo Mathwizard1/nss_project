@@ -81,7 +81,7 @@ Widget build(BuildContext context)
                         const Padding(
                           padding:  EdgeInsets.fromLTRB(20, 0, 0, 0),
                           child: Text('Time: ',style: TextStyle(fontWeight: FontWeight.bold,color: Color.fromARGB(255, 1, 88, 159),fontSize: 18)),
-                        ),Text(widget.document['timestamp'],style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 18))
+                        ),Text(widget.document['timestamp'].toString(),style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 18))
                       ], 
                     ),
 

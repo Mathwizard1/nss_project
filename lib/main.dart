@@ -17,7 +17,7 @@ void main() async
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark,
   ));
@@ -60,7 +60,7 @@ class MainApp extends StatelessWidget
             return const Center(child: Text('Loading...'));
           case ConnectionState.active:
             if (snapshot.data == null) {
-              return WelcomePage();
+              return const WelcomePage();
             }
 
             return StreamBuilder(

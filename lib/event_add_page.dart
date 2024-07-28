@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() => runApp(const MyApp());
@@ -112,8 +110,7 @@ class EventPageState extends State<EventPage> {
                       ? () {
                           Map <String,dynamic> NewEvent = {
                             "title" : _nameController.text.trim(),
-                            "date" : _dateController.text.trim(),
-                            "timestamp" : _timeController.text.trim(),
+                            "timestamp" : Timestamp.fromDate(DateTime.now()),
                             "venue" : _venueController.text.trim(),
                             "hours" : _hoursController.text.trim(),
                             "wing" : dropdownValue1,

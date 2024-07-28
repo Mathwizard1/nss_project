@@ -10,8 +10,6 @@ import 'package:nss_project/mentordummyeventpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-late Map<String, Stream<QuerySnapshot>?> _wings_map;
-
 class StudentHomePage extends StatefulWidget {
   const StudentHomePage({super.key});
 
@@ -109,12 +107,20 @@ class HoursCompletedState extends State<HoursCompletedTab> {
 
 
   final userStreamController=StreamController();
+
+  Future<double> getmaximumhours() async
+  {
+    int maxhours=await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){return snapshot.get('mandatory-hours');});
+    return maxhours.toDouble();
+  }
   
 
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.sizeOf(context).width;
     final screenheight = MediaQuery.sizeOf(context).height;
+  
+    final maxhours=getmaximumhours();
 
 
     return Scaffold(
@@ -123,9 +129,16 @@ class HoursCompletedState extends State<HoursCompletedTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'Your Progress So Far',
-              textScaler: TextScaler.linear(2),
+            TweenAnimationBuilder(
+              tween: Tween<double>(begin: 0,end: 1),
+              duration:const Duration(seconds: 1),
+              child: const Text(
+                'Your Progress So Far',
+                textScaler: TextScaler.linear(2),
+              ),
+              builder: (context, value, child) {
+                return Opacity(opacity: value,child: child,);
+              },
             ),
             SizedBox(
               width: screenwidth - 50,
@@ -146,8 +159,8 @@ class HoursCompletedState extends State<HoursCompletedTab> {
                             ),
                             pointers: <GaugePointer>[
                               RangePointer(
-                                value: (widget.userSnapshot.data!['sem-1-hours'] +
-                                        widget.userSnapshot.data!['sem-2-hours'])
+                                value: (widget.userSnapshot.data['sem-1-hours'] +
+                                        widget.userSnapshot.data['sem-2-hours'])
                                     .toDouble(),
                                 cornerStyle: CornerStyle.bothCurve,
                                 width: 0.2,
@@ -361,22 +374,15 @@ class UpcomingEventsTab extends StatefulWidget {
 }
 
 class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
-  void createStream(String wingname) {
-    if (_wings_map[wingname] == null) {
-      _wings_map[wingname] = FirebaseFirestore.instance
-          .collection('events')
-          .where('wing', isEqualTo: wingname)
-          .snapshots();
-    }
-  }
 
   String _selectedWing = 'All';
 
   ExpansionTileController tilecontroller = ExpansionTileController();
 
-  Widget _buildUpcomingEvent(
-      BuildContext context, QueryDocumentSnapshot<Object?> document,AsyncSnapshot userSnapshot) {
+  Widget _buildUpcomingEvent( BuildContext context, QueryDocumentSnapshot<Object?> document,AsyncSnapshot userSnapshot) {
+
     return Card(
+        //shape:StadiumBorder(side: BorderSide(color: Colors.green,width: 2.0)),
           child: InkWell(
               onTap: () {
                 Navigator.push(
@@ -428,14 +434,8 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return const Flex(direction: Axis.horizontal, children: [
-                  Expanded(
-                      child: Align(
-                          alignment: Alignment(0, -0.25),
-                          child: Text(
-                              'Loading...') // TODO replace all 'Loading...' with spinkit
-                          )),
-                ]);
+                return const Text(
+                    'Loading...');
               }
 
               final wingOptions = ['All'] +
@@ -445,71 +445,76 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                   }).toList();
               final events = FirebaseFirestore.instance.collection('events');
 
-              return Column(children: <Widget>[
-                Card(
-                    borderOnForeground: false,
-                    child: DropdownMenu<String>(
-                        textStyle: const TextStyle(color: Colors.white),
-                        label: const Padding(
-                          padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                          child: Text(
-                            'NSS Wing',
-                            style: TextStyle(color: Colors.white),
+              return Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: Column(children: <Widget>[
+                  Card(
+                      borderOnForeground: false,
+                      child: DropdownMenu<String>(
+                          textStyle: const TextStyle(color: Colors.white),
+                          label: const Padding(
+                            padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                            child: Text(
+                              'NSS Wing',
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
-                        ),
-                        leadingIcon: const Icon(Icons.category_outlined,
-                            color: Colors.white),
-                        expandedInsets:
-                            const EdgeInsets.only(top: 64.0, bottom: 8.0),
-                        inputDecorationTheme: const InputDecorationTheme(
-                          fillColor: Color.fromARGB(255, 128, 112, 185),
-                          filled: true,
-                        ),
-                        initialSelection: 'All',
-                        onSelected: (selectedWing) {
-                          setState(() {
-                            if (selectedWing != null) {
-                              _selectedWing = selectedWing;
-                              createStream(_selectedWing);
-                            }
-                          });
-                        },
-                        dropdownMenuEntries: wingOptions
-                            .map<DropdownMenuEntry<String>>((option) {
-                          return DropdownMenuEntry<String>(
-                            value: option,
-                            label: option,
-                          );
-                        }).toList())),
-                StreamBuilder(
-                    stream: _selectedWing == 'All'
-                        ? events.snapshots()
-                        : _wings_map[
-                            _selectedWing], //events.where('wing', isEqualTo: _selectedWing).snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Expanded(
-                            child: Align(
-                                alignment: Alignment(0, -0.25),
-                                child: Text('Loading...')));
-                      }
-
-                      if (snapshot.data!.docs.isEmpty) {
-                        return const Expanded(
-                            child: Align(
-                                alignment: Alignment(0, -0.25),
-                                child: Text('Nothing to see here ._.')));
-                      }
-
-                      return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (context, index) {
-                            return _buildUpcomingEvent(
-                                context, snapshot.data!.docs[index],widget.userSnapshot);
-                          });
-                    })
-              ]);
+                          leadingIcon: const Icon(Icons.category_outlined,
+                              color: Colors.white),
+                          expandedInsets:
+                              const EdgeInsets.only(top: 64.0, bottom: 8.0),
+                          inputDecorationTheme: const InputDecorationTheme(
+                            fillColor: Color.fromARGB(255, 128, 112, 185),
+                            filled: true,
+                          ),
+                          initialSelection: 'All',
+                          onSelected: (selectedWing) {
+                            setState(() {
+                              if (selectedWing != null) {
+                                _selectedWing = selectedWing;
+                              }
+                            });
+                          },
+                          dropdownMenuEntries: wingOptions
+                              .map<DropdownMenuEntry<String>>((option) {
+                            return DropdownMenuEntry<String>(
+                              value: option,
+                              label: option,
+                            );
+                          }).toList())),
+                  StreamBuilder(
+                      stream: _selectedWing == 'All'
+                          ? events.snapshots()
+                          : events.where('wing', isEqualTo: _selectedWing).snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Align(
+                              alignment: Alignment(0, -0.25),
+                              child: Text('Loading...'));
+                        }
+                
+                        if (snapshot.data!.docs.isEmpty) {
+                          return const Align(
+                              alignment: Alignment(0, -0.25),
+                              child: Text('Nothing to see here ._.'));
+                        }
+                
+                        return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: snapshot.data!.docs.length,
+                            itemBuilder: (context, index) {
+                              return TweenAnimationBuilder(
+                                tween:Tween<double>(begin: 0,end: 1),
+                                duration: const Duration(seconds: 1),
+                                child: _buildUpcomingEvent(context, snapshot.data!.docs[index],widget.userSnapshot),
+                                builder: (BuildContext context,double value,Widget? child){
+                                  return Opacity(opacity: value,child: child,);
+                                },
+                              );
+                            });
+                      })
+                ]),
+              );
             })
       ],
     );

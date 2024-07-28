@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:nss_project/new_event.dart';
 
 import 'package:nss_project/people_page.dart';
 import 'package:nss_project/sprofile_page.dart';
@@ -188,7 +187,7 @@ class MentorHomePageState extends State<MentorHomePage> {
                       radius: 25,
                       backgroundColor: const Color.fromARGB(255, 128, 112, 185),
                       foregroundColor: Colors.white,
-                      child: Center(child: IconButton(onPressed: (){Navigator.push(context,MaterialPageRoute(builder: (context){return NewEvent();}));},icon: const Icon(Icons.add_circle_outline),iconSize: 33,))
+                      child: Center(child: IconButton(onPressed: (){},icon: const Icon(Icons.add_circle_outline),iconSize: 33,))
                       ),
                   ),
                 ),
