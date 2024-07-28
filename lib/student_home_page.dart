@@ -7,6 +7,8 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:nss_project/mentordummyeventpage.dart';
 
+import 'package:nss_project/notification_page.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -53,6 +55,16 @@ class StudentHomePageState extends State<StudentHomePage>
       appBar: AppBar(
         title: const Text('Student'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {   
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => NotificationPage()));
+          
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
