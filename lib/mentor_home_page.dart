@@ -232,7 +232,7 @@ Widget _buildEvent(
         }
         else
         {
-          Navigator.push(context,MaterialPageRoute(builder: (context)=> DisplayEventPage(document: event, selectedRole: "mentor")));
+          Navigator.push(context,MaterialPageRoute(builder: (context)=>MentorDummyEventPage(document: event)));
         }
       },
     ),
