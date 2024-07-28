@@ -438,8 +438,9 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return const Text(
-                    'Loading...');
+	        return Expanded(
+	          child: Center(child: CircularProgressIndicator()),
+	        );
               }
 
               final wingOptions = ['All'] +
@@ -492,15 +493,11 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                           : events.where('wing', isEqualTo: _selectedWing).snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return const Align(
-                              alignment: Alignment(0, -0.25),
-                              child: Text('Loading...'));
+			  return Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: CircularProgressIndicator());
                         }
                 
                         if (snapshot.data!.docs.isEmpty) {
-                          return const Align(
-                              alignment: Alignment(0, -0.25),
-                              child: Text('Nothing to see here ._.'));
+			  return Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: const Text('Nothing to see here ._.'));
                         }
                 
                         return ListView.builder(
