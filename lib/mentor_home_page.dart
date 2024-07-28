@@ -203,38 +203,43 @@ class MentorHomePageState extends State<MentorHomePage> {
 
 Widget _buildEvent(
     QueryDocumentSnapshot<Map<String, dynamic>> event, BuildContext context,bool isFirstTabSelected) {
-  return Card.outlined(
-    elevation: 0.5,
-    margin: const EdgeInsets.fromLTRB(10, 4, 10, 4),
-    color: Colors.white70,
-    child: ListTile(
-      tileColor: const Color.fromARGB(255, 251, 250, 250),
-      title: Text(event['title']),
-      subtitle: Text(event['subtitle']),
-      leading: Icon(
-          IconData(event['icon']['codepoint'], fontFamily: 'MaterialIcons'),
-          color: Color(event['icon']['color'])),
-      trailing: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('${event['hours']} Hrs'),
-          const Text('Active', style: TextStyle(color: Colors.green))
-        ],
-      ),
-      onTap: () {
-        // ON TAP IS TRIGGERED WHEN A TILE IS CLICKED 
-        // PUT THE IF ELSE OF WHICH EVENT PAGE TO GO TO HERE
-        // istaboneselected is aldready a arg in this function
-        if(isFirstTabSelected){
-          Navigator.push(context,MaterialPageRoute(builder: (context)=>MentorDummyEventPage(document: event)));
-          // Add attendence / gallery page
-          //Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: event, selectedRole: "mentor",)));
-        }
-        else
-        {
-          Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: event,selectedRole: 'mentor',)));
-        }
-      },
-    ),
+  return StreamBuilder(
+    stream: FirebaseFirestore.instance.collection('icondata').where('wing',isEqualTo: event['wing']).snapshots(),
+    builder: (context, snapshot) {
+      return Card.outlined(
+        elevation: 0.5,
+        margin: const EdgeInsets.fromLTRB(10, 4, 10, 4),
+        color: Colors.white70,
+        child: ListTile(
+          tileColor: const Color.fromARGB(255, 251, 250, 250),
+          title: Text(event['title']),
+          subtitle: Text(event['subtitle']),
+          leading: Icon(
+              IconData(snapshot.data!.docs[0]['codepoint'], fontFamily: 'MaterialIcons'),
+              color: Color(snapshot.data!.docs[0]['color'])),
+          trailing: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('${event['hours']} Hrs'),
+              const Text('Active', style: TextStyle(color: Colors.green))
+            ],
+          ),
+          onTap: () {
+            // ON TAP IS TRIGGERED WHEN A TILE IS CLICKED 
+            // PUT THE IF ELSE OF WHICH EVENT PAGE TO GO TO HERE
+            // istaboneselected is aldready a arg in this function
+            if(isFirstTabSelected){
+              Navigator.push(context,MaterialPageRoute(builder: (context)=>MentorDummyEventPage(document: event)));
+              // Add attendence / gallery page
+              //Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: event, selectedRole: "mentor",)));
+            }
+            else
+            {
+              Navigator.push(context,MaterialPageRoute(builder: (context)=>DisplayEventPage(document: event,selectedRole: 'mentor',)));
+            }
+          },
+        ),
+      );
+    }
   );
 }
