@@ -81,7 +81,7 @@ class StudentHomePageState extends State<StudentHomePage>
         stream: userDocumentStream.asBroadcastStream(),
         builder: (context, snapshot) {
 	  if (!snapshot.hasData) {
-	    return Center(child: CircularProgressIndicator());
+	    return const Center(child: CircularProgressIndicator());
 	  }
 
           return TabBarView(
@@ -462,7 +462,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-	        return Expanded(
+	        return const Expanded(
 	          child: Center(child: CircularProgressIndicator()),
 	        );
               }
@@ -517,11 +517,11 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                           : events.where('wing', isEqualTo: _selectedWing).snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-			  return Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: CircularProgressIndicator());
+			  return const Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: CircularProgressIndicator());
                         }
                 
                         if (snapshot.data!.docs.isEmpty) {
-			  return Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: const Text('Nothing to see here ._.'));
+			  return const Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: Text('Nothing to see here ._.'));
                         }
                 
                         return ListView.builder(

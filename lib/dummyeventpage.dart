@@ -119,7 +119,7 @@ Widget build(BuildContext context)
               ),
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
-                child: FloatingActionButton.extended(onPressed: (){Navigator.push(context,MaterialPageRoute(builder: (context){return qr_code(userSnapshot:widget.userSnapshot);}));}, label:const Text("Register For Event"),backgroundColor:const Color.fromARGB(255, 247, 253, 245),elevation: 0,),
+                child: FloatingActionButton.extended(onPressed: (){Navigator.push(context,MaterialPageRoute(builder: (context){return qr_code(eventdocument:widget.document,userSnapshot:widget.userSnapshot);}));}, label:const Text("Register For Event"),backgroundColor:const Color.fromARGB(255, 247, 253, 245),elevation: 0,),
               )
               ),
           ),
