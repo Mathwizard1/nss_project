@@ -104,24 +104,27 @@ class HoursCompletedTab extends StatefulWidget {
 }
 
 class HoursCompletedState extends State<HoursCompletedTab> {
-
+  late final double maxhours;
+  late final int maxhoursdisplay;
 
   final userStreamController=StreamController();
 
-  Future<double> getmaximumhours() async
+  Future<void> setmaximumhours() async
   {
-    int maxhours=await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){return snapshot.get('mandatory-hours');});
-    return maxhours.toDouble();
+    int temp=await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){return snapshot.get('mandatory-hours');});
+    setState(() {
+       maxhours=temp.toDouble();
+       maxhoursdisplay=temp;
+    });
   }
   
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     final screenwidth = MediaQuery.sizeOf(context).width;
     final screenheight = MediaQuery.sizeOf(context).height;
-  
-    final maxhours=getmaximumhours();
 
+    setmaximumhours();
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -148,7 +151,7 @@ class HoursCompletedState extends State<HoursCompletedTab> {
                         axes: <RadialAxis>[
                           RadialAxis(
                             minimum: 0,
-                            maximum: 80,
+                            maximum: maxhours,
                             showLabels: false,
                             showTicks: false,
                             axisLineStyle: const AxisLineStyle(
@@ -187,13 +190,13 @@ class HoursCompletedState extends State<HoursCompletedTab> {
                                                               'sem-1-hours'] +
                                                           widget.userSnapshot.data![
                                                               'sem-2-hours'] <
-                                                      80)
+                                                      maxhours)
                                                   ? Colors.red
                                                   : Colors.green),
                                         ),
-                                        const Text(
-                                          "/80",
-                                          style: TextStyle(
+                                        Text(
+                                          "/$maxhoursdisplay",
+                                          style: const TextStyle(
                                               fontSize: 40,
                                               color: Colors.green),
                                         )
@@ -248,10 +251,25 @@ class HourDetailPage extends StatefulWidget {
 
 class HourDetailState extends State<HourDetailPage> with SingleTickerProviderStateMixin {
 
+  Future<void> fetchsemhours() async
+  {
+    int tempsem1hours=await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){return snapshot.get('sem1hours');});
+    int tempsem2hours=await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){return snapshot.get('sem2hours');});
+    setState(() {
+      sem1hours=tempsem1hours;
+      sem2hours=tempsem2hours;
+    });
+  }
+
+  late final int sem1hours;
+  late final int sem2hours;
 
 
   @override
   Widget build(BuildContext context) {
+
+    fetchsemhours();
+
     final screenwidth = MediaQuery.sizeOf(context).width;
     final screenheight = MediaQuery.sizeOf(context).height;
 
@@ -280,18 +298,18 @@ class HourDetailState extends State<HourDetailPage> with SingleTickerProviderSta
                                         tween: Tween(
                                             begin: 0,
                                             end: widget.userSnapshot.data!['sem-1-hours']/
-                                                40),
+                                                sem1hours),
                                         duration: const Duration(seconds: 2),
                                         builder: (context, value, _) =>
                                             CircularProgressIndicator(
                                                 strokeCap: StrokeCap.round,
                                                 strokeWidth: 10,
                                                 backgroundColor: (widget.userSnapshot.data!['sem-1-hours']<
-                                                        40)
+                                                        sem1hours)
                                                     ? Colors.red
                                                     : Colors.white,
                                                 color: (widget.userSnapshot.data!['sem-1-hours'] <
-                                                        40)
+                                                        sem1hours)
                                                     ? Colors.green
                                                     : Colors.blue,
                                                 value: value),
@@ -305,7 +323,7 @@ class HourDetailState extends State<HourDetailPage> with SingleTickerProviderSta
                                     child: Text(
                                       'Semester 1:\n     ' +
                                           widget.userSnapshot.data!['sem-1-hours'].toString() +
-                                          '/40',
+                                          '/$sem1hours',
                                       style: const TextStyle(fontSize: 20),
                                     ),
                                   ))
@@ -327,18 +345,18 @@ class HourDetailState extends State<HourDetailPage> with SingleTickerProviderSta
                                         tween: Tween(
                                             begin: 0,
                                             end: widget.userSnapshot.data!['sem-2-hours'] /
-                                                40),
+                                                sem2hours),
                                         duration: const Duration(seconds: 2),
                                         builder: (context, value, _) =>
                                             CircularProgressIndicator(
                                           strokeCap: StrokeCap.round,
                                           strokeWidth: 10,
                                           backgroundColor: (widget.userSnapshot.data!['sem-2-hours']<
-                                                        40)
+                                                        sem2hours)
                                                     ? Colors.red
                                                     : Colors.white,
                                           color: (widget.userSnapshot.data!['sem-2-hours'] <
-                                                        40)
+                                                        sem2hours)
                                                     ? Colors.green
                                                     : Colors.blue,
                                           value: value,
@@ -353,7 +371,7 @@ class HourDetailState extends State<HourDetailPage> with SingleTickerProviderSta
                                         child: Text(
                                             'Semester 2:\n     ' +
                                                 widget.userSnapshot.data!['sem-2-hours'].toString()+
-                                                '/40',
+                                                '/$sem2hours',
                                             style:
                                                 const TextStyle(fontSize: 20))),
                                   )
@@ -379,6 +397,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
 
   ExpansionTileController tilecontroller = ExpansionTileController();
 
+
   Widget _buildUpcomingEvent( BuildContext context, QueryDocumentSnapshot<Object?> document,AsyncSnapshot userSnapshot) {
 
     return Card(
@@ -392,32 +411,37 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                             document: document,userSnapshot:userSnapshot):MentorDummyEventPage(
                             document: document)));
               },
-              child: Container(
-                decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.topRight,
-                        colors: [
-                      Color.fromARGB(255, 151, 236, 154),
-                      Colors.white,
-                      Colors.white
-                    ])),
-                child: ListTile(
-                  tileColor: const Color.fromARGB(255, 251, 250, 250),
-                  title: Text(document['title']),
-                  subtitle: Text(document['subtitle']),
-                  leading: Icon(
-                      IconData(document['icon']['codepoint'],
-                          fontFamily: 'MaterialIcons'),
-                      color: Color(document['icon']['color'])),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('${document['hours']} Hrs'),
-                      const Text('Active', style: TextStyle(color: Colors.green))
-                    ],
-                  ),
-                ),
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance.collection('icondata').where('wing',isEqualTo: document['wing']).snapshots(),
+                builder: (context, snapshot) {
+                  return Container(
+                    decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.topRight,
+                            colors: [
+                          Color.fromARGB(255, 151, 236, 154),
+                          Colors.white,
+                          Colors.white
+                        ])),
+                    child: ListTile(
+                      tileColor: const Color.fromARGB(255, 251, 250, 250),
+                      title: Text(document['title']),
+                      subtitle: Text(document['subtitle']),
+                      leading: Icon(
+                          IconData(snapshot.data!.docs[0]['codepoint'],
+                              fontFamily: 'MaterialIcons'),
+                          color: Color(snapshot.data!.docs[0]['color'])),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('${document['hours']} Hrs'),
+                          const Text('Active', style: TextStyle(color: Colors.green))
+                        ],
+                      ),
+                    ),
+                  );
+                }
               )),
         );
   }

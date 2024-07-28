@@ -164,9 +164,10 @@ class EventPageState extends State<EventPage> {
                             "hours" : _hoursController.text.trim(),
                             "wing" : dropdownValue1,
                             "recurring" : dropdownValue2,
-                            
+                            "registered-volunteers":[]
                           };
                           FirebaseFirestore.instance.collection("events").add(NewEvent);
+                          Navigator.pop(context);
                           
                         }
                       : null,
