@@ -25,10 +25,54 @@ class EventPage extends StatefulWidget {
 
 class EventPageState extends State<EventPage> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _timeController = TextEditingController();
+  final TextEditingController _subtitleController = TextEditingController();
+  final TextEditingController _description = TextEditingController();
   final TextEditingController _venueController = TextEditingController();
   final TextEditingController _hoursController = TextEditingController();
+
+  DateTime _selectedDateTime = DateTime.now();
+  final TextEditingController _dateController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _dateController.text = _formatDateTime(_selectedDateTime);
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} "
+           "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+  }
+
+  Future<void> _selectDateTime(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDateTime,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (!context.mounted) return;
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(_selectedDateTime),
+      );
+
+      if (pickedTime != null) {
+        setState(() {
+          _selectedDateTime = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+          _dateController.text = _formatDateTime(_selectedDateTime);
+        });
+      }
+    }
+  }
 
   String? dropdownValue1 = 'None';
   String? dropdownValue2 = 'None';
@@ -51,16 +95,10 @@ class EventPageState extends State<EventPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+        title: const Row(
           children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                // Handle back button
-              },
-            ),
-            const SizedBox(width: 10),
-            const Text('Event Page'),
+            SizedBox(width: 10),
+            Text('Event Page'),
           ],
         ),
       ),
@@ -70,21 +108,30 @@ class EventPageState extends State<EventPage> {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Form(
                     key: _formKey,
                     onChanged: _validateForm,
                     child: Column(
                       children: [
-                        _buildTextField(_nameController, 'Name'),
+                        _buildTextField(_nameController, 'Name', 1),
                         const SizedBox(height: 10),
-                        _buildTextField(_dateController, 'Date'),
+                        _buildTextField(_subtitleController, 'subtitle', 1),
                         const SizedBox(height: 10),
-                        _buildTextField(_timeController, 'Time'),
+                        TextFormField(
+                          controller: _dateController,
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.calendar_today),
+                            labelText: 'Select Date and Time',
+                          ),
+                          onTap: () => _selectDateTime(context),
+                        ),
+                        _buildTextField(_description, 'description', 3),
                         const SizedBox(height: 10),
-                        _buildTextField(_venueController, 'Venue'),
+                        _buildTextField(_venueController, 'Venue', 1),
                         const SizedBox(height: 10),
-                        _buildTextField(_hoursController, 'Hours', inputType: TextInputType.number),
+                        _buildTextField(_hoursController, 'Hours', 1, inputType: TextInputType.number),
                         const SizedBox(height: 10),
                         _buildWingDropdown(dropdownValue1, (String? newValue) {
                           setState(() {
@@ -99,7 +146,7 @@ class EventPageState extends State<EventPage> {
                           });
                           _validateForm();
                         }),
-                        const SizedBox(height: 20), // Add some space to avoid overlapping with the floating button
+                        const SizedBox(height: 10), // Add some space to avoid overlapping with the floating button
                       ],
                     ),
                   ),
@@ -112,16 +159,17 @@ class EventPageState extends State<EventPage> {
                       ? () {
                           Map <String,dynamic> NewEvent = {
                             "title" : _nameController.text.trim(),
-                            "date" : _dateController.text.trim(),
-                            "timestamp" : _timeController.text.trim(),
+                            "subtitle" : _subtitleController.text.trim(),
+                            "timestamp" : Timestamp.fromDate(_selectedDateTime),
+                            "description" : _description.text.trim(),
                             "venue" : _venueController.text.trim(),
                             "hours" : _hoursController.text.trim(),
                             "wing" : dropdownValue1,
                             "recurring" : dropdownValue2,
+                            
                           };
                           FirebaseFirestore.instance.collection("events").add(NewEvent);
                           
-
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -153,9 +201,10 @@ class EventPageState extends State<EventPage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String labelText, {TextInputType inputType = TextInputType.text}) {
+  Widget _buildTextField(TextEditingController controller, String labelText, int boxlines, {TextInputType inputType = TextInputType.text}) {
     return TextFormField(
       controller: controller,
+      maxLines: boxlines,
       keyboardType: inputType,
       decoration: InputDecoration(
         labelText: labelText,
