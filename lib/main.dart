@@ -57,39 +57,35 @@ class MainApp extends StatelessWidget
           switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
-            return const Center(child: Text('Loading...'));
+            return Scaffold(body: Center(child: CircularProgressIndicator()));
           case ConnectionState.active:
             if (snapshot.data == null) {
-              return const WelcomePage();
+	      return const WelcomePage();
             }
 
             return StreamBuilder(
               stream: userDocumentSnapshotOnRoleChange(FirebaseFirestore.instance.collection('users').doc(snapshot.data!.uid).snapshots()),
               builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                case ConnectionState.waiting:
-                  return const Center(child: Text('Loading...'));
-                case ConnectionState.active:
-                  switch (snapshot.data!['role']) {
-                  case 'volunteer':
-                    return const StudentHomePage(); // TODO rename to VolunteerHomePage
-                  case 'mentor':
-                    return const MentorHomePage();
-                  case 'pic':
-                    return const PicHomePage();
-                  default:
-                    return const Center(child: Text('Error')); // TODO error page
-                  }
+	        // Don't need to switch here as there isn't any ambiguity as to where the null arises from
+	        if (!snapshot.hasData) {
+                  return Scaffold(body: Center(child: CircularProgressIndicator()));
+		}
 
-                case ConnectionState.done:
-                  return const Center(child: Text('Error')); // TODO error page
+                switch (snapshot.data!['role']) {
+                case 'volunteer':
+                  return const StudentHomePage(); // TODO rename to VolunteerHomePage
+                case 'mentor':
+                  return const MentorHomePage();
+                case 'pic':
+                  return const PicHomePage();
+                default:
+                  return const Center(child: Text('Error: Unknown user role')); // TODO error page
                 }
               },
             );
 
           case ConnectionState.done:
-            return const Center(child: Text('Error')); // TODO error page
+            return const Center(child: Text('Error: FirebaseAuth unexpectedly closed connection')); // TODO error page
           }
         },
       ),
