@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nss_project/notification_page.dart';
 
 void main() => runApp(const MyApp());
 
@@ -167,6 +168,7 @@ class EventPageState extends State<EventPage> {
                             "registered-volunteers":[]
                           };
                           FirebaseFirestore.instance.collection("events").add(NewEvent);
+                          addNotification("${_nameController.text.trim()}Event added. Event on ${_formatDateTime(_selectedDateTime)}");
                           Navigator.pop(context);
                           
                         }
