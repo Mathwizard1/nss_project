@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'package:nss_project/event_add_page.dart';
+
+import 'package:nss_project/event_page.dart';
 import 'package:nss_project/people_page.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:nss_project/mentordummyeventpage.dart';
@@ -229,7 +232,7 @@ Widget _buildEvent(
         }
         else
         {
-          Navigator.push(context,MaterialPageRoute(builder: (context)=>MentorDummyEventPage(document: event)));
+          Navigator.push(context,MaterialPageRoute(builder: (context)=> DisplayEventPage(document: event, selectedRole: "mentor")));
         }
       },
     ),
