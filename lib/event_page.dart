@@ -19,8 +19,8 @@ class DisplayEventPageState extends State<DisplayEventPage> {
 
   Event event = Event(
     name: "Sample event",
-    date: "2024",
-    time: "10:00 AM",
+    subtitle: "2024",
+    time: DateTime.now(),
     venue: "Room 101",
     longDescription: "Sample description",
     wing: "Technology",
@@ -32,12 +32,14 @@ class DisplayEventPageState extends State<DisplayEventPage> {
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _nameController;
-  late TextEditingController _dateController;
-  late TextEditingController _timeController;
+  late TextEditingController _subtitleController;
   late TextEditingController _venueController;
   late TextEditingController _descriptionController;
   late TextEditingController _hoursController;
   late String _selectedWing;
+
+  DateTime _selectedDateTime = DateTime.now();
+  late TextEditingController _timeController;
 
   @override 
   void initState()
@@ -47,11 +49,16 @@ class DisplayEventPageState extends State<DisplayEventPage> {
     initEdit();
   }
 
+  String _formatDateTime(DateTime dateTime) {
+    return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} "
+           "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+  }
+
   void initEdit()
   {
     _nameController = TextEditingController(text: event.name);
-    _dateController = TextEditingController(text: event.date);
-    _timeController = TextEditingController(text: event.time);
+    _subtitleController = TextEditingController(text: event.subtitle);
+    _timeController = TextEditingController(text: _formatDateTime(event.time));
     _venueController = TextEditingController(text: event.venue);
     _descriptionController = TextEditingController(text: event.longDescription);
     _hoursController = TextEditingController(text: event.hours.toString());
@@ -61,7 +68,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
   @override
   void dispose() {
     _nameController.dispose();
-    _dateController.dispose();
+    _subtitleController.dispose();
     _timeController.dispose();
     _venueController.dispose();
     _descriptionController.dispose();
@@ -77,8 +84,9 @@ Future updateDoc() async
   docpath.update({'hours':event.hours});
   docpath.update({'venue':event.venue});
   docpath.update({'title':event.name});
+  docpath.update({'subtitle':event.subtitle});
   docpath.update({'wing':event.wing});
-  docpath.update({'timestamp':event.time});
+  docpath.update({'timestamp':Timestamp.fromDate(event.time)});
 }
 
 
@@ -89,8 +97,8 @@ Future updateDoc() async
         if (_formKey.currentState!.validate()) {
           setState(() {
             event.name = _nameController.text;
-            event.date = _dateController.text;
-            event.time = _timeController.text;
+            event.subtitle = _subtitleController.text;
+            event.time = _selectedDateTime;
             event.venue = _venueController.text;
             event.longDescription = _descriptionController.text;
             event.wing = _selectedWing;
@@ -109,8 +117,8 @@ Future updateDoc() async
       if (_ismentorEditing) {
         if (_formKey.currentState!.validate()) {
           setState(() {
-            event.date = _dateController.text;
-            event.time = _timeController.text;
+            event.subtitle = _subtitleController.text;
+            event.time = _selectedDateTime;
             event.venue = _venueController.text;
             updateDoc();
             _ismentorEditing = false;
@@ -130,12 +138,42 @@ Future updateDoc() async
 
   void syncdetails()
   {
-    event.time=widget.document['timestamp'].toString();
+    event.time=widget.document['timestamp'].toDate();
     event.name=widget.document['title'];
     event.venue=widget.document['venue'];
     event.longDescription=widget.document['description'];
     event.hours=widget.document['hours'];
     event.wing=widget.document['wing'];
+  }
+
+  Future<void> _selectDateTime(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDateTime,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (!context.mounted) return;
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(_selectedDateTime),
+      );
+
+      if (pickedTime != null) {
+        setState(() {
+          _selectedDateTime = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+          _timeController.text = _formatDateTime(_selectedDateTime);
+        });
+      }
+    }
   }
 
   @override
@@ -191,12 +229,12 @@ Future updateDoc() async
                                 children: [
                                   Expanded(
                                     child: TextFormField(
-                                      controller: _dateController,
-                                      keyboardType: TextInputType.datetime,
-                                      decoration: const InputDecoration(labelText: 'Date'),
+                                      controller: _subtitleController,
+                                      keyboardType: TextInputType.text,
+                                      decoration: const InputDecoration(labelText: 'subtitle'),
                                       validator: (value) {
                                         if (value!.isEmpty) {
-                                          return 'Please enter date';
+                                          return 'Please enter subtitle';
                                         }
                                         return null;
                                       },
@@ -206,14 +244,18 @@ Future updateDoc() async
                                   Expanded(
                                     child: TextFormField(
                                       controller: _timeController,
+                                      readOnly: true,
                                       keyboardType: TextInputType.text,
-                                      decoration: const InputDecoration(labelText: 'Time'),
+                                      decoration: const InputDecoration(
+                                        icon: Icon(Icons.calendar_today),
+                                        labelText: 'Time'),
                                       validator: (value) {
                                         if (value!.isEmpty) {
                                           return 'Please enter time';
                                         }
                                         return null;
                                       },
+                                      onTap: () => _selectDateTime(context),
                                     ),
                                   ),
                                 ],
@@ -226,7 +268,7 @@ Future updateDoc() async
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
                                 child: Text(
-                                  '${event.date} at ${event.time}',
+                                  '${event.time}',
                                   style: const TextStyle(
                                     fontSize: 20,
                                     color: Colors.blue,
@@ -453,8 +495,8 @@ Future updateDoc() async
 // Define the Event class
 class Event {
   String name;
-  String date;
-  String time;
+  String subtitle;
+  DateTime time;
   String venue;
   String longDescription;
   String wing;
@@ -462,7 +504,7 @@ class Event {
 
   Event({
     required this.name,
-    required this.date,
+    required this.subtitle,
     required this.time,
     required this.venue,
     required this.longDescription,
