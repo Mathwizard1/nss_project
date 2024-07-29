@@ -14,9 +14,6 @@ final focusborder=OutlineInputBorder(
   borderRadius:BorderRadius.circular(12)
 );
 
-var _confirmpasswordbordercolor=const Color.fromARGB(255, 186, 185, 185);
-bool confirmpasswordstate=false;
-
 class SignUpPage extends StatefulWidget
 {
   const SignUpPage({super.key});
@@ -31,12 +28,11 @@ class SignUpPage extends StatefulWidget
 
 class SignUpPageState extends State<SignUpPage>
 {
+  bool _visibility = false;
+  var passwordicon = Icons.visibility;
 
-  var confirmpasswordfocusborder=OutlineInputBorder(
-  borderSide:BorderSide(width:3,color:_confirmpasswordbordercolor),
-  borderRadius:BorderRadius.circular(12)
-  );
-
+  bool _isLoading = false;
+  String _errorMessage = '';
 
   TextEditingController emailcontroller=TextEditingController();
   TextEditingController fullnamecontroller=TextEditingController();
@@ -44,42 +40,52 @@ class SignUpPageState extends State<SignUpPage>
   TextEditingController passwordcontroller=TextEditingController();
   TextEditingController confirmpasswordcontroller=TextEditingController();
 
-  bool informationcheck()
-  {
-    return (emailcontroller.text.trim()!=""&&rollnumbercontroller.text.trim()!=""&&fullnamecontroller.text.trim()!=""&&passwordcontroller.text.trim()!="");
-  }
+  Future<void> _trySignUp() async {
+    if (_isLoading) {
+      return;
+    }
 
+    if (emailcontroller.text.trim() == '' || rollnumbercontroller.text.trim() == '' || fullnamecontroller.text.trim() == '' || passwordcontroller.text.trim() == '') {
+      setState(() => _errorMessage = 'Can\'t leave one or more fields empty.');
+      return;
+    }
 
-  Future signUp() async
-  {
-    final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailcontroller.text.trim(), password: passwordcontroller.text.trim());
-    await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
-      'attended-events': [],
-      'email': emailcontroller.text.trim(),
-      'group': 'Undecided',
-      'hour-deductions': [],
-      'full-name': fullnamecontroller.text.trim(),
-      'role': 'volunteer',
-      'roll-number': rollnumbercontroller.text.trim(),
-      'sem-1-hours': 0,
-      'sem-2-hours': 0,
-    });
+    if (passwordcontroller.text.trim() != confirmpasswordcontroller.text.trim()) {
+      setState(() => _errorMessage = 'Passwords don\'t match.');
+      return;
+    }
 
-    // ignore: use_build_context_synchronously
-    Navigator.pop(context);
-  }
+    try {
+      setState(() => _isLoading = true);
 
+      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailcontroller.text.trim(), password: passwordcontroller.text.trim());
+      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+        'attended-events': [],
+        'email': emailcontroller.text.trim(),
+        'group': 'Undecided',
+        'hour-deductions': [],
+        'full-name': fullnamecontroller.text.trim(),
+        'role': 'volunteer',
+        'roll-number': rollnumbercontroller.text.trim(),
+        'sem-1-hours': 0,
+        'sem-2-hours': 0,
+      });
 
-  bool confirmpassword(String a,String b)
-  {
-    return a == b;
+      FocusManager.instance.primaryFocus?.unfocus(); // TODO Doesn't work
+
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+    } on FirebaseException catch (e) {
+      setState(() {
+	_isLoading = false;
+        _errorMessage = e.message!;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context)
   {
-    var passwordicon=Icons.enhanced_encryption;
-    bool encryptionState=false;
 
     final screenwidth=MediaQuery.sizeOf(context).width;
     final screenheight=MediaQuery.sizeOf(context).height;
@@ -95,11 +101,11 @@ class SignUpPageState extends State<SignUpPage>
           SizedBox(
             width:200,
             height:150,
-            child:Image.asset("assets/images/nss-iitp-logo.png")
+            child:Image.asset('assets/images/nss-iitp-logo.png')
           ),
 
           Padding( padding:EdgeInsets.fromLTRB(0,20,screenwidth*0.5,20),
-          child:const Text("Sign Up",style:TextStyle(fontSize:30,fontWeight:FontWeight.w900))
+          child:const Text('Sign Up',style:TextStyle(fontSize:30,fontWeight:FontWeight.w900))
           ),
 
           Padding( 
@@ -109,7 +115,7 @@ class SignUpPageState extends State<SignUpPage>
               decoration: InputDecoration(
               enabledBorder: enableborder,
               focusedBorder: focusborder,
-              labelText:"Enter Email",
+              labelText:'Enter Email',
             ),
           )
           ),
@@ -121,7 +127,7 @@ class SignUpPageState extends State<SignUpPage>
               decoration: InputDecoration(
               enabledBorder: enableborder,
               focusedBorder: focusborder,
-              labelText:"Enter Full Name",
+              labelText:'Enter Full Name',
             ),
           )
           ),
@@ -133,7 +139,7 @@ class SignUpPageState extends State<SignUpPage>
               decoration: InputDecoration(
               enabledBorder: enableborder,
               focusedBorder: focusborder,
-              labelText:"Enter Roll Number",
+              labelText:'Enter Roll Number',
             ),
           )
           ),
@@ -143,21 +149,21 @@ class SignUpPageState extends State<SignUpPage>
             padding:EdgeInsets.fromLTRB(screenwidth/10,20,screenwidth/10,0),
             child:TextField(
               obscuringCharacter: '*',
-              obscureText: encryptionState,
+              obscureText: !_visibility,
               controller:passwordcontroller,
               decoration: InputDecoration(
               suffixIcon:IconButton(
                 icon:Icon(passwordicon),
                 onPressed:()=>{setState((){
-                  if(encryptionState==false)
+                  if(_visibility==false)
                    {
-                  encryptionState=true;
-                  passwordicon=Icons.no_encryption;
+                  _visibility=true;
+                  passwordicon=Icons.visibility_off;
                    }
                   else
                   {
-                    encryptionState=false;
-                    passwordicon=Icons.enhanced_encryption;
+                    _visibility=false;
+                    passwordicon=Icons.visibility;
                   }
                   }
                  )
@@ -166,7 +172,7 @@ class SignUpPageState extends State<SignUpPage>
               ),
               enabledBorder: enableborder,
               focusedBorder: focusborder,
-              labelText:"Enter Password",
+              labelText:'Enter Password',
             ),
           )
           ),
@@ -175,41 +181,15 @@ class SignUpPageState extends State<SignUpPage>
             padding:EdgeInsets.fromLTRB(screenwidth/10,20,screenwidth/10,0),
             child:TextField(
               controller:confirmpasswordcontroller,
-              onTap: (){setState(() {
-                _confirmpasswordbordercolor=Colors.red;
-              });},
-              onSubmitted: (value){
-                if
-                (confirmpassword(passwordcontroller.text.trim(),confirmpasswordcontroller.text.trim()))
-                {
-                  setState(() {
-                    _confirmpasswordbordercolor=Colors.green;
-                    confirmpasswordstate=true;
-                  });
-                }
-                else
-                {
-                   setState(() {
-                  
-                  _confirmpasswordbordercolor=Colors.red;
-                  confirmpasswordstate=false;
-                  });
-                }
-              },
               obscuringCharacter: '*',
               obscureText: true,
               decoration: InputDecoration(
-              enabledBorder: OutlineInputBorder(
-                borderSide:BorderSide(width:3,color:_confirmpasswordbordercolor),
-                borderRadius:BorderRadius.circular(12)
-                ),
-              focusedBorder: focusborder,
-              labelText:"Confirm Password",
+                enabledBorder: enableborder,
+                focusedBorder: focusborder,
+                labelText:'Confirm Password',
+              ),
             ),
-          )
           ),
-
-          
 
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
@@ -217,26 +197,25 @@ class SignUpPageState extends State<SignUpPage>
               width:screenwidth/3,
               height:50,
               child:TextButton(
-                onPressed: (){
-		  debugPrint('$confirmpasswordstate');
-                  if(confirmpasswordstate && informationcheck())
-                  {
-                  signUp();
-                  }
-                },
+                onPressed: _trySignUp,
                 style:const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(Colors.blue),
+                  backgroundColor: WidgetStatePropertyAll(Colors.indigo),
                   foregroundColor:WidgetStatePropertyAll(Colors.white),
                 ),
-                child:const Text("Submit"),
+                child: (_isLoading ? CircularProgressIndicator(color: Colors.white) : const Text('Submit')),
               )
-              ),
+            ),
           ),
 
+	  Padding(
+	    padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+	    child: SizedBox(child: Center(child: Text((_isLoading ? '' : _errorMessage), style: TextStyle(color: Colors.red))), width: 3 * screenwidth / 4),
+	  ),
+
           Padding(
-             padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+             padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
              child: Row(mainAxisAlignment: MainAxisAlignment.center,
-             children: [const Text("Have an account? "),GestureDetector(onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage())),child: const Text("Login",style:TextStyle(color:Colors.blue)))],),
+             children: [const Text('Have an account? '),GestureDetector(onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage())),child: const Text('Login',style:TextStyle(color:Colors.blue)))],),
            )
 
           ]
