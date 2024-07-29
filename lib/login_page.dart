@@ -28,8 +28,8 @@ class LoginPageState extends State<LoginPage>
   TextEditingController emailinput=TextEditingController();
   TextEditingController passwordinput=TextEditingController();
 
-  bool _encryptionState=true;
-  var passwordicon=Icons.no_encryption;
+  bool _visibility=false;
+  var passwordicon=Icons.visibility;
 
   bool _isLoading = false;
   String _errorMessage = '';
@@ -46,7 +46,10 @@ class LoginPageState extends State<LoginPage>
 
     try {
       setState(() => _isLoading = true);
+
       await FirebaseAuth.instance.signInWithEmailAndPassword(email:emailinput.text.trim(), password: passwordinput.text.trim());
+
+      FocusManager.instance.primaryFocus?.unfocus(); // TODO Doesn't work
 
       // ignore: use_build_context_synchronously
       Navigator.pop(context);
@@ -111,21 +114,21 @@ class LoginPageState extends State<LoginPage>
               padding:EdgeInsets.fromLTRB(width/10,20,width/10,0),
               child:TextField(
                 obscuringCharacter: '*',
-                obscureText: _encryptionState,
+                obscureText: !_visibility,
                 controller:passwordinput,
                 decoration: InputDecoration(
                 suffixIcon:IconButton(
                   icon:Icon(passwordicon),
                   onPressed:()=>{setState((){
-                    if(_encryptionState==false)
+                    if(_visibility==false)
                      {
-                    _encryptionState=true;
-                    passwordicon=Icons.no_encryption;
+                    _visibility=true;
+                    passwordicon=Icons.visibility_off;
                      }
                     else
                     {
-                      _encryptionState=false;
-                      passwordicon=Icons.enhanced_encryption;
+                      _visibility=false;
+                      passwordicon=Icons.visibility;
                     }
                     }
                    )
