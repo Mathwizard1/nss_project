@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nss_project/wing_piechart.dart';
 import 'student_view_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -13,6 +14,7 @@ class PeoplePage extends StatefulWidget {
 }
 
 class _PeoplePageState extends State<PeoplePage> {
+
   @override
   Widget build(BuildContext context) {
     String mentorname = "Pranjal";
@@ -22,6 +24,9 @@ class _PeoplePageState extends State<PeoplePage> {
       initialIndex: 0,
       length: 2,
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(onPressed:(){
+          Navigator.push(context,MaterialPageRoute(builder: (context) => const WingPiechart()));
+        },),
         appBar: AppBar(
           title: Text('Hey $mentorname'),
           actions: <Widget>[
@@ -85,10 +90,11 @@ class _PeoplePageState extends State<PeoplePage> {
       ),
     );
   }
+
 }
 
 Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person, String userRole ,BuildContext context){
-  print(person.id.toString());
+
   return Card.outlined(
     elevation: 0.5,
     color: Colors.white70,
