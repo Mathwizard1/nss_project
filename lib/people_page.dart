@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:nss_project/wing_piechart.dart';
+import 'package:nss_project/newpic_homepage.dart';
 import 'student_view_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -25,7 +25,7 @@ class _PeoplePageState extends State<PeoplePage> {
       length: 2,
       child: Scaffold(
         floatingActionButton: FloatingActionButton(onPressed:(){
-          Navigator.push(context,MaterialPageRoute(builder: (context) => const WingPiechart()));
+          Navigator.push(context,MaterialPageRoute(builder: (context) => const NewpicHomepage()));
         },),
         appBar: AppBar(
           title: Text('Hey $mentorname'),
