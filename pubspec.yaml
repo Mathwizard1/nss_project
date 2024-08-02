@@ -42,6 +42,7 @@ dependencies:
   cloud_firestore: ^5.1.0
   qr_flutter: ^4.1.0
   flutter_barcode_scanner: ^2.0.0
+  pie_chart: ^5.4.0
 
 dev_dependencies:
   flutter_test:
