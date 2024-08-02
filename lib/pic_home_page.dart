@@ -88,6 +88,10 @@ class _PeoplePageState extends State<PicHomePage> {
                 stream:
                     FirebaseFirestore.instance.collection('configurables').doc("document").snapshots(),
                 builder: (context, snapshot) {
+		  if (!snapshot.hasData) {
+		    return CircularProgressIndicator();
+		  }
+
                   List<String> WingOptions = ["All"] +
                       snapshot.data!['wings'].map<String>((wing) {
                         String ret = wing;
@@ -145,6 +149,10 @@ Widget _buildEvent(
   return StreamBuilder(
     stream: FirebaseFirestore.instance.collection('icondata').where('wing',isEqualTo: event['wing']).snapshots(),
     builder: (context, snapshot) {
+      if (!snapshot.hasData) {
+        return CircularProgressIndicator();
+      }
+
       return Card.outlined(
         elevation: 0.5,
         margin: const EdgeInsets.fromLTRB(10, 4, 10, 4),
