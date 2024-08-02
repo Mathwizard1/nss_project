@@ -42,9 +42,13 @@ class DisplayEventPageState extends State<DisplayEventPage> {
   late TextEditingController _timeController;
 
   @override 
-  void initState()
+  void initState() async
   {
     super.initState();
+
+    wingsList = (await FirebaseFirestore.instance.collection('configurables').doc('document').get())['wings'].map((dyn) { String ret = dyn; return ret; }).toList();
+    debugPrint('$wingsList');
+
     syncdetails();
     initEdit();
   }
