@@ -76,11 +76,11 @@ class _NewpicHomepageState extends State<NewpicHomepage> {
                 width: width/2 - 15,
                 height: width/2 -15,
                 child: ElevatedButton(
-                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 108, 120, 90)), shape: WidgetStateProperty.all(const ContinuousRectangleBorder())),
+                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Color.fromARGB(255, 191, 193, 189)), shape: WidgetStateProperty.all(const ContinuousRectangleBorder())),
                   onPressed: (){
                     Navigator.push(context,MaterialPageRoute(builder: (context) => const PicEventList()));
                   },
-                  child: const Icon(Icons.abc_rounded),
+                  child: Icon(Icons.list,size: width/3,color: const Color.fromARGB(255, 28, 32, 30),),
                 ),
               ),
                 const SizedBox(width: 10,),
