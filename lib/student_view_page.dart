@@ -93,7 +93,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                     const SizedBox(
                       height: 30,
                     ),
-                RichText(
+                (widget.person['role'] == 'volunteer') ? RichText(
                     text: TextSpan(
                         style: const TextStyle(
                             color: Colors.black,
@@ -115,11 +115,11 @@ class _StudentViewPageState extends State<StudentViewPage> {
                           text: '${(snapshot.data!['mandatory-hours'])/2}',
                           style: const TextStyle(
                               fontSize: 33.0, color: Colors.lightBlueAccent)),
-                    ])),
+                    ])) : const SizedBox(height: 20,),
                 SizedBox(
                   height: height / 8,
                 ),
-                RichText(
+                (widget.person['role'] == 'volunteer') ? RichText(
                     text: TextSpan(
                         style: const TextStyle(
                             color: Colors.black,
@@ -140,7 +140,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                           text: '${(snapshot.data!['mandatory-hours'])/2}',
                           style: const TextStyle(
                               fontSize: 33.0, color: Colors.lightBlueAccent)),
-                    ])),
+                    ])) : const SizedBox(height: 20,),
                     SizedBox(height: 20,),
                     SizedBox(
                       width: width/1.3,
