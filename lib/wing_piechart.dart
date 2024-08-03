@@ -12,11 +12,12 @@ class WingPiechart extends StatefulWidget {
 }
 
 class _WingPiechartState extends State<WingPiechart> {
-  Map<String, double> wingmap = {};
 
   @override
   Widget build(BuildContext context) {
+    Map<String, double> wingmap = {};
     return Scaffold(
+      appBar: AppBar(title: Text('Wing Activity'),),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('events').snapshots(),
         builder: (context, snapshot) {
@@ -34,8 +35,12 @@ class _WingPiechartState extends State<WingPiechart> {
               }
             }
             
-            return PieChart(
-              dataMap: wingmap,
+            return Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: PieChart(
+                dataMap: wingmap,
+                legendOptions: LegendOptions(legendPosition: LegendPosition.bottom),
+              ),
             );
           }
           return const Text('helo');

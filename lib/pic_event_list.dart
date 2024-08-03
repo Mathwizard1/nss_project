@@ -23,6 +23,18 @@ class _PicEventListState extends State<PicEventList> {
 
   String selectedWing = 'All';
   String selectedMentor = 'All';
+  Stream<DocumentSnapshot<Map<String, dynamic>>>? ConfigurablesStream;
+  Stream<QuerySnapshot<Map<String, dynamic>>>? EventStream;
+  Stream<QuerySnapshot<Map<String, dynamic>>>? MentorStream;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    ConfigurablesStream = FirebaseFirestore.instance.collection('configurables').doc("document").snapshots();
+    EventStream = FirebaseFirestore.instance.collection("events").snapshots();
+    MentorStream = FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'mentor').snapshots();
+  }
   @override
   Widget build(BuildContext context) {
     String mentorname = "Pranjal";
@@ -68,75 +80,78 @@ class _PicEventListState extends State<PicEventList> {
               ],
             ),
             StreamBuilder(
-                stream:
-                    FirebaseFirestore.instance.collection('configurables').doc("document").snapshots(),
-                builder: (context, snapshot) {
-                  List<String> WingOptions = ["All"] +
-                      snapshot.data!['wings'].map<String>((wing) {
-                        String ret = wing;
-                        return ret;
-                      }).toList();
-                  List<DropdownMenuEntry<String>> WingMenuEntries =
-                      WingOptions.map((option) => DropdownMenuEntry<String>(value: option, label: option)).toList();
-                  List<String> MentorOptions = ["All"] + 
-                      snapshot.data!['mentors'].map<String>((mentor) {
-                        String ret = mentor;
-                        return ret;
-                      }).toList();
-                  List<DropdownMenuEntry<String>> MentorMenuEntries =
-                      MentorOptions.map((option) => DropdownMenuEntry<String>(value: option, label: option)).toList();
-                  return Column(
-                    children: [
-                      DropdownMenu<String>(
-                        initialSelection: 'All',
-                        requestFocusOnTap: false,
-                        expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                        textStyle: const TextStyle(color: Colors.white),
-                        inputDecorationTheme: const InputDecorationTheme(
-                          fillColor: Color.fromARGB(255, 128, 112, 185),
-                          filled: true,
+              stream: MentorStream,
+              builder:(context,mentorshot) => StreamBuilder(
+                  stream: ConfigurablesStream,
+                  builder: (context, snapshot) {
+                    if(!snapshot.hasData) return Center(child: CircularProgressIndicator(),);
+                    List<String> WingOptions = ["All"] +
+                        snapshot.data!['wings'].map<String>((wing) {
+                          String ret = wing;
+                          return ret;
+                        }).toList();
+                    List<DropdownMenuEntry<String>> WingMenuEntries =
+                        WingOptions.map((option) => DropdownMenuEntry<String>(value: option, label: option)).toList();
+                    List<String> MentorOptions = ["All"] + 
+                        mentorshot.data!.docs.map<String>((mentor) {
+                          String ret = mentor['full-name'];
+                          return ret;
+                        }).toList();
+                    List<DropdownMenuEntry<String>> MentorMenuEntries =
+                        MentorOptions.map((option) => DropdownMenuEntry<String>(value: option, label: option)).toList();
+                    return Column(
+                      children: [
+                        DropdownMenu<String>(
+                          initialSelection: 'All',
+                          requestFocusOnTap: false,
+                          expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          textStyle: const TextStyle(color: Colors.white),
+                          inputDecorationTheme: const InputDecorationTheme(
+                            fillColor: Color.fromARGB(255, 128, 112, 185),
+                            filled: true,
+                          ),
+                          label: const Text(
+                            'NSS Wing',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onSelected: (String? wing) {
+                            setState(() {
+                              if (wing != null) {
+                                selectedWing = wing;
+                              }
+                            });
+                          },
+                          dropdownMenuEntries: WingMenuEntries,
                         ),
-                        label: const Text(
-                          'NSS Wing',
-                          style: TextStyle(color: Colors.white),
+                        DropdownMenu<String>(
+                          initialSelection: 'All',
+                          requestFocusOnTap: false,
+                          expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          textStyle: const TextStyle(color: Colors.white),
+                          inputDecorationTheme: const InputDecorationTheme(
+                            fillColor: Color.fromARGB(255, 0, 255, 102),
+                            filled: true,
+                          ),
+                          label: const Text(
+                            'Mentor',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onSelected: (String? mentor) {
+                            setState(() {
+                              if (mentor != null) {
+                                selectedMentor = mentor;
+                              }
+                            });
+                          },
+                          dropdownMenuEntries: MentorMenuEntries,
                         ),
-                        onSelected: (String? wing) {
-                          setState(() {
-                            if (wing != null) {
-                              selectedWing = wing;
-                            }
-                          });
-                        },
-                        dropdownMenuEntries: WingMenuEntries,
-                      ),
-                      DropdownMenu<String>(
-                        initialSelection: 'All',
-                        requestFocusOnTap: false,
-                        expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                        textStyle: const TextStyle(color: Colors.white),
-                        inputDecorationTheme: const InputDecorationTheme(
-                          fillColor: Color.fromARGB(255, 0, 255, 102),
-                          filled: true,
-                        ),
-                        label: const Text(
-                          'Mentor',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onSelected: (String? mentor) {
-                          setState(() {
-                            if (mentor != null) {
-                              selectedMentor = mentor;
-                            }
-                          });
-                        },
-                        dropdownMenuEntries: MentorMenuEntries,
-                      ),
-                      
-                    ],
-                  );
-                }),
+                        
+                      ],
+                    );
+                  }),
+            ),
             StreamBuilder(
-                stream: FirebaseFirestore.instance.collection("events").snapshots(),
+                stream: EventStream,
                 builder: (context, snapshot) {
                   List<QueryDocumentSnapshot<Map<String,dynamic>>> events = [for(var x in snapshot.data!.docs) 
                                                                                     if((selectedWing == 'All') ? true :x['wing'] == selectedWing)
