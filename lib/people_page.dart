@@ -69,6 +69,7 @@ class _PeoplePageState extends State<PeoplePage> {
                 }
                 );
               }),
+
               StreamBuilder(stream: FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'mentor').snapshots(), 
               builder: (context,snapshot){
                 if(!snapshot.hasData){
@@ -81,9 +82,9 @@ class _PeoplePageState extends State<PeoplePage> {
                 itemBuilder: (context,index){
                   return _buildPerson(stdlist[index],widget.userRole,context);
                 }
+          );}),
 
-                return const Text('Hello Darkness my ..');
-              }),
+
               StreamBuilder(stream: FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'secretary').snapshots(), 
               builder: (context,snapshot){
                 if(snapshot.hasData){
@@ -97,9 +98,8 @@ class _PeoplePageState extends State<PeoplePage> {
                   );
                 }
                 return const Text('Hello Darkness my ..');
-                );
-              })
 
+              }),
             ],
           ),
         ),
