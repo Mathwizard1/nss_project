@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'date_time_formatter.dart';
+import 'package:nss_project/notification_page.dart';
 
 class DisplayEventPage extends StatefulWidget {
   final QueryDocumentSnapshot document;
@@ -69,6 +70,32 @@ class DisplayEventPageState extends State<DisplayEventPage> {
     super.dispose();
   }
 
+  Future<void> _deleteDocumentByName(BuildContext context) async {
+    try {
+      // Reference to the Firestore collection
+        final DocumentReference documentref = widget.document.reference;
+
+        // Delete the document
+        await documentref.delete();
+
+        // Optionally show a success message
+        if(!context.mounted){ return; }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Document with name ${widget.document['title']} deleted successfully')),
+        );
+
+      // Pop the page
+      addNotification("${widget.document['title']} event as been deleted.");
+      if(!context.mounted){ return; }
+      Navigator.of(context).pop();
+
+    } catch (e) {
+      // Handle errors (e.g., show an error message)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete document: $e')),
+      );
+    }
+  }
 
   Future updateDoc() async
   {
@@ -120,10 +147,6 @@ class DisplayEventPageState extends State<DisplayEventPage> {
         });
       }
     }
-  }
-
-  void _deleteEvent() {
-    // Implement delete functionality here
   }
 
   void syncdetails()
@@ -466,7 +489,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                   bottom: 90.0,
                   right: 80.0,
                   child: FloatingActionButton(
-                    onPressed: _deleteEvent,
+                    onPressed: (){ _deleteDocumentByName(context); },
                     backgroundColor: Colors.red,
                     child: const Icon(Icons.delete),
                   ),
