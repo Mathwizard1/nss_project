@@ -10,8 +10,7 @@ import 'student_home_page.dart';
 import 'mentor_home_page.dart';
 import 'pic_home_page.dart';
 
-void main() async
-{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await SystemChrome.setPreferredOrientations([
@@ -29,9 +28,7 @@ void main() async
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget
-{
-
+class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   Stream<DocumentSnapshot> userDocumentSnapshotOnRoleChange(Stream<DocumentSnapshot> userDocumentStream) async* {
@@ -75,7 +72,8 @@ class MainApp extends StatelessWidget
                 case 'volunteer':
                   return const StudentHomePage(); // TODO rename to VolunteerHomePage
                 case 'mentor':
-                  return const MentorHomePage();
+                case 'secretary':
+                  return MentorHomePage(role: snapshot.data!['role']);
                 case 'pic':
                   return const PicHomePage();
                 default:

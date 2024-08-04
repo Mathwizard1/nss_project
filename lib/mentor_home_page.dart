@@ -13,28 +13,10 @@ import 'package:nss_project/notification_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MentorHomePageApp extends StatelessWidget {
-  const MentorHomePageApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: MentorHomePage(),
-    );
-  }
-}
-
-int calculateDifferenceInMinutes(Timestamp firebaseTimestamp) {
-  DateTime currentTime = DateTime.now();
-  DateTime firebaseTime = firebaseTimestamp.toDate();
-
-  // Calculate the difference in minutes
-  int differenceInMinutes = currentTime.difference(firebaseTime).inMinutes;
-  return differenceInMinutes;
-}
-
 class MentorHomePage extends StatefulWidget {
-  const MentorHomePage({super.key});
+  final String role;
+
+  const MentorHomePage({super.key, required this.role });
 
   @override
   MentorHomePageState createState() => MentorHomePageState();
@@ -44,13 +26,11 @@ class MentorHomePageState extends State<MentorHomePage> {
   bool isFirstTabSelected = true;
   String selectedWing = 'All';
 
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mentor'),
+        title: Text(widget.role[0].toUpperCase() + widget.role.substring(1)),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
