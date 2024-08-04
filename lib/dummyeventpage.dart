@@ -122,7 +122,7 @@ class DummyEventPageState extends State<DummyEventPage> {
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(0, height / 15, 0, 0),
-              child: Container(
+               child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: const Color.fromARGB(255, 130, 252, 134),

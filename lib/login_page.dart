@@ -153,7 +153,7 @@ class LoginPageState extends State<LoginPage>
                     backgroundColor: WidgetStatePropertyAll(Colors.indigo),
                     foregroundColor:WidgetStatePropertyAll(Colors.white),
                   ),
-                  child: (_isLoading ? CircularProgressIndicator(color: Colors.white) : const Text('Submit')),
+                  child: (_isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('Submit')),
                 )
               ),
             ),

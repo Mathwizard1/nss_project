@@ -6,7 +6,6 @@ import 'package:nss_project/wing_piechart.dart';
 import 'package:nss_project/pic_event_list.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NewpicHomepage extends StatefulWidget {
   const NewpicHomepage({super.key});
@@ -80,7 +79,7 @@ class _NewpicHomepageState extends State<NewpicHomepage> {
                   onPressed: (){
                     Navigator.push(context,MaterialPageRoute(builder: (context) => const PicEventList()));
                   },
-                  child: Icon(Icons.list_alt,size: width/3,color: Color.fromARGB(255, 59, 62, 61),),
+                  child: Icon(Icons.list_alt,size: width/3,color: const Color.fromARGB(255, 59, 62, 61),),
                 ),
               ),
                 const SizedBox(width: 10,),

@@ -66,7 +66,7 @@ class SignUpPageState extends State<SignUpPage>
         'hour-deductions': [],
         'full-name': fullnamecontroller.text.trim(),
         'role': 'volunteer',
-        'roll-number': rollnumbercontroller.text.trim(),
+        'roll-number': rollnumbercontroller.text.trim().toUpperCase(),
         'sem-1-hours': 0,
         'sem-2-hours': 0,
       });
@@ -202,7 +202,7 @@ class SignUpPageState extends State<SignUpPage>
                   backgroundColor: WidgetStatePropertyAll(Colors.indigo),
                   foregroundColor:WidgetStatePropertyAll(Colors.white),
                 ),
-                child: (_isLoading ? CircularProgressIndicator(color: Colors.white) : const Text('Submit')),
+                child: (_isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('Submit')),
               )
             ),
           ),
@@ -215,7 +215,7 @@ class SignUpPageState extends State<SignUpPage>
           Padding(
              padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
              child: Row(mainAxisAlignment: MainAxisAlignment.center,
-             children: [const Text('Have an account? '),GestureDetector(onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage())),child: const Text('Login',style:TextStyle(color:Colors.blue)))],),
+             children: [const Text('Have an account? '),GestureDetector(onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage())),child: const Text('Login',style:TextStyle(color:Colors.blue)))],),
            )
 
           ]

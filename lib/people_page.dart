@@ -16,6 +16,26 @@ class PeoplePage extends StatefulWidget {
 
 class _PeoplePageState extends State<PeoplePage> {
 
+  var tempvolunteerstream=FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'volunteer');
+  var volunteerstream=FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'volunteer');
+
+  Future openDialog()
+  {
+    TextEditingController searchcontroller=TextEditingController();
+    return showDialog(context: context, builder: (context){return AlertDialog(
+      title: const Text("Enter Roll Number"),
+      content: SearchBar(controller: searchcontroller,),
+      actions: [
+        FloatingActionButton(child:const Text("Submit"),
+        onPressed: (){setState(() {
+          volunteerstream=volunteerstream.where('roll-number',isEqualTo: searchcontroller.text.trim().toUpperCase());
+          Navigator.pop(context);
+        });}
+        )
+      ],
+    );});
+  }
+
   @override
   Widget build(BuildContext context) {
     String mentorname = "Pranjal";
@@ -25,12 +45,21 @@ class _PeoplePageState extends State<PeoplePage> {
       initialIndex: 0,
       length: 3,
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(onPressed:(){
-          Navigator.push(context,MaterialPageRoute(builder: (context) => const NewpicHomepage()));
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.search),
+          onPressed:(){
+          openDialog();
         },),
         appBar: AppBar(
           title: Text('Hey $mentorname'),
           actions: <Widget>[
+            
+            IconButton(onPressed:(){setState(() {
+              volunteerstream=tempvolunteerstream;
+            });}, 
+            icon: const Icon(Icons.refresh)
+            ),
+
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
@@ -56,12 +85,12 @@ class _PeoplePageState extends State<PeoplePage> {
           margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           child: TabBarView(
             children: <Widget>[
-              StreamBuilder(stream: FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'volunteer').snapshots(), 
+              StreamBuilder(stream: volunteerstream.snapshots(), 
               builder: (context,snapshot){
                 if(!snapshot.hasData){
                   return const Center(child: Text("Loading"));
                 }
-
+                
                 List<QueryDocumentSnapshot<Map<String, dynamic>>> stdlist = 
                 [for (var i in snapshot.data!.docs) i];
                 return ListView.builder(itemCount: stdlist.length,
@@ -145,16 +174,6 @@ Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person, String u
               child: Text('${person['roll-number']}',style:const TextStyle(fontSize: 18,color: Color.fromARGB(201, 119, 109, 109)),),
             )
           ],)
-          /*ListTile(
-            horizontalTitleGap: 16,
-        
-            leading: const Icon(Icons.account_circle,size: 50,),
-            title: Text(getCapitalizedName(person['full-name']),style:const TextStyle(fontWeight: FontWeight.w600,fontSize: 22),),
-            subtitle: Text('${person['roll-number']}',style:const TextStyle(fontSize: 14),),
-            onTap: (){
-              Navigator.push(context,MaterialPageRoute(builder: (context) => StudentViewPage(person: person)));
-            },
-          )*/,
         ),
       ),
     ),
