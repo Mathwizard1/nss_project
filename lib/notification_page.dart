@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import 'date_time_formatter.dart';
+
 class NotificationModel {
   final String id;
   final String message;
@@ -52,7 +54,7 @@ class NotificationPage extends StatelessWidget {
               final notification = notifications[index];
               return ListTile(
                 title: Text(notification.message),
-                subtitle: Text(notification.timestamp.toString()),
+                subtitle: Text(DateTimeFormatter.format(notification.timestamp)),
               );
             },
           );

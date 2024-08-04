@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import 'date_time_formatter.dart';
 
 class DisplayEventPage extends StatefulWidget {
   final QueryDocumentSnapshot document;
@@ -17,7 +18,6 @@ class DisplayEventPageState extends State<DisplayEventPage> {
 
   Event event = Event(
     name: "Sample event",
-    subtitle: "2024",
     time: DateTime.now(),
     venue: "Room 101",
     longDescription: "Sample description",
@@ -30,7 +30,6 @@ class DisplayEventPageState extends State<DisplayEventPage> {
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _nameController;
-  late TextEditingController _subtitleController;
   late TextEditingController _venueController;
   late TextEditingController _descriptionController;
   late TextEditingController _hoursController;
@@ -50,16 +49,10 @@ class DisplayEventPageState extends State<DisplayEventPage> {
     initEdit();
   }
 
-  String _formatDateTime(DateTime dateTime) {
-    return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} "
-           "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
-  }
-
   void initEdit()
   {
     _nameController = TextEditingController(text: event.name);
-    _subtitleController = TextEditingController(text: event.subtitle);
-    _timeController = TextEditingController(text: _formatDateTime(event.time));
+    _timeController = TextEditingController(text: DateTimeFormatter.format(event.time));
     _venueController = TextEditingController(text: event.venue);
     _descriptionController = TextEditingController(text: event.longDescription);
     _hoursController = TextEditingController(text: event.hours.toString());
@@ -69,7 +62,6 @@ class DisplayEventPageState extends State<DisplayEventPage> {
   @override
   void dispose() {
     _nameController.dispose();
-    _subtitleController.dispose();
     _timeController.dispose();
     _venueController.dispose();
     _descriptionController.dispose();
@@ -85,7 +77,6 @@ class DisplayEventPageState extends State<DisplayEventPage> {
     docpath.update({'hours':event.hours});
     docpath.update({'venue':event.venue});
     docpath.update({'title':event.name});
-    docpath.update({'subtitle':event.subtitle});
     docpath.update({'wing':event.wing});
     docpath.update({'timestamp':Timestamp.fromDate(event.time)});
   }
@@ -98,7 +89,6 @@ class DisplayEventPageState extends State<DisplayEventPage> {
         if (_formKey.currentState!.validate()) {
           setState(() {
             event.name = _nameController.text;
-            event.subtitle = _subtitleController.text;
             event.time = _selectedDateTime;
             event.venue = _venueController.text;
             event.longDescription = _descriptionController.text;
@@ -118,7 +108,6 @@ class DisplayEventPageState extends State<DisplayEventPage> {
       if (_ismentorEditing) {
         if (_formKey.currentState!.validate()) {
           setState(() {
-            event.subtitle = _subtitleController.text;
             event.time = _selectedDateTime;
             event.venue = _venueController.text;
             updateDoc();
@@ -171,7 +160,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
             pickedTime.hour,
             pickedTime.minute,
           );
-          _timeController.text = _formatDateTime(_selectedDateTime);
+          _timeController.text = DateTimeFormatter.format(_selectedDateTime);
         });
       }
     }
@@ -237,20 +226,6 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                             (_isEditing || _ismentorEditing)
                                 ? Row(
                                     children: [
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: _subtitleController,
-                                          keyboardType: TextInputType.text,
-                                          decoration: const InputDecoration(labelText: 'subtitle'),
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return 'Please enter subtitle';
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
                                       Expanded(
                                         child: TextFormField(
                                           controller: _timeController,
@@ -510,7 +485,6 @@ class DisplayEventPageState extends State<DisplayEventPage> {
 // Define the Event class
 class Event {
   String name;
-  String subtitle;
   DateTime time;
   String venue;
   String longDescription;
@@ -519,7 +493,6 @@ class Event {
 
   Event({
     required this.name,
-    required this.subtitle,
     required this.time,
     required this.venue,
     required this.longDescription,

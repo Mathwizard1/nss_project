@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:nss_project/date_time_formatter.dart';
 import 'package:nss_project/picprofile_page.dart';
 import 'package:nss_project/event_page.dart';
 
@@ -184,7 +185,7 @@ Widget _buildEvent(
         child: ListTile(
           tileColor: const Color.fromARGB(255, 251, 250, 250),
           title: Text(event['title']),
-          subtitle: Text(event['subtitle']),
+          subtitle: Text(DateTimeFormatter.format(event['timestamp'].toDate())),
           leading: Icon(
               IconData(snapshot.data!.docs[0]['codepoint'], fontFamily: 'MaterialIcons'),
               color: Color(snapshot.data!.docs[0]['color'])),

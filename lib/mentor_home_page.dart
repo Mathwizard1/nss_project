@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'package:nss_project/date_time_formatter.dart';
 import 'package:nss_project/event_add_page.dart';
 
 import 'package:nss_project/event_page.dart';
@@ -12,32 +13,10 @@ import 'package:nss_project/notification_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
-  runApp(const MentorHomePageApp());
-}
-
-class MentorHomePageApp extends StatelessWidget {
-  const MentorHomePageApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: MentorHomePage(),
-    );
-  }
-}
-
-int calculateDifferenceInMinutes(Timestamp firebaseTimestamp) {
-  DateTime currentTime = DateTime.now();
-  DateTime firebaseTime = firebaseTimestamp.toDate();
-
-  // Calculate the difference in minutes
-  int differenceInMinutes = currentTime.difference(firebaseTime).inMinutes;
-  return differenceInMinutes;
-}
-
 class MentorHomePage extends StatefulWidget {
-  const MentorHomePage({super.key});
+  final String role;
+
+  const MentorHomePage({super.key, required this.role });
 
   @override
   MentorHomePageState createState() => MentorHomePageState();
@@ -47,13 +26,11 @@ class MentorHomePageState extends State<MentorHomePage> {
   bool isFirstTabSelected = true;
   String selectedWing = 'All';
 
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mentor'),
+        title: Text(widget.role[0].toUpperCase() + widget.role.substring(1)),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
@@ -62,7 +39,6 @@ class MentorHomePageState extends State<MentorHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => NotificationPage()));
-          
             },
           ),
           IconButton(
@@ -233,7 +209,7 @@ Widget _buildEvent(
         child: ListTile(
           tileColor: const Color.fromARGB(255, 251, 250, 250),
           title: Text(event['title']),
-          subtitle: Text(event['subtitle']),
+          subtitle: Text(DateTimeFormatter.format(event['timestamp'].toDate())),
           leading: Icon(
               IconData(snapshot.data!.docs[0]['codepoint'], fontFamily: 'MaterialIcons'),
               color: Color(snapshot.data!.docs[0]['color'])),
