@@ -28,6 +28,12 @@ class qrcodeState extends State<qr_code>
     final screenheight=MediaQuery.sizeOf(context).height;
 
     return Scaffold(
+      //floatingActionButton: FloatingActionButton(
+      //  child: Icon(Icons.image),
+      //  onTap: () {
+      //    
+      //  },
+      //),
       body:Center(child: Stack(
         children: [
           

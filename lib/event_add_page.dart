@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:nss_project/notification_page.dart';
+
+import 'date_time_formatter.dart';
+import 'notification_page.dart';
 
 void main() => runApp(const MyApp());
 
@@ -24,7 +26,6 @@ class EventPage extends StatefulWidget {
 
 class EventPageState extends State<EventPage> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _subtitleController = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final TextEditingController _venueController = TextEditingController();
   final TextEditingController _hoursController = TextEditingController();
@@ -35,12 +36,7 @@ class EventPageState extends State<EventPage> {
   @override
   void initState() {
     super.initState();
-    _dateController.text = _formatDateTime(_selectedDateTime);
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} "
-           "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+    _dateController.text = DateTimeFormatter.format(_selectedDateTime);
   }
 
   Future<void> _selectDateTime(BuildContext context) async {
@@ -67,7 +63,7 @@ class EventPageState extends State<EventPage> {
             pickedTime.hour,
             pickedTime.minute,
           );
-          _dateController.text = _formatDateTime(_selectedDateTime);
+          _dateController.text = DateTimeFormatter.format(_selectedDateTime);
         });
       }
     }
@@ -115,8 +111,6 @@ class EventPageState extends State<EventPage> {
                       children: [
                         _buildTextField(_nameController, 'Name', 1),
                         const SizedBox(height: 10),
-                        _buildTextField(_subtitleController, 'subtitle', 1),
-                        const SizedBox(height: 10),
                         TextFormField(
                           controller: _dateController,
                           readOnly: true,
@@ -158,7 +152,6 @@ class EventPageState extends State<EventPage> {
                       ? () {
                           Map <String,dynamic> NewEvent = {
                             "title" : _nameController.text.trim(),
-                            "subtitle" : _subtitleController.text.trim(),
                             "timestamp" : Timestamp.fromDate(_selectedDateTime),
                             "description" : _description.text.trim(),
                             "venue" : _venueController.text.trim(),
@@ -168,7 +161,7 @@ class EventPageState extends State<EventPage> {
                             "registered-volunteers":[]
                           };
                           FirebaseFirestore.instance.collection("events").add(NewEvent);
-                          addNotification("${_nameController.text.trim()}Event added. Event on ${_formatDateTime(_selectedDateTime)}");
+                          addNotification("${_nameController.text.trim()}Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
                           Navigator.pop(context);
                           
                         }
