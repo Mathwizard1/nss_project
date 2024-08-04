@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nss_project/event_add_page.dart';
 
 import 'package:nss_project/people_page.dart';
 import 'package:nss_project/picprofile_page.dart';
@@ -47,6 +48,34 @@ class _NewpicHomepageState extends State<NewpicHomepage> {
                 width: width/2 - 15,
                 height: width/2 -15,
                 child: ElevatedButton(
+                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 191, 193, 189)), shape: WidgetStateProperty.all(const ContinuousRectangleBorder())),
+                  onPressed: (){
+                    Navigator.push(context,MaterialPageRoute(builder: (context) => const PicEventList()));
+                  },
+                  child: Icon(Icons.list_alt,size: width/3,color: const Color.fromARGB(255, 59, 62, 61),),
+                ),
+              ),
+                const SizedBox(width: 10,),
+                SizedBox(
+                width: width/2 - 15,
+                height: width/2 -15,
+                child: ElevatedButton(
+                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 191, 193, 189)), shape: WidgetStateProperty.all(const ContinuousRectangleBorder())),
+                  onPressed: (){
+                    Navigator.push(context,MaterialPageRoute(builder: (context) => const EventPage()));
+                  },
+                  child: Icon(Icons.format_list_bulleted_add,size: width/3,color: const Color.fromARGB(255, 59, 62, 61),),
+                ),
+              )
+              ],
+            ),
+            const SizedBox(height: 10,),
+            Row(
+              children: [
+                SizedBox(
+                width: width/2 - 15,
+                height: width/2 -15,
+                child: ElevatedButton(
                   style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 155, 169, 215)), shape: WidgetStateProperty.all(const ContinuousRectangleBorder())),
                   onPressed: (){
                     Navigator.push(context,MaterialPageRoute(builder: (context) => const PeoplePage(userRole: "pic",)));
@@ -69,32 +98,7 @@ class _NewpicHomepageState extends State<NewpicHomepage> {
               ],
             ),
             const SizedBox(height: 10,),
-            Row(
-              children: [
-                SizedBox(
-                width: width/2 - 15,
-                height: width/2 -15,
-                child: ElevatedButton(
-                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 191, 193, 189)), shape: WidgetStateProperty.all(const ContinuousRectangleBorder())),
-                  onPressed: (){
-                    Navigator.push(context,MaterialPageRoute(builder: (context) => const PicEventList()));
-                  },
-                  child: Icon(Icons.list_alt,size: width/3,color: const Color.fromARGB(255, 59, 62, 61),),
-                ),
-              ),
-                const SizedBox(width: 10,),
-                SizedBox(
-                width: width/2 - 15,
-                height: width/2 -15,
-                child: ElevatedButton(
-                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 108, 120, 90)), shape: WidgetStateProperty.all(const ContinuousRectangleBorder())),
-                  onPressed: (){},
-                  child: const Icon(Icons.abc_rounded),
-                ),
-              )
-              ],
-            ),
-            const SizedBox(height: 10,),
+            
             
           ],),
       )
