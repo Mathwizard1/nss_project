@@ -36,7 +36,7 @@ class _EmailSenderState extends State<EmailSender> {
   final _subjectController = TextEditingController(text: 'The subject');
 
   final _bodyController = TextEditingController(
-    text: 'Mail body.',
+    text: 'Mail body. This is a sample text and will be replaced with more information.',
   );
 
   Future<void> send() async {
@@ -71,7 +71,7 @@ class _EmailSenderState extends State<EmailSender> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Plugin example app'),
+        title: const Text('Email Page'),
         actions: <Widget>[
           IconButton(
             onPressed: send,
@@ -136,32 +136,12 @@ class _EmailSenderState extends State<EmailSender> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: <Widget>[
-                  for (var i = 0; i < attachments.length; i++)
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            attachments[i],
-                            softWrap: false,
-                            overflow: TextOverflow.fade,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle),
-                          onPressed: () => {_removeAttachment(i)},
-                        )
-                      ],
-                    ),
                   Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
                       icon: const Icon(Icons.attach_file),
                       onPressed: _openImagePicker,
                     ),
-                  ),
-                  TextButton(
-                    child: const Text('Attach file in app documents directory'),
-                    onPressed: () => _attachFileFromAppDocumentsDirectoy(context),
                   ),
                 ],
               ),
@@ -179,32 +159,6 @@ class _EmailSenderState extends State<EmailSender> {
       setState(() {
         attachments.add(pick.path);
       });
-    }
-  }
-
-  void _removeAttachment(int index) {
-    setState(() {
-      attachments.removeAt(index);
-    });
-  }
-
-  Future<void> _attachFileFromAppDocumentsDirectoy(BuildContext context) async {
-    try {
-      final appDocumentDir = await getApplicationDocumentsDirectory();
-      final filePath = '${appDocumentDir.path}/file.txt';
-      final file = File(filePath);
-      await file.writeAsString('Text file in app directory');
-
-      setState(() {
-        attachments.add(filePath);
-      });
-    } catch (e) {
-      if(!context.mounted) {return;}
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to create file in applicion directory'),
-        ),
-      );
     }
   }
 }
