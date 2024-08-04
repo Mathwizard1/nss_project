@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'date_time_formatter.dart';
 import 'notification_page.dart';
 
+import 'package:textfield_tags/textfield_tags.dart';
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -25,6 +27,9 @@ class EventPage extends StatefulWidget {
 }
 
 class EventPageState extends State<EventPage> {
+  late List<String> wingslist;
+  List<String> mentorlist = [];
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final TextEditingController _venueController = TextEditingController();
@@ -33,11 +38,78 @@ class EventPageState extends State<EventPage> {
   DateTime _selectedDateTime = DateTime.now();
   final TextEditingController _dateController = TextEditingController();
 
+  late double _distanceToField;
+  late StringTagController _wingTagController;
+  late double _distanceToField2;
+  late StringTagController _mentorTagController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _distanceToField = MediaQuery.of(context).size.width;
+    _distanceToField2 = MediaQuery.of(context).size.width;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _nameController.dispose();
+    _description.dispose();
+    _venueController.dispose();
+    _hoursController.dispose();
+    _dateController.dispose();
+    _wingTagController.dispose();
+    _mentorTagController.dispose();
+  }
+
+  Future<void> getWings() async
+  {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('configurables').doc('document').get();
+
+      if (snapshot.exists) {
+        List<dynamic> arrayField = snapshot.get('wings'); 
+        setState(() {
+          wingslist = List<String>.from(arrayField);
+        });
+      }
+      else
+      {
+        wingslist = ["None"];
+      }
+  }
+
+  Future<void> getMentors() async {
+    // Query the 'users' collection for documents where 'role' is 'mentors'
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'mentor')
+        .get();
+
+    // Iterate through the query results and extract the 'name' field
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      String? name = doc.get('full-name');
+      if (name != null) {
+        mentorlist.add(name);
+      }
+    }
+
+    if(mentorlist.isEmpty)
+    {
+      mentorlist.add("All");
+    }
+}
+
   @override
   void initState() {
     super.initState();
+    getWings();
+    getMentors();
     _dateController.text = DateTimeFormatter.format(_selectedDateTime);
+    _wingTagController = StringTagController();
+    _mentorTagController = StringTagController();
   }
+
 
   Future<void> _selectDateTime(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
@@ -139,7 +211,321 @@ class EventPageState extends State<EventPage> {
                           });
                           _validateForm(_hoursController.text.trim());
                         }),
-                        const SizedBox(height: 10), // Add some space to avoid overlapping with the floating button
+                        const SizedBox(height: 10),
+            Autocomplete<String>(
+              optionsViewBuilder: (context, onSelected, options) {
+                return Container(
+                  height: 40,
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 4.0),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Material(
+                      elevation: 4.0,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 200),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: options.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final String option = options.elementAt(index);
+                            return TextButton(
+                              onPressed: () {
+                                onSelected(option);
+                              },
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  '#$option',
+                                  textAlign: TextAlign.left,
+                                  style: const TextStyle(
+                                    color: Color.fromARGB(255, 74, 137, 92),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                if (textEditingValue.text == '') {
+                  return const Iterable<String>.empty();
+                }
+                return wingslist.where((String option) {
+                  return (option.toLowerCase()).contains(textEditingValue.text.toLowerCase());
+                });
+              },
+              onSelected: (String selectedTag) {
+                _wingTagController.onTagSubmitted(selectedTag);
+              },
+              fieldViewBuilder: (context, textEditingController, focusNode,
+                  onFieldSubmitted) {
+                return TextFieldTags<String>(
+                  textEditingController: textEditingController,
+                  focusNode: focusNode,
+                  textfieldTagsController: _wingTagController,
+                  letterCase: LetterCase.normal,
+                  validator: (String tag) {
+                    if (!wingslist.contains(tag)) {
+                      return 'No Wing found for collborators';
+                    } else if (_wingTagController.getTags!.contains(tag)) {
+                      return 'Wing already in list';
+                    }
+                    return null;
+                  },
+                  inputFieldBuilder: (context, inputFieldValues) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: TextField(
+                        controller: inputFieldValues.textEditingController,
+                        focusNode: inputFieldValues.focusNode,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          border: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromARGB(255, 74, 137, 92),
+                              width: 3.0,
+                            ),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromARGB(255, 74, 137, 92),
+                              width: 3.0,
+                            ),
+                          ),
+                          helperText: 'Enter Collaborator wings',
+                          helperStyle: const TextStyle(
+                            color: Color.fromARGB(255, 74, 137, 92),
+                          ),
+                          hintText: inputFieldValues.tags.isNotEmpty
+                              ? ''
+                              : "Enter Wings",
+                          errorText: inputFieldValues.error,
+                          prefixIconConstraints:
+                              BoxConstraints(maxWidth: _distanceToField * 0.74),
+                          prefixIcon: inputFieldValues.tags.isNotEmpty
+                              ? SingleChildScrollView(
+                                  controller:
+                                      inputFieldValues.tagScrollController,
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                      children: inputFieldValues.tags
+                                          .map((String tag) {
+                                    return Container(
+                                      decoration: const BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0),
+                                        ),
+                                        color: Color.fromARGB(255, 74, 137, 92),
+                                      ),
+                                      margin:
+                                          const EdgeInsets.only(right: 10.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0, vertical: 4.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          InkWell(
+                                            child: Text(
+                                              tag,
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            onTap: () {
+                                              //print("$tag selected");
+                                            },
+                                          ),
+                                          const SizedBox(width: 4.0),
+                                          InkWell(
+                                            child: const Icon(
+                                              Icons.cancel,
+                                              size: 14.0,
+                                              color: Color.fromARGB(
+                                                  255, 233, 233, 233),
+                                            ),
+                                            onTap: () {
+                                              inputFieldValues
+                                                  .onTagRemoved(tag);
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }).toList()),
+                                )
+                              : null,
+                        ),
+                        onChanged: inputFieldValues.onTagChanged,
+                        onSubmitted: inputFieldValues.onTagSubmitted,
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+                      const SizedBox(height: 10),
+            Autocomplete<String>(
+              optionsViewBuilder: (context, onSelected, options) {
+                return Container(
+                  height: 40,
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 4.0),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Material(
+                      elevation: 4.0,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 200),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: options.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final String option = options.elementAt(index);
+                            return TextButton(
+                              onPressed: () {
+                                onSelected(option);
+                              },
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  option,
+                                  textAlign: TextAlign.left,
+                                  style: const TextStyle(
+                                    color: Color.fromARGB(255, 74, 137, 92),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                if (textEditingValue.text == '') {
+                  return const Iterable<String>.empty();
+                }
+                return mentorlist.where((String option) {
+                  return (option.toLowerCase()).contains(textEditingValue.text.toLowerCase());
+                });
+              },
+              onSelected: (String selectedTag) {
+                _mentorTagController.onTagSubmitted(selectedTag);
+              },
+              fieldViewBuilder: (context, textEditingController, focusNode,
+                  onFieldSubmitted) {
+                return TextFieldTags<String>(
+                  textEditingController: textEditingController,
+                  focusNode: focusNode,
+                  textfieldTagsController: _mentorTagController,
+                  letterCase: LetterCase.normal,
+                  validator: (String tag) {
+                    if (!mentorlist.contains(tag)) {
+                      return 'No mentors found';
+                    } else if (_mentorTagController.getTags!.contains(tag)) {
+                      return 'Mentor already selected';
+                    }
+                    return null;
+                  },
+                  inputFieldBuilder: (context, inputFieldValues) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: TextField(
+                        controller: inputFieldValues.textEditingController,
+                        focusNode: inputFieldValues.focusNode,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          border: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromARGB(255, 74, 137, 92),
+                              width: 3.0,
+                            ),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromARGB(255, 74, 137, 92),
+                              width: 3.0,
+                            ),
+                          ),
+                          helperText: 'Enter organizing mentors',
+                          helperStyle: const TextStyle(
+                            color: Color.fromARGB(255, 74, 137, 92),
+                          ),
+                          hintText: inputFieldValues.tags.isNotEmpty
+                              ? ''
+                              : "Enter Mentors",
+                          errorText: inputFieldValues.error,
+                          prefixIconConstraints:
+                              BoxConstraints(maxWidth: _distanceToField2 * 0.74),
+                          prefixIcon: inputFieldValues.tags.isNotEmpty
+                              ? SingleChildScrollView(
+                                  controller:
+                                      inputFieldValues.tagScrollController,
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                      children: inputFieldValues.tags
+                                          .map((String tag) {
+                                    return Container(
+                                      decoration: const BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0),
+                                        ),
+                                        color: Color.fromARGB(255, 74, 137, 92),
+                                      ),
+                                      margin:
+                                          const EdgeInsets.only(right: 10.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0, vertical: 4.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          InkWell(
+                                            child: Text(
+                                              tag,
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            onTap: () {
+                                              //print("$tag selected");
+                                            },
+                                          ),
+                                          const SizedBox(width: 4.0),
+                                          InkWell(
+                                            child: const Icon(
+                                              Icons.cancel,
+                                              size: 14.0,
+                                              color: Color.fromARGB(
+                                                  255, 233, 233, 233),
+                                            ),
+                                            onTap: () {
+                                              inputFieldValues
+                                                  .onTagRemoved(tag);
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }).toList()),
+                                )
+                              : null,
+                        ),
+                        onChanged: inputFieldValues.onTagChanged,
+                        onSubmitted: inputFieldValues.onTagSubmitted,
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+                      const SizedBox(height: 50),
                       ],
                     ),
                   ),
@@ -158,10 +544,13 @@ class EventPageState extends State<EventPage> {
                             "hours" : int.parse(_hoursController.text.trim()),
                             "wing" : dropdownValue1,
                             "recurring" : dropdownValue2,
-                            "registered-volunteers":[]
+                            "registered-volunteers":[],
+                            "organizing-mentor": _mentorTagController.getTags!.toList(),
+                            "collaborators": _wingTagController.getTags!.toList(),
+                            "are-photos-final": false
                           };
                           FirebaseFirestore.instance.collection("events").add(NewEvent);
-                          addNotification("${_nameController.text.trim()}Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
+                          addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
                           Navigator.pop(context);
                           
                         }

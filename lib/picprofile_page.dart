@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
+import 'notification_page.dart';
 
 // import 'package:nss_project/leaderboard_page.dart';
 
@@ -130,17 +131,49 @@ class _PicProfilePageState extends State<PicProfilePage> {
                     name = text;
                   },
                 ),
-                TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Configurables()));
-                    },
-                    child: const Text(
-                      'Change Configurables',
-                      style: TextStyle(decoration: TextDecoration.underline),
-                    )),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white, backgroundColor: Colors.blue[900],
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                              MaterialPageRoute(
+                            builder: (context) => const Configurables()));
+                      },
+                      child: const Text(
+                        'Change Configurables',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white, backgroundColor: Colors.blue[900],
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      ),
+                      onPressed: () {
+                        deleteAllNotifications();
+                      },
+                      child: const Text(
+                        'Delete all notifications',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
                 // Padding(
                 //   padding: const EdgeInsets.all(5.0),
                 //   child: SizedBox(

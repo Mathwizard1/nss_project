@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'date_time_formatter.dart';
 import 'package:nss_project/notification_page.dart';
+import 'email_page.dart';
 
 class DisplayEventPage extends StatefulWidget {
   final QueryDocumentSnapshot document;
@@ -439,7 +440,8 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                                       ),
                                       onPressed: () {
-                                        // Implement your onPressed functionality here
+                                        Navigator.push(context,
+                                          MaterialPageRoute(builder: (context) => const EmailSender()));
                                       },
                                       child: const Text(
                                         'Generate and Send Email to PIC',
