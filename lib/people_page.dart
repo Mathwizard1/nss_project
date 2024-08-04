@@ -57,31 +57,31 @@ class _PeoplePageState extends State<PeoplePage> {
             children: <Widget>[
               StreamBuilder(stream: FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'volunteer').snapshots(), 
               builder: (context,snapshot){
-                if(snapshot.hasData){
-                  List<QueryDocumentSnapshot<Map<String, dynamic>>> stdlist = 
-                  [for (var i in snapshot.data!.docs) i];   // FIX CAUSE DEV IS A ASSHOLE   if(i['first name'] != 'dev') if(i['role'] == 'volunteer')
-                  //print(stdlist.length);
-                  return ListView.builder(itemCount: stdlist.length,
-                  itemBuilder: (context,index){
-                    return _buildPerson(stdlist[index],widget.userRole,context);
-                  }
-                  );
+                if(!snapshot.hasData){
+                  return const Text('Hello Darkness my ..');
                 }
-                return const Text('Hello Darkness my ..');
+
+                List<QueryDocumentSnapshot<Map<String, dynamic>>> stdlist = 
+                [for (var i in snapshot.data!.docs) i];
+                return ListView.builder(itemCount: stdlist.length,
+                itemBuilder: (context,index){
+                  return _buildPerson(stdlist[index],widget.userRole,context);
+                }
+                );
               }),
               StreamBuilder(stream: FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'mentor').snapshots(), 
               builder: (context,snapshot){
-                if(snapshot.hasData){
-                  List<QueryDocumentSnapshot<Map<String, dynamic>>> stdlist = 
-                  [for (var i in snapshot.data!.docs) i]; // FIX CAUSE DEV IS A ASSHOLE  if(i['first name'] != 'dev') if(i['role'] == 'mentor')
-                  //print(stdlist.length);
-                  return ListView.builder(itemCount: stdlist.length,
-                  itemBuilder: (context,index){
-                    return _buildPerson(stdlist[index],widget.userRole,context);
-                  }
-                  );
+                if(!snapshot.hasData){
+                  return const Text('Hello Darkness my ..');
                 }
-                return const Text('Hello Darkness my ..');
+
+                List<QueryDocumentSnapshot<Map<String, dynamic>>> stdlist = 
+                [for (var i in snapshot.data!.docs) i];
+                return ListView.builder(itemCount: stdlist.length,
+                itemBuilder: (context,index){
+                  return _buildPerson(stdlist[index],widget.userRole,context);
+                }
+                );
               })
 
             ],

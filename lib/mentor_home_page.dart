@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'package:nss_project/date_time_formatter.dart';
 import 'package:nss_project/event_add_page.dart';
 
 import 'package:nss_project/event_page.dart';
@@ -11,10 +12,6 @@ import 'package:nss_project/notification_page.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-void main() {
-  runApp(const MentorHomePageApp());
-}
 
 class MentorHomePageApp extends StatelessWidget {
   const MentorHomePageApp({super.key});
@@ -62,7 +59,6 @@ class MentorHomePageState extends State<MentorHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => NotificationPage()));
-          
             },
           ),
           IconButton(
@@ -233,7 +229,7 @@ Widget _buildEvent(
         child: ListTile(
           tileColor: const Color.fromARGB(255, 251, 250, 250),
           title: Text(event['title']),
-          subtitle: Text(event['subtitle']),
+          subtitle: Text(DateTimeFormatter.format(event['timestamp'].toDate())),
           leading: Icon(
               IconData(snapshot.data!.docs[0]['codepoint'], fontFamily: 'MaterialIcons'),
               color: Color(snapshot.data!.docs[0]['color'])),

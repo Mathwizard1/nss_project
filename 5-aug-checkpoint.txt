@@ -1,0 +1,7 @@
+overhauled pic
+pie chart for wings
+sort event by organising mentors
+secretary roles
+photo upload
+	photo chosen reward
+firebase rules
