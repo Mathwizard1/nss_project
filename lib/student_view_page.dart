@@ -5,15 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 // import 'dart:io';
 
 class StudentViewPage extends StatefulWidget {
-  const StudentViewPage({super.key,required this.userRole ,required this.person});
+  const StudentViewPage({super.key,required this.person});
   final QueryDocumentSnapshot<Map<String, dynamic>> person;
-  final String userRole;
   @override
   State<StudentViewPage> createState() => _StudentViewPageState();
 }
 
 class _StudentViewPageState extends State<StudentViewPage> {
   String rolechange = 'volunteer';
+
   
   @override
   Widget build(BuildContext context) {
@@ -147,14 +147,8 @@ class _StudentViewPageState extends State<StudentViewPage> {
                       child: StreamBuilder(
                         stream: FirebaseFirestore.instance.collection('roles').snapshots(),
                         builder:(context,snaphot){
-                          List<String> roles = ['pic','mentor'];
-                          int i = roles.indexOf(widget.userRole);
-                                        
-                          for(int j = i;j>=0;j--){
-                            roles.removeAt(j);
-                          }
-                          roles.add('volunteer');
-                        
+                          List<String> roles = ['secretary','mentor','volunteer'];
+
                           // ignore: non_constant_identifier_names
                           List<DropdownMenuEntry<String>> RoleEntries =
                             roles.map((option) => DropdownMenuEntry<String>(
@@ -186,10 +180,50 @@ class _StudentViewPageState extends State<StudentViewPage> {
                             tileColor: Colors.green,
                             title: const Center (child: Text('Change Role')),
                             onTap: () {
-                              setState(() {
-                                FirebaseFirestore.instance.collection('users').doc(widget.person.id).update({"role": rolechange}).then(
-                              (value) => print("DocumentSnapshot successfully updated!"),
-                              onError: (e) => print("Error updating document $e"));;
+                              setState(() async {
+                                if(rolechange  == 'volunteer' || rolechange == 'mentor'){
+                                  FirebaseFirestore.instance.collection('users').doc(widget.person.id).update({"role": rolechange}).then(
+                                  (value) => print("DocumentSnapshot successfully updated!"),
+                                  onError: (e) => print("Error updating document $e"));
+                                }
+                                if(rolechange == 'secretary'){
+                                  DocumentSnapshot<Map<String, dynamic>> wings = await FirebaseFirestore.instance.collection('configurables').doc('document').get();
+                                  QuerySnapshot<Map<String, dynamic>> secs = await FirebaseFirestore.instance.collection('users').where('role',isEqualTo:'secretary').get();
+                                  List<String> w = [];
+                                  for(var x in wings.data()!['wings']){
+                                    w.add(x);
+                                  }
+                                  for(var x in secs.docs){
+                                    w.remove(x['wing']);
+                                  }
+                                  String? _newsecwing;
+                                  showDialog(context: context, builder:(BuildContext context){
+                                    return AlertDialog(
+                                      title: const Text('Choose Wing'),
+                                      content: ListView.builder(
+                                        itemCount: w.length,
+                                        itemBuilder: (context, index) => RadioListTile(title: Text(w[index]),value: w[index], groupValue: _newsecwing, onChanged: (String? value) {
+                                          setState(() {
+                                            _newsecwing = value;
+                                          });
+                                        }),
+                                      ),
+                                      actions: [
+                                        TextButton(onPressed: (){
+                                          if(_newsecwing != null){
+                                             FirebaseFirestore.instance.collection('users').doc(widget.person.id).update({"role": rolechange,"wing": _newsecwing}).then(
+                                              (value) => print("DocumentSnapshot successfully updated!"),
+                                              onError: (e) => print("Error updating document $e"));
+
+                                          }
+                                         Navigator.pop(context);
+                                        }, child: const Text('confirm'))
+                                      ],
+                                    );
+                                  });
+
+                                }
+
                               });
                             },
                           ),

@@ -22,7 +22,7 @@ class _PeoplePageState extends State<PeoplePage> {
     //double height = MediaQuery.sizeOf(context).height;
     return DefaultTabController(
       initialIndex: 0,
-      length: 2,
+      length: 3,
       child: Scaffold(
         floatingActionButton: FloatingActionButton(onPressed:(){
           Navigator.push(context,MaterialPageRoute(builder: (context) => const NewpicHomepage()));
@@ -48,7 +48,7 @@ class _PeoplePageState extends State<PeoplePage> {
                 },
                 icon: const Icon(Icons.exit_to_app)),
           ],
-          bottom: const TabBar(tabs: [Tab(text: 'students'),Tab(text: 'mentors')],labelStyle: TextStyle(fontSize: 22
+          bottom: const TabBar(tabs: [Tab(text: 'students'),Tab(text: 'mentors'),Tab(text: 'secretary',)],labelStyle: TextStyle(fontSize: 22
           ,height: 1.8),),
         ),
         body: Container(
@@ -82,6 +82,20 @@ class _PeoplePageState extends State<PeoplePage> {
                   );
                 }
                 return const Text('Hello Darkness my ..');
+              }),
+              StreamBuilder(stream: FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'secretary').snapshots(), 
+              builder: (context,snapshot){
+                if(snapshot.hasData){
+                  List<QueryDocumentSnapshot<Map<String, dynamic>>> stdlist = 
+                  [for (var i in snapshot.data!.docs) i]; // FIX CAUSE DEV IS A ASSHOLE  if(i['first name'] != 'dev') if(i['role'] == 'mentor')
+                  //print(stdlist.length);
+                  return ListView.builder(itemCount: stdlist.length,
+                  itemBuilder: (context,index){
+                    return _buildPerson(stdlist[index],widget.userRole,context);
+                  }
+                  );
+                }
+                return const Text('Hello Darkness my ..');
               })
 
             ],
@@ -101,11 +115,11 @@ Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person, String u
     child: ListTile(
       horizontalTitleGap: 16,
       
-      leading: Icon(Icons.account_circle,size: 50,),
+      leading: const Icon(Icons.account_circle,size: 50,),
       title: Text(getCapitalizedName(person['full-name']),style:const TextStyle(fontWeight: FontWeight.w600,fontSize: 22),),
       subtitle: Text('${person['roll-number']}',style:const TextStyle(fontSize: 14),),
       onTap: (){
-        Navigator.push(context,MaterialPageRoute(builder: (context) => StudentViewPage(userRole: userRole,person: person)));
+        Navigator.push(context,MaterialPageRoute(builder: (context) => StudentViewPage(person: person)));
       },
     ),
   );

@@ -66,16 +66,6 @@ class MentorHomePageState extends State<MentorHomePage> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {   
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const PeoplePage(userRole: 'mentor')));
-          
-            },
-          ),
-          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
