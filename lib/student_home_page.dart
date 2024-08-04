@@ -12,6 +12,8 @@ import 'package:nss_project/notification_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'date_time_formatter.dart';
+
 class StudentHomePage extends StatefulWidget {
   const StudentHomePage({super.key});
 
@@ -422,7 +424,6 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
 
   ExpansionTileController tilecontroller = ExpansionTileController();
 
-
   Widget _buildUpcomingEvent( BuildContext context, QueryDocumentSnapshot<Object?> document,AsyncSnapshot userSnapshot) {
 
     return Card(
@@ -457,7 +458,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                     child: ListTile(
                       tileColor: const Color.fromARGB(255, 251, 250, 250),
                       title: Text(document['title']),
-                      subtitle: Text(document['subtitle']),
+                      subtitle: Text(DateTimeFormatter.format(document['timestamp'].toDate())),
                       leading: Icon(
                           IconData(snapshot.data!.docs[0]['codepoint'],
                               fontFamily: 'MaterialIcons'),
