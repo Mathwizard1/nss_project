@@ -199,7 +199,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
 
                 
                     Padding(
-                      padding: EdgeInsets.only(top:width/3),
+                      padding: EdgeInsets.only(top:width/3 - 25),
                       child: SizedBox(
                         width: width-10,
                         child: StreamBuilder(
@@ -236,7 +236,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                         child: Card.outlined(
                           clipBehavior: Clip.hardEdge,
                           child: ListTile(
-                            tileColor: Color.fromARGB(255, 8, 21, 125),
+                            tileColor: const Color.fromARGB(255, 8, 21, 125),
                             title: const Center (child: Text('Change Role',style: TextStyle(color: Colors.white),)),
                             onTap: () {
                               setState(() async {
