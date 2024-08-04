@@ -74,6 +74,15 @@ class NotificationPage extends StatelessWidget {
   }
 }
 
+  // blow up all notificaitons
+  Future<void> deleteAllNotifications() async {
+  final CollectionReference notificationsRef = FirebaseFirestore.instance.collection('notifications');
+  final QuerySnapshot snapshot = await notificationsRef.get();
+  for (final QueryDocumentSnapshot doc in snapshot.docs) {
+    await doc.reference.delete();
+    }
+  }
+
 // Add this function whenever on pressed is called and it will add a notification
 Future<void> addNotification(String message) async {
   final CollectionReference notificationsRef = FirebaseFirestore.instance.collection('notifications');
