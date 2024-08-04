@@ -55,7 +55,7 @@ class _NewpicHomepageState extends State<NewpicHomepage> {
                   child: Icon(Icons.person,size: width/3,color: const Color.fromARGB(255, 80, 80, 200),),
                 ),
               ),
-                const SizedBox(width: 10,),
+                const SizedBox (width: 10,),
                 SizedBox(
                 width: width/2 - 15,
                 height: width/2 -15,
