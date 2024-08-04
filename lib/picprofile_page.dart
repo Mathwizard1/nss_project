@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 
 // import 'package:nss_project/leaderboard_page.dart';
 
@@ -182,6 +183,7 @@ class _ConfigurablesState extends State<Configurables> {
  
   bool isHoursChanged = false;
   bool isWingsChanged = false;
+  String? newWingName;
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +209,7 @@ class _ConfigurablesState extends State<Configurables> {
               child: StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('configurables')
-                      .doc('documen')
+                      .doc('document')
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.active) {
@@ -218,10 +220,11 @@ class _ConfigurablesState extends State<Configurables> {
                         return ret;
                       }).toList();
                       return Container(
-                        height: height / 1.5,
+                        height: height / 1.2,
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             TextField(
                               decoration: const InputDecoration(
@@ -248,8 +251,8 @@ class _ConfigurablesState extends State<Configurables> {
                                           if (isHoursChanged) {
                                             FirebaseFirestore.instance
                                             .collection('configurables')
-                                            .doc('documen')
-                                            .set({'mandatory-hours': totalhours}, SetOptions(merge: true));
+                                            .doc('document')
+                                            .set({'mandatory-hours': totalhours,'sem1hours' : totalhours.toDouble() /2,'sem2hours': totalhours.toDouble()/2}, SetOptions(merge: true));
                                          }
                                          Navigator.pop(context);
                                         }, child: const Text('confirm'))
@@ -267,37 +270,8 @@ class _ConfigurablesState extends State<Configurables> {
                             Flexible(
                               child: ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount: wings.length + 1,
+                                  itemCount: wings.length,
                                   itemBuilder: (context, index) {
-                                    String? newWing;
-                                    if (index == wings.length) {
-                                      return TextButton(
-                                          onPressed: () => showDialog(
-                                            context: context,
-                                            builder:(BuildContext context){
-                                              return AlertDialog(
-                                                title: const Text('Name of new wing'),
-                                                content: TextField(
-                                                  onChanged: (text){newWing = text;},
-                                                ),
-                                                actions: [
-                                                  TextButton(onPressed: (){
-                                                    if(newWing != null){
-                                                      wings.add(newWing ?? '');
-                                                      FirebaseFirestore.instance.collection('configurables').doc('documen').set({'wings': wings}, SetOptions(merge: true));
-                                                      setState(() {});
-                                                    }
-                                                    Navigator.pop(context);
-
-                                                 
-
-                                                  }, child: const Text('confirm'),)
-                                                ],
-                                              );
-                                            }
-                                          ),
-                                          child: const Text('add event'));
-                                    }
                                     return Card(
                                       child: ListTile(
                                         title: Text(wings[index]),
@@ -313,7 +287,7 @@ class _ConfigurablesState extends State<Configurables> {
                                                   TextButton(onPressed: (){Navigator.pop(context);}, child: const  Text('No')),
                                                   TextButton(onPressed: (){
                                                     wings.removeAt(index);
-                                                    FirebaseFirestore.instance.collection('configurables').doc('documen').set({'wings': wings}, SetOptions(merge: true));
+                                                    FirebaseFirestore.instance.collection('configurables').doc('document').set({'wings': wings}, SetOptions(merge: true));
                                                     setState(() {});
                                                     Navigator.pop(context);
                                                   }, child: const Text('Yes')),
@@ -325,6 +299,24 @@ class _ConfigurablesState extends State<Configurables> {
                                       ),
                                     );
                                   }),
+                            ),
+                            TextField(
+                              decoration: InputDecoration(labelText: 'Add Wing',hintText: 'New wing name'),
+                              onChanged: (text){
+                                newWingName = text;
+                              },
+                              onSubmitted: (value) async {
+                                if(value != null && value != ''){
+                                 IconData? icon = await showIconPicker(context,iconPackModes: [IconPack.material]);
+                                  if(icon != null){
+                                    wings.add(value);
+                                    FirebaseFirestore.instance.collection('configurables').doc('document').set({'wings': wings}, SetOptions(merge: true));
+                                    FirebaseFirestore.instance.collection('icondata').add({'codepoint': icon.codePoint ,'color': 0xff000000,'wing' : value});
+                                  }
+                                 
+                                }
+                              },
+                            
                             )
                           ],
                         ),
