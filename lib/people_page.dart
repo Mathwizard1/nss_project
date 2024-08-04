@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nss_project/newpic_homepage.dart';
@@ -48,7 +49,7 @@ class _PeoplePageState extends State<PeoplePage> {
                 },
                 icon: const Icon(Icons.exit_to_app)),
           ],
-          bottom: const TabBar(tabs: [Tab(text: 'students'),Tab(text: 'mentors'),Tab(text: 'secretary',)],labelStyle: TextStyle(fontSize: 22
+          bottom: const TabBar(tabs: [Tab(text: 'Students'),Tab(text: 'Mentors'),Tab(text: 'Secretary',)],labelStyle: TextStyle(fontSize: 22
           ,height: 1.8),),
         ),
         body: Container(
@@ -58,7 +59,7 @@ class _PeoplePageState extends State<PeoplePage> {
               StreamBuilder(stream: FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'volunteer').snapshots(), 
               builder: (context,snapshot){
                 if(!snapshot.hasData){
-                  return const Text('Hello Darkness my ..');
+                  return const Center(child: Text("Loading"));
                 }
 
                 List<QueryDocumentSnapshot<Map<String, dynamic>>> stdlist = 
@@ -111,18 +112,51 @@ class _PeoplePageState extends State<PeoplePage> {
 
 Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person, String userRole ,BuildContext context){
 
-  return Card.outlined(
-    elevation: 0.5,
-    color: Colors.white70,
-    child: ListTile(
-      horizontalTitleGap: 16,
-      
-      leading: const Icon(Icons.account_circle,size: 50,),
-      title: Text(getCapitalizedName(person['full-name']),style:const TextStyle(fontWeight: FontWeight.w600,fontSize: 22),),
-      subtitle: Text('${person['roll-number']}',style:const TextStyle(fontSize: 14),),
-      onTap: (){
-        Navigator.push(context,MaterialPageRoute(builder: (context) => StudentViewPage(person: person)));
-      },
+  final screenwidth=MediaQuery.sizeOf(context).width;
+
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(0,5,0,5),
+    child: SizedBox(
+      height:300,
+      child: InkWell(
+        onTap: (){
+              Navigator.push(context,MaterialPageRoute(builder: (context) => StudentViewPage(person: person)));
+            },
+        child: Card(
+          elevation: 0.5,
+          color: Colors.white70,
+          child: 
+          Column(children: 
+          [
+            Container(
+            width: screenwidth,
+            height: 200,
+            color: (person['role']=='volunteer')?Colors.blue:((person['role']=='mentor'))?Colors.red:Color.fromARGB(255, 255, 204, 1),
+            child:Icon(Icons.account_circle,size: 50,color: Colors.white,) ,
+            ),
+        
+            Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: Text(getCapitalizedName(person['full-name']),style:const TextStyle(fontWeight: FontWeight.w600,fontSize: 22),),
+            ),
+        
+             Padding(
+              padding: const EdgeInsets.only(top: 5),
+              child: Text('${person['roll-number']}',style:const TextStyle(fontSize: 18,color: Color.fromARGB(201, 119, 109, 109)),),
+            )
+          ],)
+          /*ListTile(
+            horizontalTitleGap: 16,
+        
+            leading: const Icon(Icons.account_circle,size: 50,),
+            title: Text(getCapitalizedName(person['full-name']),style:const TextStyle(fontWeight: FontWeight.w600,fontSize: 22),),
+            subtitle: Text('${person['roll-number']}',style:const TextStyle(fontSize: 14),),
+            onTap: (){
+              Navigator.push(context,MaterialPageRoute(builder: (context) => StudentViewPage(person: person)));
+            },
+          )*/,
+        ),
+      ),
     ),
   );
 }

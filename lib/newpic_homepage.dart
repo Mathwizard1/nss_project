@@ -80,7 +80,7 @@ class _NewpicHomepageState extends State<NewpicHomepage> {
                   onPressed: (){
                     Navigator.push(context,MaterialPageRoute(builder: (context) => const PicEventList()));
                   },
-                  child: Icon(Icons.list,size: width/3,color: const Color.fromARGB(255, 28, 32, 30),),
+                  child: Icon(Icons.list_alt,size: width/3,color: Color.fromARGB(255, 59, 62, 61),),
                 ),
               ),
                 const SizedBox(width: 10,),

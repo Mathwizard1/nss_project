@@ -7,8 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'welcome_page.dart';
 import 'student_home_page.dart';
-import 'mentor_home_page.dart';
-import 'pic_home_page.dart';
+import 'mentor_home_page.dart'; 
+import 'newpic_homepage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,7 +75,7 @@ class MainApp extends StatelessWidget {
                 case 'secretary':
                   return MentorHomePage(role: snapshot.data!['role']);
                 case 'pic':
-                  return const PicHomePage();
+                  return const NewpicHomepage();
                 default:
                   return const Center(child: Text('Error: Unknown user role')); // TODO error page
                 }
