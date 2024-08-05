@@ -543,16 +543,25 @@ class EventPageState extends State<EventPage> {
                             "venue" : _venueController.text.trim(),
                             "hours" : int.parse(_hoursController.text.trim()),
                             "wing" : dropdownValue1,
+                            "attending-volunteers": [],
                             "recurring" : dropdownValue2,
                             "registered-volunteers":[],
                             "organizing-mentor": _mentorTagController.getTags!.toList(),
                             "collaborators": _wingTagController.getTags!.toList(),
                             "are-photos-final": false
                           };
-                          FirebaseFirestore.instance.collection("events").add(NewEvent);
-                          addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
-                          Navigator.pop(context);
-                          
+                          try{
+                            FirebaseFirestore.instance.collection("events").add(NewEvent);
+                            addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
+                            Navigator.pop(context);
+                          }
+                          catch(e)
+                          {
+                            // Handle errors (e.g., show an error message)
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Failed to add event: $e')),
+                            );
+                          }                          
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
