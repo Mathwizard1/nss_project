@@ -1,11 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:nss_project/dummyeventpage.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
+import 'package:nss_project/event_details_page.dart';
 import 'package:nss_project/sprofile_page.dart';
-import 'package:nss_project/mentordummyeventpage.dart';
 
 import 'package:nss_project/notification_page.dart';
 
@@ -35,7 +33,6 @@ class StudentHomePageState extends State<StudentHomePage>
   late final Stream<DocumentSnapshot> userDocumentStream;
   late final Stream<QuerySnapshot> eventsDocumentStream;
   late final Stream<QuerySnapshot> configurablesDocumentStream;
-
 
   late TabController _tabController;
 
@@ -68,12 +65,9 @@ class StudentHomePageState extends State<StudentHomePage>
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
-            onPressed: () {   
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => NotificationPage()));
-          
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()));
             },
           ),
           IconButton(
@@ -100,54 +94,60 @@ class StudentHomePageState extends State<StudentHomePage>
           ],
         ),
       ),
-      body: StreamBuilder<Object>(
-        stream: userDocumentStream.asBroadcastStream(),
-        builder: (context, snapshot) {
-	  if (!snapshot.hasData) {
-	    return const Center(child: CircularProgressIndicator());
-	  }
+      body: StreamBuilder(
+          stream: userDocumentStream,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          return TabBarView(
-            controller: _tabController,
-            children: [
-              HoursCompletedTab(snapshot),
-              UpcomingEventsTab(userSnapshot: snapshot,),
-              const AttendedEventsTab(),
-            ],
-          );
-        }
-      ),
+            return TabBarView(
+              controller: _tabController,
+              children: [
+                HoursCompletedTab(
+		  userDocSnap: snapshot.data!,
+		),
+                UpcomingEventsTab(
+                  userDocSnap: snapshot.data!,
+                ),
+                const AttendedEventsTab(),
+              ],
+            );
+          }),
     );
   }
 }
 
 class HoursCompletedTab extends StatefulWidget {
-  final AsyncSnapshot userSnapshot;
-  const HoursCompletedTab(this.userSnapshot, {super.key});
-  
+  final DocumentSnapshot userDocSnap;
+  const HoursCompletedTab({ super.key, required this.userDocSnap });
 
   @override
   State createState() => HoursCompletedState();
 }
 
 class HoursCompletedState extends State<HoursCompletedTab> {
-  double maxhours=200;
-  int maxhoursdisplay=200;
+  double maxhours = 200;
+  int maxhoursdisplay = 200;
 
-  final userStreamController=StreamController();
+  final userStreamController = StreamController();
 
-  Future<void> setmaximumhours() async
-  {
-    int temp=await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){return snapshot.get('mandatory-hours');});
+  Future<void> setmaximumhours() async {
+    int temp = await FirebaseFirestore.instance
+        .collection('configurables')
+        .doc('document')
+        .get()
+        .then((snapshot) {
+      return snapshot.get('mandatory-hours');
+    });
     setState(() {
-        maxhours=temp.toDouble();
-       maxhoursdisplay=temp;
+      maxhours = temp.toDouble();
+      maxhoursdisplay = temp;
     });
   }
-  
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     final screenwidth = MediaQuery.sizeOf(context).width;
     final screenheight = MediaQuery.sizeOf(context).height;
 
@@ -160,88 +160,86 @@ class HoursCompletedState extends State<HoursCompletedTab> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TweenAnimationBuilder(
-              tween: Tween<double>(begin: 0,end: 1),
-              duration:const Duration(seconds: 1),
+              tween: Tween<double>(begin: 0, end: 1),
+              duration: const Duration(seconds: 1),
               child: const Text(
                 'Your Progress So Far',
                 textScaler: TextScaler.linear(2),
               ),
               builder: (context, value, child) {
-                return Opacity(opacity: value,child: child,);
+                return Opacity(
+                  opacity: value,
+                  child: child,
+                );
               },
             ),
             SizedBox(
-              width: screenwidth - 50,
-              height: screenheight / 2,
-              child: SfRadialGauge(
-                        enableLoadingAnimation: true,
-                        axes: <RadialAxis>[
-                          RadialAxis(
-                            minimum: 0,
-                            maximum: maxhours,
-                            showLabels: false,
-                            showTicks: false,
-                            axisLineStyle: const AxisLineStyle(
-                              thickness: 0.2,
-                              cornerStyle: CornerStyle.bothCurve,
-                              color: Color.fromARGB(30, 0, 169, 181),
-                              thicknessUnit: GaugeSizeUnit.factor,
-                            ),
-                            pointers: <GaugePointer>[
-                              RangePointer(
-                                value: (widget.userSnapshot.data['sem-1-hours'] +
-                                        widget.userSnapshot.data['sem-2-hours'])
-                                    .toDouble(),
-                                cornerStyle: CornerStyle.bothCurve,
-                                width: 0.2,
-                                sizeUnit: GaugeSizeUnit.factor,
+                width: screenwidth - 50,
+                height: screenheight / 2,
+                child: SfRadialGauge(
+                  enableLoadingAnimation: true,
+                  axes: <RadialAxis>[
+                    RadialAxis(
+                      minimum: 0,
+                      maximum: maxhours,
+                      showLabels: false,
+                      showTicks: false,
+                      axisLineStyle: const AxisLineStyle(
+                        thickness: 0.2,
+                        cornerStyle: CornerStyle.bothCurve,
+                        color: Color.fromARGB(30, 0, 169, 181),
+                        thicknessUnit: GaugeSizeUnit.factor,
+                      ),
+                      pointers: <GaugePointer>[
+                        RangePointer(
+                          value: (widget.userDocSnap['sem-1-hours'] +
+                                  widget.userDocSnap['sem-2-hours'])
+                              .toDouble(),
+                          cornerStyle: CornerStyle.bothCurve,
+                          width: 0.2,
+                          sizeUnit: GaugeSizeUnit.factor,
+                        ),
+                      ],
+                      annotations: <GaugeAnnotation>[
+                        GaugeAnnotation(
+                          positionFactor: 0,
+                          widget: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    (widget.userDocSnap['sem-1-hours'] +
+                                            widget.userDocSnap['sem-2-hours'])
+                                        .toStringAsFixed(0),
+                                    style: TextStyle(
+                                        fontSize: 40,
+                                        color: (widget.userDocSnap['sem-1-hours'] +
+                                                    widget.userDocSnap['sem-2-hours'] <
+                                                maxhours)
+                                            ? Colors.red
+                                            : Colors.green),
+                                  ),
+                                  Text(
+                                    "/$maxhoursdisplay",
+                                    style: const TextStyle(
+                                        fontSize: 40, color: Colors.green),
+                                  )
+                                ],
                               ),
-                            ],
-                            annotations: <GaugeAnnotation>[
-                              GaugeAnnotation(
-                                positionFactor: 0,
-                                widget: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          (widget.userSnapshot.data!['sem-1-hours'] +
-                                                  widget.userSnapshot.data!['sem-2-hours'])
-                                              .toStringAsFixed(0),
-                                          style: TextStyle(
-                                              fontSize: 40,
-                                              color: (widget.userSnapshot.data![
-                                                              'sem-1-hours'] +
-                                                          widget.userSnapshot.data![
-                                                              'sem-2-hours'] <
-                                                      maxhours)
-                                                  ? Colors.red
-                                                  : Colors.green),
-                                        ),
-                                        Text(
-                                          "/$maxhoursdisplay",
-                                          style: const TextStyle(
-                                              fontSize: 40,
-                                              color: Colors.green),
-                                        )
-                                      ],
-                                    ),
-                                    const Text(
-                                      "Hours Completed",
-                                      style: TextStyle(
-                                          fontSize: 15, color: Colors.green),
-                                    )
-                                  ],
-                                ),
-                              ),
+                              const Text(
+                                "Hours Completed",
+                                style: TextStyle(
+                                    fontSize: 15, color: Colors.green),
+                              )
                             ],
                           ),
-                        ],
-                      )
-            ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )),
             SizedBox(
               width: screenwidth / 2,
               child: TextButton(
@@ -250,7 +248,7 @@ class HoursCompletedState extends State<HoursCompletedTab> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              HourDetailPage(widget.userSnapshot)));
+                              HourDetailPage(userDocSnap: widget.userDocSnap)));
                 },
                 style: const ButtonStyle(
                     backgroundColor: WidgetStatePropertyAll(
@@ -267,8 +265,8 @@ class HoursCompletedState extends State<HoursCompletedTab> {
 }
 
 class HourDetailPage extends StatefulWidget {
-  final AsyncSnapshot userSnapshot;
-  const HourDetailPage(this.userSnapshot, {super.key});
+  final DocumentSnapshot userDocSnap;
+  const HourDetailPage({ super.key, required this.userDocSnap });
 
   @override
   State createState() {
@@ -276,25 +274,34 @@ class HourDetailPage extends StatefulWidget {
   }
 }
 
-class HourDetailState extends State<HourDetailPage> with SingleTickerProviderStateMixin {
-
-  Future<void> fetchsemhours() async
-  {
-    int tempsem1hours=await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){return snapshot.get('sem1hours');});
-    int tempsem2hours=await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){return snapshot.get('sem2hours');});
+class HourDetailState extends State<HourDetailPage>
+    with SingleTickerProviderStateMixin {
+  Future<void> fetchsemhours() async {
+    int tempsem1hours = await FirebaseFirestore.instance
+        .collection('configurables')
+        .doc('document')
+        .get()
+        .then((snapshot) {
+      return snapshot.get('sem1hours');
+    });
+    int tempsem2hours = await FirebaseFirestore.instance
+        .collection('configurables')
+        .doc('document')
+        .get()
+        .then((snapshot) {
+      return snapshot.get('sem2hours');
+    });
     setState(() {
-      sem1hours=tempsem1hours;
-      sem2hours=tempsem2hours;
+      sem1hours = tempsem1hours;
+      sem2hours = tempsem2hours;
     });
   }
 
-  int sem1hours=60;
-  int sem2hours=60;
-
+  int sem1hours = 60;
+  int sem2hours = 60;
 
   @override
   Widget build(BuildContext context) {
-
     fetchsemhours();
 
     final screenwidth = MediaQuery.sizeOf(context).width;
@@ -310,142 +317,135 @@ class HourDetailState extends State<HourDetailPage> with SingleTickerProviderSta
           foregroundColor: Colors.white,
         ),
         body: Center(
-            child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(
-                                    0, 0, 0, screenheight / 10),
-                                child: Stack(children: [
-                                  Center(
-                                    child: SizedBox(
-                                      width: screenwidth / 2,
-                                      height: screenwidth / 2,
-                                      child: TweenAnimationBuilder<double>(
-                                        tween: Tween(
-                                            begin: 0,
-                                            end: widget.userSnapshot.data!['sem-1-hours']/
-                                                sem1hours),
-                                        duration: const Duration(seconds: 2),
-                                        builder: (context, value, _) =>
-                                            CircularProgressIndicator(
-                                                strokeCap: StrokeCap.round,
-                                                strokeWidth: 10,
-                                                backgroundColor: (widget.userSnapshot.data!['sem-1-hours']<
-                                                        sem1hours)
-                                                    ? Colors.red
-                                                    : Colors.white,
-                                                color: (widget.userSnapshot.data!['sem-1-hours'] <
-                                                        sem1hours)
-                                                    ? Colors.green
-                                                    : Colors.blue,
-                                                value: value),
-                                      ),
-                                    ),
-                                  ),
-                                  Center(
-                                      child: Padding(
-                                    padding: EdgeInsets.fromLTRB(
-                                        0, screenwidth / 5, 0, 0),
-                                    child: Text(
-                                      'Semester 1:\n     ' +
-                                          widget.userSnapshot.data!['sem-1-hours'].toString() +
-                                          '/$sem1hours',
-                                      style: const TextStyle(fontSize: 20),
-                                    ),
-                                  ))
-                                ]),
-                              ),
-                              const Divider(
-                                color: Color.fromARGB(255, 127, 112, 180),
-                                thickness: 4,
-                              ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(
-                                    0, screenheight / 10, 0, 0),
-                                child: Stack(children: [
-                                  Center(
-                                    child: SizedBox(
-                                      width: screenwidth / 2,
-                                      height: screenwidth / 2,
-                                      child: TweenAnimationBuilder<double>(
-                                        tween: Tween(
-                                            begin: 0,
-                                            end: widget.userSnapshot.data!['sem-2-hours'] /
-                                                sem2hours),
-                                        duration: const Duration(seconds: 2),
-                                        builder: (context, value, _) =>
-                                            CircularProgressIndicator(
-                                          strokeCap: StrokeCap.round,
-                                          strokeWidth: 10,
-                                          backgroundColor: (widget.userSnapshot.data!['sem-2-hours']<
-                                                        sem2hours)
-                                                    ? Colors.red
-                                                    : Colors.white,
-                                          color: (widget.userSnapshot.data!['sem-2-hours'] <
-                                                        sem2hours)
-                                                    ? Colors.green
-                                                    : Colors.blue,
-                                          value: value,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(
-                                        0, screenwidth / 5, 0, 0),
-                                    child: Center(
-                                        child: Text(
-                                            'Semester 2:\n     ' +
-                                                widget.userSnapshot.data!['sem-2-hours'].toString()+
-                                                '/$sem2hours',
-                                            style:
-                                                const TextStyle(fontSize: 20))),
-                                  )
-                                ]),
-                              )
-                            ])
-                  
-                ));
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, screenheight / 10),
+            child: Stack(children: [
+              Center(
+                child: SizedBox(
+                  width: screenwidth / 2,
+                  height: screenwidth / 2,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(
+                        begin: 0,
+                        end: widget.userDocSnap['sem-1-hours'] /
+                            sem1hours),
+                    duration: const Duration(seconds: 2),
+                    builder: (context, value, _) => CircularProgressIndicator(
+                        strokeCap: StrokeCap.round,
+                        strokeWidth: 10,
+                        backgroundColor:
+                            (widget.userDocSnap['sem-1-hours'] <
+                                    sem1hours)
+                                ? Colors.red
+                                : Colors.white,
+                        color: (widget.userDocSnap['sem-1-hours'] <
+                                sem1hours)
+                            ? Colors.green
+                            : Colors.blue,
+                        value: value),
+                  ),
+                ),
+              ),
+              Center(
+                  child: Padding(
+                padding: EdgeInsets.fromLTRB(0, screenwidth / 5, 0, 0),
+                child: Text(
+                  'Semester 1:\n     ' +
+                      widget.userDocSnap['sem-1-hours'].toString() +
+                      '/$sem1hours',
+                  style: const TextStyle(fontSize: 20),
+                ),
+              ))
+            ]),
+          ),
+          const Divider(
+            color: Color.fromARGB(255, 127, 112, 180),
+            thickness: 4,
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, screenheight / 10, 0, 0),
+            child: Stack(children: [
+              Center(
+                child: SizedBox(
+                  width: screenwidth / 2,
+                  height: screenwidth / 2,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(
+                        begin: 0,
+                        end: widget.userDocSnap['sem-2-hours'] /
+                            sem2hours),
+                    duration: const Duration(seconds: 2),
+                    builder: (context, value, _) => CircularProgressIndicator(
+                      strokeCap: StrokeCap.round,
+                      strokeWidth: 10,
+                      backgroundColor:
+                          (widget.userDocSnap['sem-2-hours'] < sem2hours)
+                              ? Colors.red
+                              : Colors.white,
+                      color:
+                          (widget.userDocSnap['sem-2-hours'] < sem2hours)
+                              ? Colors.green
+                              : Colors.blue,
+                      value: value,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(0, screenwidth / 5, 0, 0),
+                child: Center(
+                    child: Text(
+                        'Semester 2:\n     ' +
+                            widget.userDocSnap['sem-2-hours']
+                                .toString() +
+                            '/$sem2hours',
+                        style: const TextStyle(fontSize: 20))),
+              )
+            ]),
+          )
+        ])));
   }
 }
 
 class UpcomingEventsTab extends StatefulWidget {
-  final AsyncSnapshot userSnapshot;
-  const UpcomingEventsTab({required this.userSnapshot,super.key});
+  final DocumentSnapshot userDocSnap;
+  const UpcomingEventsTab({ required this.userDocSnap, super.key });
 
   @override
   State<UpcomingEventsTab> createState() => _UpcomingEventsTabState();
 }
 
 class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
-
   String _selectedWing = 'All';
 
   ExpansionTileController tilecontroller = ExpansionTileController();
 
-  Widget _buildUpcomingEvent( BuildContext context, QueryDocumentSnapshot<Object?> document,AsyncSnapshot userSnapshot) {
-
+  Widget _buildUpcomingEvent(BuildContext context,
+      {required QueryDocumentSnapshot eventDocSnap, required DocumentSnapshot userDocSnap}) {
     return Card(
-        //shape:StadiumBorder(side: BorderSide(color: Colors.green,width: 2.0)),
-          child: InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => (userSnapshot.data!['role']=='volunteer')?DummyEventPage(
-                            document: document,userSnapshot:userSnapshot):MentorDummyEventPage(
-                            document: document)));
-              },
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance.collection('icondata').where('wing',isEqualTo: document['wing']).snapshots(),
-                builder: (context, snapshot) {
-
-                  if(!snapshot.hasData)
-                  {return const CircularProgressIndicator();}
-
-                  else
-                  {return Container(
+      child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EventDetailsPage(
+                  eventDocId: eventDocSnap.id,
+                ),
+              ),
+            );
+          },
+          child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('icondata')
+                  .where('wing', isEqualTo: eventDocSnap['wing'])
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                } else {
+                  return Container(
                     decoration: const BoxDecoration(
                         gradient: LinearGradient(
                             begin: Alignment.topLeft,
@@ -457,8 +457,9 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                         ])),
                     child: ListTile(
                       tileColor: const Color.fromARGB(255, 251, 250, 250),
-                      title: Text(document['title']),
-                      subtitle: Text(DateTimeFormatter.format(document['timestamp'].toDate())),
+                      title: Text(eventDocSnap['title']),
+                      subtitle: Text(DateTimeFormatter.format(
+                          eventDocSnap['timestamp'].toDate())),
                       leading: Icon(
                           IconData(snapshot.data!.docs[0]['codepoint'],
                               fontFamily: 'MaterialIcons'),
@@ -466,22 +467,21 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                       trailing: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('${document['hours']} Hrs'),
-                          const Text('Active', style: TextStyle(color: Colors.green))
+                          Text('${eventDocSnap['hours']} Hrs'),
+                          const Text('Active',
+                              style: TextStyle(color: Colors.green))
                         ],
                       ),
                     ),
                   );
-                  }
                 }
-              )),
-        );
+              })),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-
-    final screenheight=MediaQuery.sizeOf(context).height;
+    final screenheight = MediaQuery.sizeOf(context).height;
 
     // TODO make this smooth (every rebuild waits on calls to snapshots())
     return Column(
@@ -493,18 +493,18 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-              return const Expanded(
-                child: Center(child: CircularProgressIndicator()),
-              );
+                return const Expanded(
+                  child: Center(child: CircularProgressIndicator()),
+                );
               }
-    
+
               final wingOptions = ['All'] +
                   snapshot.data!['wings'].map<String>((dyn) {
                     String ret = dyn;
                     return ret;
                   }).toList();
               final events = FirebaseFirestore.instance.collection('events');
-    
+
               return Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: Column(children: <Widget>[
@@ -519,7 +519,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
-                          leadingIcon: const Icon(Icons.category_outlined,
+                          leadingIcon: const Icon(Icons.category,
                               color: Colors.white),
                           expandedInsets:
                               const EdgeInsets.only(top: 64.0, bottom: 8.0),
@@ -545,28 +545,42 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                   StreamBuilder(
                       stream: _selectedWing == 'All'
                           ? events.snapshots()
-                          : events.where('wing', isEqualTo: _selectedWing).snapshots(),
+                          : events
+                              .where('wing', isEqualTo: _selectedWing)
+                              .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-            return const Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: CircularProgressIndicator());
+                          return const Padding(
+                              padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                              child: CircularProgressIndicator());
                         }
-                
+
                         if (snapshot.data!.docs.isEmpty) {
-            return const Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0), child: Text('Nothing to see here ._.'));
+                          return const Padding(
+                              padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                              child: Text('Nothing to see here ._.'));
                         }
-                
+
                         return SizedBox(
-                          height: screenheight-207,
+                          height: screenheight - 207,
                           child: ListView.builder(
                               shrinkWrap: true,
                               itemCount: snapshot.data!.docs.length,
                               itemBuilder: (context, index) {
                                 return TweenAnimationBuilder(
-                                  tween:Tween<double>(begin: 0,end: 1),
+                                  tween: Tween<double>(begin: 0, end: 1),
                                   duration: const Duration(seconds: 1),
-                                  child: _buildUpcomingEvent(context, snapshot.data!.docs[index],widget.userSnapshot),
-                                  builder: (BuildContext context,double value,Widget? child){
-                                    return Opacity(opacity: value,child: child,);
+                                  child: _buildUpcomingEvent(
+                                      context,
+                                      eventDocSnap: snapshot.data!.docs[index],
+                                      userDocSnap: widget.userDocSnap
+				  ),
+                                  builder: (BuildContext context, double value,
+                                      Widget? child) {
+                                    return Opacity(
+                                      opacity: value,
+                                      child: child,
+                                    );
                                   },
                                 );
                               }),
