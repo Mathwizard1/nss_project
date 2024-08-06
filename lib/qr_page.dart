@@ -67,6 +67,8 @@ class QrPageState extends State<QrPage> {
             final DocumentSnapshot eventDocSnap = eventDocAsyncSnap.data!;
 
             final double screenHeight = MediaQuery.sizeOf(context).height;
+            final double screenWidth = MediaQuery.sizeOf(context).width;
+
             final double appBarHeight = 0.075 * screenHeight;
 
             return Scaffold(
@@ -79,13 +81,18 @@ class QrPageState extends State<QrPage> {
                 ),
               ),
               body: AnimatedContainer(
-                duration: const Duration(seconds: 2),
+                duration: const Duration(seconds: 1),
                 color: _hasMarkedAttendance(
                         eventDocSnap: eventDocSnap, userDocSnap: userDocSnap)
                     ? Colors.green
-                    : null,
+                    : Colors.white,
                 child: Center(
-                    child: QrImageView(data: userDocSnap['roll-number'])),
+                  child: QrImageView(
+                    backgroundColor: Colors.white,
+                    padding: EdgeInsets.all(0.05 * screenWidth),
+                    data: userDocSnap['roll-number'],
+                  ),
+                ),
               ),
             );
           },
