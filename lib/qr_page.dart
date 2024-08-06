@@ -1,102 +1,96 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class qr_code extends StatefulWidget
-{
-  final AsyncSnapshot userSnapshot;
-  final QueryDocumentSnapshot eventdocument;
-  const qr_code({super.key,required this.userSnapshot,required this.eventdocument});
+class QrPage extends StatefulWidget {
+  final String eventDocId;
+  const QrPage({super.key, required this.eventDocId});
 
-  @override 
-  State createState()
-  {
-    return qrcodeState();
+  @override
+  State createState() {
+    return QrPageState();
   }
 }
 
-class qrcodeState extends State<qr_code>
-{
+class QrPageState extends State<QrPage> {
+  late final Stream<DocumentSnapshot> eventDocSnapStream;
+  late final Stream<DocumentSnapshot> userDocSnapStream;
 
-  var backgroundcolor=const Color.fromARGB(255, 246, 65, 52);
+  @override
+  void initState() {
+    super.initState();
+    eventDocSnapStream = FirebaseFirestore.instance
+        .collection('events')
+        .doc(widget.eventDocId)
+        .snapshots();
+    userDocSnapStream = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .snapshots();
+  }
 
-  @override 
-  Widget build(BuildContext context)
-  {
-    bool flag=false;
-    final screenwidth=MediaQuery.sizeOf(context).width;
-    final screenheight=MediaQuery.sizeOf(context).height;
+  bool _hasMarkedAttendance(
+      {required DocumentSnapshot eventDocSnap,
+      required DocumentSnapshot userDocSnap}) {
+    return userDocSnap['attended-events']
+        .map<String>((dyn) {
+          String ret = dyn;
+          return ret;
+        })
+        .toList()
+        .contains(widget.eventDocId);
+  }
 
-    return Scaffold(
-      //floatingActionButton: FloatingActionButton(
-      //  child: Icon(Icons.image),
-      //  onTap: () {
-      //    
-      //  },
-      //),
-      body:Center(child: Stack(
-        children: [
-          
-          Center(
-            child: StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('users').where('attended-events',arrayContains:widget.eventdocument.id).snapshots(),
-              builder: (context, snapshot) {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: userDocSnapStream,
+      builder: (context, userDocAsyncSnap) {
+        if (!userDocAsyncSnap.hasData) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-                if(!snapshot.hasData)
-                {return Container(color:const Color.fromARGB(255, 246, 65, 52) ,);}
+        final DocumentSnapshot userDocSnap = userDocAsyncSnap.data!;
 
-                else{
-                if(flag==false)
-                {
-                  for(var x in snapshot.data!.docs)
-                  {
-                  if(x.get('roll-number')==widget.userSnapshot.data!['roll-number'])
-                    {
-                      flag=true;
-                      backgroundcolor=const Color.fromARGB(255, 79, 236, 84);
-                    
-                    }
-                  }
-                }
+        return StreamBuilder(
+          stream: eventDocSnapStream,
+          builder: (context, eventDocAsyncSnap) {
+            if (!eventDocAsyncSnap.hasData) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
 
-                return AnimatedContainer(
-                  decoration: BoxDecoration(shape:BoxShape.rectangle,color: backgroundcolor),
-                  width:screenwidth,
-                  height:screenheight,
-                duration:const Duration(seconds: 1),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 40, 0, 0),
-                    child: Opacity(opacity:1,child: IconButton(icon: const Icon(Icons.arrow_back),onPressed: (){Navigator.pop(context);},iconSize: 30,)),
-                  )
-                  ),
-                );
-                }
-              }
-            ),
-          ),
+            final DocumentSnapshot eventDocSnap = eventDocAsyncSnap.data!;
 
-          Center(
-            child: Padding(
-              padding: EdgeInsets.only(top:screenheight/2),
-              child: Text("${widget.eventdocument.get('title')}",style: const TextStyle(fontSize: 30,color: Colors.white,fontWeight: FontWeight.bold),),
-            ),
-          ),
+            final double screenHeight = MediaQuery.sizeOf(context).height;
+            final double appBarHeight = 0.075 * screenHeight;
 
-
-          Center(
-            child: Container(
-            width:screenwidth/2,
-            height:screenwidth/2,
-            color: Colors.white,
-            child: QrImageView(data: widget.userSnapshot.data!['roll-number'])
+            return Scaffold(
+              appBar: AppBar(
+                toolbarHeight: appBarHeight,
+                backgroundColor: Colors.deepPurple[400],
+                title: Text(
+                  eventDocSnap['title'],
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
-          )
-          ],
-      )
-    )
+              body: AnimatedContainer(
+                duration: const Duration(seconds: 2),
+                color: _hasMarkedAttendance(
+                        eventDocSnap: eventDocSnap, userDocSnap: userDocSnap)
+                    ? Colors.green
+                    : null,
+                child: Center(
+                    child: QrImageView(data: userDocSnap['roll-number'])),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
-
