@@ -1,87 +1,133 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Leaderboard',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: LeaderboardPage(),
-    );
-  }
+void main() {
+  runApp(const MaterialApp(
+    home: LeaderboardPage(),
+  ));
 }
 
 class LeaderboardPage extends StatelessWidget {
-  final List<String> volunteers = [
-    'Alice', 'Bob', 'Charlie', 'David', 'Eve',
-    'Frank', 'Grace', 'Hannah', 'Ivy', 'Jack',
-    'Kate', 'Liam', 'Mia', 'Noah', 'Olivia',
-    'Penelope', 'Quinn', 'Ryan', 'Sophia', 'Thomas',
-    'Uma', 'Victor', 'Willow', 'Xavier', 'Yasmine',
-  ];
+  const LeaderboardPage({super.key});
 
-  final List<double> hours = [
-    30.5, 25.0, 23.5, 21.0, 19.5,
-    18.0, 16.5, 15.0, 14.5, 12.0,
-    11.5, 10.0, 9.5, 8.0, 7.5,
-    6.0, 5.5, 4.0, 3.5, 2.0,
-    1.5, 1.0, 0.5, 0.2, 0.1,
-  ];
+  Future<List<Map<String, dynamic>>> fetchVolunteerData() async {
+    List<Map<String, dynamic>> volunteers = [];
 
-  LeaderboardPage({super.key});
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'volunteer')
+        .get();
+
+    for (var doc in snapshot.docs) {
+      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+
+      if (data != null) {
+        String name = data['full-name'] ?? 'Unknown';
+        int sem1 = data['sem-1-hours'] != null ? data['sem-1-hours'] as int : 0;
+        int sem2 = data['sem-2-hours'] != null ? data['sem-2-hours'] as int : 0;
+        int totalHours = sem1 + sem2;
+
+        volunteers.add({
+          'name': name,
+          'totalHours': totalHours,
+        });
+      }
+    }
+
+    volunteers.sort((a, b) => b['totalHours'].compareTo(a['totalHours']));
+    return volunteers.take(100).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          children: [
-            Text("Leaderboard"),
-          ],
-        ),
+        title: const Text('Leaderboard'),
       ),
-      body: ListView.builder(
-        itemCount: volunteers.length,
-        itemBuilder: (context, index) {
-          String volunteer = volunteers[index];
-          double hour = hours[index];
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: fetchVolunteerData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No data available.'));
+          } else {
+            List<Map<String, dynamic>> volunteers = snapshot.data!;
+            return ListView.builder(
+              itemCount: volunteers.length,
+              itemBuilder: (context, index) {
+                var volunteer = volunteers[index];
+                String name = volunteer['name'] ?? 'Unknown';
+                int totalHours = volunteer['totalHours'] ?? 0;
 
-          // Determine styling based on index (top 3, 4-10, 11-20)
-          TextStyle? textStyle;
-          if (index < 3) {
-            textStyle = const TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.green, decoration: TextDecoration.underline);
-          } else if (index < 10) {
-            textStyle = const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.blue);
-          } else if (index < 20) {
-            textStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange);
-          }
+                TextStyle textStyle;
 
-          return ListTile(
-            title: Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    volunteer,
-                    style: textStyle,
+                if (index == 0) {
+                  textStyle = const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                    fontSize: 21,
+                    color: Colors.amber,
+                  );
+                } else if (index == 1) {
+                  textStyle = const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                    fontSize: 18,
+                    color: Colors.grey,
+                  );
+                } else if (index == 2) {
+                  textStyle = const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    decoration: TextDecoration.underline,
+                    color: Colors.brown,
+                  );
+                } else if (index >= 3 && index < 10) {
+                  textStyle = const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    color: Colors.indigo,
+                  );
+                } else if (index >= 10 && index < 25) {
+                  textStyle = const TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 15,
+                    color: Colors.green,
+                  );
+                } else if (index >= 25 && index < 50) {
+                  textStyle = const TextStyle(
+                    fontWeight: FontWeight.w300,
+                    fontSize: 14,
+                    color: Colors.yellow,
+                  );
+                } else {
+                  textStyle = const TextStyle(
+                    fontSize: 13,
+                    color: Colors.red,
+                  );
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListTile(
+                    title: Text(
+                      name,
+                      style: textStyle,
                     ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    hour.toString(),
-                    textAlign: TextAlign.right,
-                    style: textStyle,
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
+                    tileColor: (index <= 3)? Colors.teal[200]: Colors.blueGrey[50],
+                    trailing: Text(
+                      '$totalHours hrs',
+                      style: textStyle,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
+                );
+              },
+            );
+          }
         },
       ),
     );
