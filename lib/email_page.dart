@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -36,7 +34,8 @@ class _EmailSenderState extends State<EmailSender> {
   final _subjectController = TextEditingController(text: 'The subject');
 
   final _bodyController = TextEditingController(
-    text: 'Mail body. This is a sample text and will be replaced with more information.',
+    text:
+        'Mail body. This is a sample text and will be replaced with more information.',
   );
 
   Future<void> send() async {
