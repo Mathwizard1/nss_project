@@ -105,8 +105,8 @@ class StudentHomePageState extends State<StudentHomePage>
               controller: _tabController,
               children: [
                 HoursCompletedTab(
-		  userDocSnap: snapshot.data!,
-		),
+                  userDocSnap: snapshot.data!,
+                ),
                 UpcomingEventsTab(
                   userDocSnap: snapshot.data!,
                 ),
@@ -120,7 +120,7 @@ class StudentHomePageState extends State<StudentHomePage>
 
 class HoursCompletedTab extends StatefulWidget {
   final DocumentSnapshot userDocSnap;
-  const HoursCompletedTab({ super.key, required this.userDocSnap });
+  const HoursCompletedTab({super.key, required this.userDocSnap});
 
   @override
   State createState() => HoursCompletedState();
@@ -215,11 +215,13 @@ class HoursCompletedState extends State<HoursCompletedTab> {
                                         .toStringAsFixed(0),
                                     style: TextStyle(
                                         fontSize: 40,
-                                        color: (widget.userDocSnap['sem-1-hours'] +
-                                                    widget.userDocSnap['sem-2-hours'] <
-                                                maxhours)
-                                            ? Colors.red
-                                            : Colors.green),
+                                        color:
+                                            (widget.userDocSnap['sem-1-hours'] +
+                                                        widget.userDocSnap[
+                                                            'sem-2-hours'] <
+                                                    maxhours)
+                                                ? Colors.red
+                                                : Colors.green),
                                   ),
                                   Text(
                                     "/$maxhoursdisplay",
@@ -266,7 +268,7 @@ class HoursCompletedState extends State<HoursCompletedTab> {
 
 class HourDetailPage extends StatefulWidget {
   final DocumentSnapshot userDocSnap;
-  const HourDetailPage({ super.key, required this.userDocSnap });
+  const HourDetailPage({super.key, required this.userDocSnap});
 
   @override
   State createState() {
@@ -329,19 +331,16 @@ class HourDetailState extends State<HourDetailPage>
                   child: TweenAnimationBuilder<double>(
                     tween: Tween(
                         begin: 0,
-                        end: widget.userDocSnap['sem-1-hours'] /
-                            sem1hours),
+                        end: widget.userDocSnap['sem-1-hours'] / sem1hours),
                     duration: const Duration(seconds: 2),
                     builder: (context, value, _) => CircularProgressIndicator(
                         strokeCap: StrokeCap.round,
                         strokeWidth: 10,
                         backgroundColor:
-                            (widget.userDocSnap['sem-1-hours'] <
-                                    sem1hours)
+                            (widget.userDocSnap['sem-1-hours'] < sem1hours)
                                 ? Colors.red
                                 : Colors.white,
-                        color: (widget.userDocSnap['sem-1-hours'] <
-                                sem1hours)
+                        color: (widget.userDocSnap['sem-1-hours'] < sem1hours)
                             ? Colors.green
                             : Colors.blue,
                         value: value),
@@ -374,8 +373,7 @@ class HourDetailState extends State<HourDetailPage>
                   child: TweenAnimationBuilder<double>(
                     tween: Tween(
                         begin: 0,
-                        end: widget.userDocSnap['sem-2-hours'] /
-                            sem2hours),
+                        end: widget.userDocSnap['sem-2-hours'] / sem2hours),
                     duration: const Duration(seconds: 2),
                     builder: (context, value, _) => CircularProgressIndicator(
                       strokeCap: StrokeCap.round,
@@ -384,10 +382,9 @@ class HourDetailState extends State<HourDetailPage>
                           (widget.userDocSnap['sem-2-hours'] < sem2hours)
                               ? Colors.red
                               : Colors.white,
-                      color:
-                          (widget.userDocSnap['sem-2-hours'] < sem2hours)
-                              ? Colors.green
-                              : Colors.blue,
+                      color: (widget.userDocSnap['sem-2-hours'] < sem2hours)
+                          ? Colors.green
+                          : Colors.blue,
                       value: value,
                     ),
                   ),
@@ -398,8 +395,7 @@ class HourDetailState extends State<HourDetailPage>
                 child: Center(
                     child: Text(
                         'Semester 2:\n     ' +
-                            widget.userDocSnap['sem-2-hours']
-                                .toString() +
+                            widget.userDocSnap['sem-2-hours'].toString() +
                             '/$sem2hours',
                         style: const TextStyle(fontSize: 20))),
               )
@@ -411,7 +407,7 @@ class HourDetailState extends State<HourDetailPage>
 
 class UpcomingEventsTab extends StatefulWidget {
   final DocumentSnapshot userDocSnap;
-  const UpcomingEventsTab({ required this.userDocSnap, super.key });
+  const UpcomingEventsTab({required this.userDocSnap, super.key});
 
   @override
   State<UpcomingEventsTab> createState() => _UpcomingEventsTabState();
@@ -423,59 +419,50 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   ExpansionTileController tilecontroller = ExpansionTileController();
 
   Widget _buildUpcomingEvent(BuildContext context,
-      {required QueryDocumentSnapshot eventDocSnap, required DocumentSnapshot userDocSnap}) {
+      {required QueryDocumentSnapshot eventDocSnap,
+      required DocumentSnapshot userDocSnap,
+      required QueryDocumentSnapshot icondataDocSnap}) {
     return Card(
       child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EventDetailsPage(
-                  eventDocId: eventDocSnap.id,
-                ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EventDetailsPage(
+                eventDocId: eventDocSnap.id,
               ),
-            );
-          },
-          child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('icondata')
-                  .where('wing', isEqualTo: eventDocSnap['wing'])
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const CircularProgressIndicator();
-                } else {
-                  return Container(
-                    decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.topRight,
-                            colors: [
-                          Color.fromARGB(255, 151, 236, 154),
-                          Colors.white,
-                          Colors.white
-                        ])),
-                    child: ListTile(
-                      tileColor: const Color.fromARGB(255, 251, 250, 250),
-                      title: Text(eventDocSnap['title']),
-                      subtitle: Text(DateTimeFormatter.format(
-                          eventDocSnap['timestamp'].toDate())),
-                      leading: Icon(
-                          IconData(snapshot.data!.docs[0]['codepoint'],
-                              fontFamily: 'MaterialIcons'),
-                          color: Color(snapshot.data!.docs[0]['color'])),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('${eventDocSnap['hours']} Hrs'),
-                          const Text('Active',
-                              style: TextStyle(color: Colors.green))
-                        ],
-                      ),
-                    ),
-                  );
-                }
-              })),
+            ),
+          );
+        },
+        child: Container(
+          decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.topRight,
+                  colors: [
+                Color.fromARGB(255, 151, 236, 154),
+                Colors.white,
+                Colors.white
+              ])),
+          child: ListTile(
+            tileColor: const Color.fromARGB(255, 251, 250, 250),
+            title: Text(eventDocSnap['title']),
+            subtitle: Text(
+                DateTimeFormatter.format(eventDocSnap['timestamp'].toDate())),
+            leading: Icon(
+                IconData(icondataDocSnap['codepoint'],
+                    fontFamily: 'MaterialIcons'),
+                color: Color(icondataDocSnap['color'])),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('${eventDocSnap['hours']} Hrs'),
+                const Text('Active', style: TextStyle(color: Colors.green))
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -483,29 +470,28 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   Widget build(BuildContext context) {
     final screenheight = MediaQuery.sizeOf(context).height;
 
-    // TODO make this smooth (every rebuild waits on calls to snapshots())
     return Column(
       children: <Widget>[
         StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection('configurables')
-                .doc("document")
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Expanded(
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
+          stream: FirebaseFirestore.instance
+              .collection('configurables')
+              .doc("document")
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Expanded(
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
 
-              final wingOptions = ['All'] +
-                  snapshot.data!['wings'].map<String>((dyn) {
-                    String ret = dyn;
-                    return ret;
-                  }).toList();
-              final events = FirebaseFirestore.instance.collection('events');
+            final wingOptions = ['All'] +
+                snapshot.data!['wings'].map<String>((dyn) {
+                  String ret = dyn;
+                  return ret;
+                }).toList();
+            final events = FirebaseFirestore.instance.collection('events');
 
-              return Padding(
+            return Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: Column(children: <Widget>[
                   Card(
@@ -519,8 +505,8 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
-                          leadingIcon: const Icon(Icons.category,
-                              color: Colors.white),
+                          leadingIcon:
+                              const Icon(Icons.category, color: Colors.white),
                           expandedInsets:
                               const EdgeInsets.only(top: 64.0, bottom: 8.0),
                           inputDecorationTheme: const InputDecorationTheme(
@@ -543,52 +529,72 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                             );
                           }).toList())),
                   StreamBuilder(
-                      stream: _selectedWing == 'All'
-                          ? events.snapshots()
-                          : events
-                              .where('wing', isEqualTo: _selectedWing)
-                              .snapshots(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return const Padding(
-                              padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
-                              child: CircularProgressIndicator());
-                        }
+                    stream: FirebaseFirestore.instance
+                        .collection('icondata')
+                        .snapshots(), // Incredibly retarded to not unify icon codepoints and colors with their wings
+                    builder: (context, icondataAsyncSnap) {
+                      if (icondataAsyncSnap.data == null) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                        if (snapshot.data!.docs.isEmpty) {
-                          return const Padding(
-                              padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
-                              child: Text('Nothing to see here ._.'));
-                        }
+                      final QuerySnapshot icondataSnap =
+                          icondataAsyncSnap.data!;
 
-                        return SizedBox(
-                          height: screenheight - 207,
-                          child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: snapshot.data!.docs.length,
-                              itemBuilder: (context, index) {
-                                return TweenAnimationBuilder(
-                                  tween: Tween<double>(begin: 0, end: 1),
-                                  duration: const Duration(seconds: 1),
-                                  child: _buildUpcomingEvent(
+                      return StreamBuilder(
+                        stream: _selectedWing == 'All'
+                            ? events.snapshots()
+                            : events
+                                .where('wing', isEqualTo: _selectedWing)
+                                .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Padding(
+                                padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                child: CircularProgressIndicator());
+                          }
+
+                          if (snapshot.data!.docs.isEmpty) {
+                            return const Padding(
+                                padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                child: Text('Nothing to see here ._.'));
+                          }
+
+                          return SizedBox(
+                            height: screenheight - 207,
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: snapshot.data!.docs.length,
+                                itemBuilder: (context, index) {
+                                  return TweenAnimationBuilder(
+                                    tween: Tween<double>(begin: 0, end: 1),
+                                    duration: const Duration(seconds: 1),
+                                    child: _buildUpcomingEvent(
                                       context,
                                       eventDocSnap: snapshot.data!.docs[index],
-                                      userDocSnap: widget.userDocSnap
-				  ),
-                                  builder: (BuildContext context, double value,
-                                      Widget? child) {
-                                    return Opacity(
-                                      opacity: value,
-                                      child: child,
-                                    );
-                                  },
-                                );
-                              }),
-                        );
-                      })
-                ]),
-              );
-            })
+                                      userDocSnap: widget.userDocSnap,
+                                      icondataDocSnap: icondataSnap.docs
+                                          .singleWhere((docSnap) =>
+                                              docSnap['wing'] ==
+                                              snapshot.data!.docs[index]
+                                                  ['wing']),
+                                    ),
+                                    builder: (BuildContext context,
+                                        double value, Widget? child) {
+                                      return Opacity(
+                                        opacity: value,
+                                        child: child,
+                                      );
+                                    },
+                                  );
+                                }),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ]));
+          },
+        ),
       ],
     );
   }
