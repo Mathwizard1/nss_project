@@ -50,7 +50,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     });
   }
 
-  bool _hasRegistered(
+  bool _isInRegisteredEvents(
       {required DocumentSnapshot eventDocSnap,
       required DocumentSnapshot userDocSnap}) {
     return userDocSnap['registered-events']
@@ -62,7 +62,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         .contains(widget.eventDocId);
   }
 
-  bool _hasMarkedAttendance(
+  bool _isInAttendedEvents(
       {required DocumentSnapshot eventDocSnap,
       required DocumentSnapshot userDocSnap}) {
     return userDocSnap['attended-events']
@@ -114,10 +114,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             final double appBarHeight = 0.075 * screenHeight;
             final double bottomPadding = 0.05 * screenHeight;
 
-            final bool hasRegistered = _hasRegistered(
+            final bool hasRegistered = _isInRegisteredEvents(
                 eventDocSnap: eventDocSnap, userDocSnap: userDocSnap);
-            final bool hasMarkedAttendance = _hasMarkedAttendance(
-                eventDocSnap: eventDocSnap, userDocSnap: userDocSnap);
+            final bool hasMarkedAttendance = hasRegistered &&
+                _isInAttendedEvents(
+                    eventDocSnap: eventDocSnap, userDocSnap: userDocSnap);
 
             return Scaffold(
               appBar: AppBar(
@@ -181,7 +182,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                             child: hasRegistered
                                 ? const Text('Registered for Event',
                                     style: TextStyle(color: Colors.white))
-                                : const Text('Regsiter for Event',
+                                : const Text('Register for Event',
                                     style: TextStyle(color: Colors.white)),
                           ),
                           enabled: !hasRegistered,

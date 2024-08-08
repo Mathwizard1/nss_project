@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -131,49 +130,51 @@ class _PicProfilePageState extends State<PicProfilePage> {
                     name = text;
                   },
                 ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white, backgroundColor: Colors.blue[900],
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                              MaterialPageRoute(
-                            builder: (context) => const Configurables()));
-                      },
-                      child: const Text(
-                        'Change Configurables',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blue[900],
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Configurables()));
+                    },
+                    child: const Text(
+                      'Change Configurables',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white, backgroundColor: Colors.blue[900],
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      ),
-                      onPressed: () {
-                        deleteAllNotifications();
-                      },
-                      child: const Text(
-                        'Delete all notifications',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blue[900],
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    ),
+                    onPressed: () {
+                      deleteAllNotifications();
+                    },
+                    child: const Text(
+                      'Delete all notifications',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
+                ),
                 // Padding(
                 //   padding: const EdgeInsets.all(5.0),
                 //   child: SizedBox(
@@ -213,7 +214,6 @@ class Configurables extends StatefulWidget {
 }
 
 class _ConfigurablesState extends State<Configurables> {
- 
   bool isHoursChanged = false;
   bool isWingsChanged = false;
   String? newWingName;
@@ -275,25 +275,39 @@ class _ConfigurablesState extends State<Configurables> {
                                 isHoursChanged = true;
                               },
                               onSubmitted: (value) {
-                                if(value != ''){
-                                  showDialog(context: context, builder:(BuildContext context){
-                                    return AlertDialog(
-                                      title: const Text('confirm new total hours'),
-                                      actions: [
-                                        TextButton(onPressed: (){
-                                          if (isHoursChanged) {
-                                            FirebaseFirestore.instance
-                                            .collection('configurables')
-                                            .doc('document')
-                                            .set({'mandatory-hours': totalhours,'sem1hours' : totalhours.toDouble() /2,'sem2hours': totalhours.toDouble()/2}, SetOptions(merge: true));
-                                         }
-                                         Navigator.pop(context);
-                                        }, child: const Text('confirm'))
-                                      ],
-                                    );
-                                  });
+                                if (value != '') {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                              'confirm new total hours'),
+                                          actions: [
+                                            TextButton(
+                                                onPressed: () {
+                                                  if (isHoursChanged) {
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            'configurables')
+                                                        .doc('document')
+                                                        .set({
+                                                      'mandatory-hours':
+                                                          totalhours,
+                                                      'sem1hours': totalhours
+                                                              .toDouble() /
+                                                          2,
+                                                      'sem2hours': totalhours
+                                                              .toDouble() /
+                                                          2
+                                                    }, SetOptions(merge: true));
+                                                  }
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('confirm'))
+                                          ],
+                                        );
+                                      });
                                 }
-                                
                               },
                             ),
                             const SizedBox(
@@ -310,46 +324,74 @@ class _ConfigurablesState extends State<Configurables> {
                                         title: Text(wings[index]),
                                         trailing: IconButton(
                                           icon: const Icon(Icons.delete),
-                                          onPressed: () =>
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context){
-                                               return AlertDialog(
-                                                title: const Text('Do you want to delete this wing'),
+                                          onPressed: () => showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: const Text(
+                                                    'Do you want to delete this wing'),
                                                 actions: [
-                                                  TextButton(onPressed: (){Navigator.pop(context);}, child: const  Text('No')),
-                                                  TextButton(onPressed: (){
-                                                    wings.removeAt(index);
-                                                    FirebaseFirestore.instance.collection('configurables').doc('document').set({'wings': wings}, SetOptions(merge: true));
-                                                    setState(() {});
-                                                    Navigator.pop(context);
-                                                  }, child: const Text('Yes')),
-                                              
+                                                  TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: const Text('No')),
+                                                  TextButton(
+                                                      onPressed: () {
+                                                        wings.removeAt(index);
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'configurables')
+                                                            .doc('document')
+                                                            .set(
+                                                                {
+                                                              'wings': wings
+                                                            },
+                                                                SetOptions(
+                                                                    merge:
+                                                                        true));
+                                                        setState(() {});
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: const Text('Yes')),
                                                 ],
-                                              );},
-                                            ),
+                                              );
+                                            },
+                                          ),
                                         ),
                                       ),
                                     );
                                   }),
                             ),
                             TextField(
-                              decoration: InputDecoration(labelText: 'Add Wing',hintText: 'New wing name'),
-                              onChanged: (text){
+                              decoration: const InputDecoration(
+                                  labelText: 'Add Wing',
+                                  hintText: 'New wing name'),
+                              onChanged: (text) {
                                 newWingName = text;
                               },
                               onSubmitted: (value) async {
-                                if(value != null && value != ''){
-                                 IconData? icon = await showIconPicker(context,iconPackModes: [IconPack.material]);
-                                  if(icon != null){
+                                if (value != '') {
+                                  IconData? icon = await showIconPicker(context,
+                                      iconPackModes: [IconPack.material]);
+                                  if (icon != null) {
                                     wings.add(value);
-                                    FirebaseFirestore.instance.collection('configurables').doc('document').set({'wings': wings}, SetOptions(merge: true));
-                                    FirebaseFirestore.instance.collection('icondata').add({'codepoint': icon.codePoint ,'color': 0xff000000,'wing' : value});
+                                    FirebaseFirestore.instance
+                                        .collection('configurables')
+                                        .doc('document')
+                                        .set({'wings': wings},
+                                            SetOptions(merge: true));
+                                    FirebaseFirestore.instance
+                                        .collection('icondata')
+                                        .add({
+                                      'codepoint': icon.codePoint,
+                                      'color': 0xff000000,
+                                      'wing': value
+                                    });
                                   }
-                                 
                                 }
                               },
-                            
                             )
                           ],
                         ),
@@ -364,4 +406,3 @@ class _ConfigurablesState extends State<Configurables> {
     );
   }
 }
-
