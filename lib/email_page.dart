@@ -30,14 +30,14 @@ class EmailSenderState extends State<EmailSender> {
   bool isHTML = false;
 
   final _recipientController = TextEditingController(
-    text: 'example@example.com',
+    text: 'anshurup.gupta@gmail.com',
   );
 
   final _subjectController = TextEditingController(text: 'The subject');
 
   final _bodyController = TextEditingController(
     text:
-        'Mail body. This is a sample text and will be replaced with more information.',
+        'This is a current sample emails',
   );
 
   Future<void> send() async {
@@ -59,7 +59,7 @@ class EmailSenderState extends State<EmailSender> {
     }
 
     if (!mounted) return;
-
+    Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(platformResponse),
