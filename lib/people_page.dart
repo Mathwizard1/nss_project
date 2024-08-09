@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:nss_project/sprofile_page.dart';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'student_view_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:csv/csv.dart';
 
 class PeoplePage extends StatefulWidget {
   final String userRole;
@@ -46,6 +48,23 @@ class _PeoplePageState extends State<PeoplePage> {
         });
   }
 
+  Future generateCSV() async
+  {
+
+    // ignore: non_constant_identifier_names
+    List<List<String>> CSVtemp=[<String>['Name','Roll Number','E-Mail','Group','Semester 1','Semester 2']];
+    await FirebaseFirestore.instance.collection('users').where('role',isEqualTo: 'volunteer').get().then((snapshot){snapshot.docs.forEach((document){CSVtemp.add(<String>[document.get('full-name'),document.get('roll-number'),document.get('email'),document.get('group'),document.get('sem-1-hours').toString(),document.get('sem-2-hours').toString()]);});});
+
+    // ignore: non_constant_identifier_names
+    String CSVdata=const ListToCsvConverter().convert(CSVtemp);
+
+    Directory downloadDirectory=Directory('storage/emulated/0/Download');
+
+    final File file=await(File('${downloadDirectory.path}/Students.csv').create());
+    await file.writeAsString(CSVdata);
+
+  }
+
   @override
   Widget build(BuildContext context) {
     String mentorname = "Pranjal";
@@ -73,22 +92,11 @@ class _PeoplePageState extends State<PeoplePage> {
                 icon: const Icon(Icons.refresh)),
 
             IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfilePage()));
-              },
+              onPressed: (){generateCSV();},
+              icon:const Icon(Icons.edit_document)
             ),
 
             // SIGN OUT DOES NOT WORK
-
-            IconButton(
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                },
-                icon: const Icon(Icons.exit_to_app)),
           ],
           bottom: const TabBar(
             tabs: [
@@ -152,12 +160,16 @@ class _PeoplePageState extends State<PeoplePage> {
                         for (var i in snapshot.data!.docs) i
                       ]; // FIX CAUSE DEV IS A ASSHOLE  if(i['first name'] != 'dev') if(i['role'] == 'mentor')
                       //print(stdlist.length);
-                      return ListView.builder(
-                          itemCount: stdlist.length,
-                          itemBuilder: (context, index) {
-                            return _buildPerson(
-                                stdlist[index], widget.userRole, context);
-                          });
+                      return Column(
+                        children: [
+                          ListView.builder(
+                              itemCount: stdlist.length,
+                              itemBuilder: (context, index) {
+                                return _buildPerson(
+                                    stdlist[index], widget.userRole, context);
+                              }),
+                        ],
+                      );
                     }
                     return const Text('Hello Darkness my ..');
                   }),

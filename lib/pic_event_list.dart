@@ -33,9 +33,12 @@ class _PicEventListState extends State<PicEventList> {
     // TODO: implement initState
     super.initState();
     ConfigurablesStream = FirebaseFirestore.instance.collection('configurables').doc("document").snapshots();
-    EventStream = FirebaseFirestore.instance.collection("events").snapshots();
+    EventStream = FirebaseFirestore.instance.collection("events").orderBy("timestamp",descending: true).snapshots();
     MentorStream = FirebaseFirestore.instance.collection("users").where('role',isEqualTo: 'mentor').snapshots();
   }
+
+
+
   @override
   Widget build(BuildContext context) {
     String mentorname = "Pranjal";
@@ -179,8 +182,30 @@ class _PicEventListState extends State<PicEventList> {
   }
 }
 
+int calculateDifferenceInMinutes(Timestamp firebaseTimestamp) {
+  DateTime currentTime = DateTime.now();
+  DateTime firebaseTime = firebaseTimestamp.toDate();
+
+  // Calculate the difference in minutes
+  int differenceInMinutes = currentTime.difference(firebaseTime).inMinutes;
+  return differenceInMinutes;
+  }
+
 Widget _buildEvent(
     QueryDocumentSnapshot<Map<String, dynamic>> event, BuildContext context) {
+
+       String state;
+
+    int minutes=calculateDifferenceInMinutes(event.get('timestamp'));
+    if(minutes<0)
+    {state="Upcoming";}
+    else if(minutes>300)
+    {state="Finished";}
+    else
+    {
+      state="Active";
+    }
+
   return StreamBuilder(
     stream: FirebaseFirestore.instance.collection('icondata').where('wing',isEqualTo: event['wing']).snapshots(),
     builder: (context, snapshot) {
@@ -209,7 +234,7 @@ Widget _buildEvent(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('${event['hours']} Hrs'),
-                const Text('Active', style: TextStyle(color: Colors.green))
+                Text(state, style: TextStyle(color:(state=="Active")?const Color.fromARGB(255, 151, 236, 154):((state=="Finished")?const Color.fromARGB(255, 224, 57, 45):const Color.fromARGB(255, 109, 189, 255))))
               ],
             ),
             onTap: () {
