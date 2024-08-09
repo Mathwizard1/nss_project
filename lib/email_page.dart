@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:image_picker/image_picker.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,22 +22,22 @@ class EmailSender extends StatefulWidget {
   const EmailSender({super.key});
 
   @override
-  _EmailSenderState createState() => _EmailSenderState();
+  EmailSenderState createState() => EmailSenderState();
 }
 
-class _EmailSenderState extends State<EmailSender> {
+class EmailSenderState extends State<EmailSender> {
   List<String> attachments = [];
   bool isHTML = false;
 
   final _recipientController = TextEditingController(
-    text: 'example@example.com',
+    text: 'anshurup.gupta@gmail.com',
   );
 
   final _subjectController = TextEditingController(text: 'The subject');
 
   final _bodyController = TextEditingController(
     text:
-        'Mail body. This is a sample text and will be replaced with more information.',
+        'This is a current sample emails',
   );
 
   Future<void> send() async {
@@ -53,12 +55,11 @@ class _EmailSenderState extends State<EmailSender> {
       await FlutterEmailSender.send(email);
       platformResponse = 'success';
     } catch (error) {
-      print(error);
       platformResponse = error.toString();
     }
 
     if (!mounted) return;
-
+    Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(platformResponse),

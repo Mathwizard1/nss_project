@@ -48,9 +48,6 @@ class DisplayEventPageState extends State<DisplayEventPage> {
   void initState()
   {
     super.initState();
-
-    ;
-
     syncdetails();
     initEdit();
   }

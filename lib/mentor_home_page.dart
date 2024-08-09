@@ -166,31 +166,8 @@ class MentorHomePageState extends State<MentorHomePage> {
                         }),
                   );
                 }
-                return const Text('Hello Darkness my ..');
+                return const Text('Working');
               }),
-          Expanded(
-            child: Align(
-              alignment: FractionalOffset.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
-                child: CircleAvatar(
-                    radius: 25,
-                    backgroundColor: const Color.fromARGB(255, 128, 112, 185),
-                    foregroundColor: Colors.white,
-                    child: Center(
-                        child: IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const EventPage()));
-                      },
-                      icon: const Icon(Icons.add_circle_outline),
-                      iconSize: 33,
-                    ))),
-              ),
-            ),
-          )
         ],
       ),
     );
