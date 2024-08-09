@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:csv/csv.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'date_time_formatter.dart';
 import 'package:nss_project/notification_page.dart';
@@ -190,13 +194,32 @@ class DisplayEventPageState extends State<DisplayEventPage> {
     }
   }
 
+  Future generateCSV() async
+  {
+    // ignore: non_constant_identifier_names
+    List<List<String>> CSVtemp=[<String>['Name','Roll Number','E-Mail','Group']];
+    for(var x in widget.document.get('attending-volunteers'))
+    {
+      await FirebaseFirestore.instance.collection('users').doc(x).get().then((snapshot){CSVtemp.add(<String>[snapshot['full-name'],snapshot['roll-number'],snapshot['email'],snapshot['group']]);});
+    }
+
+    // ignore: non_constant_identifier_names
+    String CSVdata=const ListToCsvConverter().convert(CSVtemp);
+
+    Directory downloadDirectory=Directory('storage/emulated/0/Download');
+
+    final File file=await(File('${downloadDirectory.path}/${widget.document['title']}.csv').create());
+    await file.writeAsString(CSVdata);
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection('configurables').doc('document').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-	  return Scaffold(body: Center(child: CircularProgressIndicator()));
+	  return const Scaffold(body: Center(child: CircularProgressIndicator()));
 	}
 
 	final wingsList = snapshot.data!['wings'].map<String>((dyn) { String ret = dyn; return ret; }).toList();
@@ -454,32 +477,65 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                                   ),
                                 ],
                               )
-                            : SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: _isEditing ? Colors.blue[900] : Colors.white, 
-                                    backgroundColor: _isEditing ? Colors.white : Colors.blue[900],
-                                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            : Padding(
+                              padding: const EdgeInsets.only(bottom:20),
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom:8.0),
+                                    child: SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: _isEditing ? Colors.blue[900] : Colors.white, 
+                                            backgroundColor: _isEditing ? Colors.white : Colors.blue[900],
+                                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                                          ),
+                                          onPressed: _isEditing ? null : () {
+
+                                            generateCSV();
+                                            // Implement your onPressed functionality here
+                                          },
+                                          child: const Text(
+                                            'Download Excel Sheet',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                   ),
-                                  onPressed: _isEditing ? null : () {
-                                    // Implement your onPressed functionality here
-                                  },
-                                  child: const Text(
-                                    'View Gallery',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                              
+                                  SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          foregroundColor: _isEditing ? Colors.blue[900] : Colors.white, 
+                                          backgroundColor: _isEditing ? Colors.white : Colors.blue[900],
+                                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                                        ),
+                                        onPressed: _isEditing ? null : () {
+                                          // Implement your onPressed functionality here
+                                        },
+                                        child: const Text(
+                                          'View Gallery',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                ],
                               ),
+                            ),
                   ),
                 ],
               ),
               if (widget.selectedRole == "pic" || widget.selectedRole == "mentor")
                 Positioned(
-                  bottom: 90.0,
+                  bottom: 190.0,
                   right: 16.0,
                   child: FloatingActionButton(
                     onPressed: _toggleEdit,
