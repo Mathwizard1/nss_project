@@ -458,7 +458,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                                       ),
                                       onPressed: () {
                                         Navigator.push(context,
-                                          MaterialPageRoute(builder: (context) => const EmailSender()));
+                                          MaterialPageRoute(builder: (context) => EmailSender(document: widget.document)));
                                       },
                                       child: const Text(
                                         'Generate and Send Email to PIC',

@@ -1,25 +1,16 @@
 import 'dart:async';
+import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:image_picker/image_picker.dart';
-
-void main() => runApp(const MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(primaryColor: Colors.red),
-      home: const EmailSender(),
-    );
-  }
-}
+import 'date_time_formatter.dart';
 
 class EmailSender extends StatefulWidget {
-  const EmailSender({super.key});
+  final QueryDocumentSnapshot document;
+
+  const EmailSender({super.key, required this.document});
 
   @override
   EmailSenderState createState() => EmailSenderState();
@@ -27,18 +18,10 @@ class EmailSender extends StatefulWidget {
 
 class EmailSenderState extends State<EmailSender> {
   List<String> attachments = [];
-  bool isHTML = false;
 
-  final _recipientController = TextEditingController(
-    text: 'anshurup.gupta@gmail.com',
-  );
-
-  final _subjectController = TextEditingController(text: 'The subject');
-
-  final _bodyController = TextEditingController(
-    text:
-        'This is a current sample emails',
-  );
+  late TextEditingController _recipientController;
+  late TextEditingController _subjectController;
+  late TextEditingController _bodyController;
 
   Future<void> send() async {
     final Email email = Email(
@@ -46,7 +29,7 @@ class EmailSenderState extends State<EmailSender> {
       subject: _subjectController.text,
       recipients: [_recipientController.text],
       attachmentPaths: attachments,
-      isHTML: isHTML,
+      isHTML: false,
     );
 
     String platformResponse;
@@ -65,6 +48,52 @@ class EmailSenderState extends State<EmailSender> {
         content: Text(platformResponse),
       ),
     );
+  }
+
+  String getEmailid()
+  {
+    return 'anshurup.gupta@gmail.com';
+  }
+
+  String generateHtmlEmailBody() {
+  return 
+  '''
+    respected sir/ma'am,
+We have successfully completed the event ${widget.document['title']}.
+This event was conducted by ${widget.document['wing']} wing. It was conducted on ${DateTimeFormatter.format(widget.document['timestamp'].toDate())} in ${widget.document['venue']}.
+
+  students registered: ${widget.document['registered-volunteers'].length}
+  students attended: ${widget.document['attending-volunteers'].length}
+  hours given: ${widget.document['hours']}
+
+The event objective was:
+    ${widget.document['description']}
+
+    Thank you
+  ''';
+}
+
+  @override 
+  void initState()
+  {
+    super.initState();
+    initEdit();
+  }
+
+    void initEdit()
+  {
+    _subjectController = TextEditingController(text: 'Report on ${widget.document['title']}');
+
+    _bodyController = TextEditingController(text: generateHtmlEmailBody());
+    _recipientController = TextEditingController(text: getEmailid());
+  }
+
+  @override
+  void dispose() {
+    _subjectController.dispose();
+    _recipientController.dispose();
+    _bodyController.dispose();
+    super.dispose();
   }
 
   @override
@@ -118,19 +147,6 @@ class EmailSenderState extends State<EmailSender> {
                       labelText: 'Body', border: OutlineInputBorder()),
                 ),
               ),
-            ),
-            CheckboxListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-              title: const Text('HTML'),
-              onChanged: (bool? value) {
-                if (value != null) {
-                  setState(() {
-                    isHTML = value;
-                  });
-                }
-              },
-              value: isHTML,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
