@@ -117,8 +117,10 @@ class LeaderboardPage extends StatelessWidget {
                       name,
                       style: textStyle,
                     ),
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
-                    tileColor: (index <= 3)? Colors.teal[200]: Colors.blueGrey[50],
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5))),
+                    tileColor:
+                        (index <= 3) ? Colors.teal[200] : Colors.blueGrey[50],
                     trailing: Text(
                       '$totalHours hrs',
                       style: textStyle,
