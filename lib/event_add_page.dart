@@ -555,7 +555,7 @@ class EventPageState extends State<EventPage> {
                             addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
                             Navigator.pop(context);
                           }
-                          catch(e)
+                          on FirebaseException catch(e)
                           {
                             // Handle errors (e.g., show an error message)
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -577,16 +577,6 @@ class EventPageState extends State<EventPage> {
                 ),
               ),
             ],
-          ),
-          Positioned(
-            right: 16,
-            bottom: 80,
-            child: FloatingActionButton(
-              onPressed: () {
-                // Handle add image
-              },
-              child: const Icon(Icons.add_a_photo),
-            ),
           ),
         ],
       ),

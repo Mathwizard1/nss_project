@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:image_picker/image_picker.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,10 +22,10 @@ class EmailSender extends StatefulWidget {
   const EmailSender({super.key});
 
   @override
-  _EmailSenderState createState() => _EmailSenderState();
+  EmailSenderState createState() => EmailSenderState();
 }
 
-class _EmailSenderState extends State<EmailSender> {
+class EmailSenderState extends State<EmailSender> {
   List<String> attachments = [];
   bool isHTML = false;
 
@@ -53,7 +55,6 @@ class _EmailSenderState extends State<EmailSender> {
       await FlutterEmailSender.send(email);
       platformResponse = 'success';
     } catch (error) {
-      print(error);
       platformResponse = error.toString();
     }
 

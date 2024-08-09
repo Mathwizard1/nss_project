@@ -44,9 +44,6 @@ class DisplayEventPageState extends State<DisplayEventPage> {
   void initState()
   {
     super.initState();
-
-    ;
-
     syncdetails();
     initEdit();
   }
@@ -196,7 +193,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
       stream: FirebaseFirestore.instance.collection('configurables').doc('document').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-	  return Scaffold(body: Center(child: CircularProgressIndicator()));
+	  return const Scaffold(body: Center(child: CircularProgressIndicator()));
 	}
 
 	final wingsList = snapshot.data!['wings'].map<String>((dyn) { String ret = dyn; return ret; }).toList();

@@ -162,6 +162,7 @@ class _PicEventListState extends State<PicEventList> {
                       return Padding(
                         padding: const EdgeInsets.only(top:10.0),
                         child: ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: events.length,
                             itemBuilder: (context, index) {
