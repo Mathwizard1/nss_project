@@ -9,6 +9,7 @@ import 'welcome_page.dart';
 import 'student_home_page.dart';
 import 'mentor_home_page.dart'; 
 import 'newpic_homepage.dart';
+import 'secretary_home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();  
@@ -72,8 +73,9 @@ class MainApp extends StatelessWidget {
                 case 'volunteer':
                   return const StudentHomePage(); // TODO rename to VolunteerHomePage
                 case 'mentor':
-                case 'secretary':
                   return MentorHomePage(role: snapshot.data!['role']);
+                case 'secretary':
+                  return SecretaryHomePage(wing: snapshot.data!['wing']);
                 case 'pic':
                   return const NewpicHomepage();
                 default:

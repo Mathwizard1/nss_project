@@ -19,8 +19,6 @@ class DisplayEventPage extends StatefulWidget {
 }
 
 class DisplayEventPageState extends State<DisplayEventPage> {
-  DisplayEventPageState();
-
   Event event = Event(
     name: "Sample event",
     time: DateTime.now(),
@@ -427,7 +425,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: widget.selectedRole == "volunteer"
+                    child: widget.selectedRole == "secretary_edit"
                         ? SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
@@ -439,7 +437,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                                 // Implement your onPressed functionality here
                               },
                               child: const Text(
-                                'Register',
+                                'Set Event for next time',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -473,7 +471,8 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                                   ),
                                 ],
                               )
-                            : Padding(
+                            : widget.selectedRole == "pic"? 
+                            Padding(
                               padding: const EdgeInsets.only(bottom:20),
                               child: Column(
                                 children: [
@@ -525,6 +524,10 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                                     ),
                                 ],
                               ),
+                            ):
+                            const SizedBox(
+                              height: 20,
+                              child: Text("All data displayed"),
                             ),
                   ),
                 ],
