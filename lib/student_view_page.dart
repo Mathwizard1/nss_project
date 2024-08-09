@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:nss_project/sprofile_page.dart';
+import 'package:nss_project/secretary_wing_changepage.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // import 'dart:io';
@@ -246,41 +249,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                                   onError: (e) => print("Error updating document $e"));
                                 }
                                 if(rolechange == 'secretary'){
-                                  DocumentSnapshot<Map<String, dynamic>> wings = await FirebaseFirestore.instance.collection('configurables').doc('document').get();
-                                  QuerySnapshot<Map<String, dynamic>> secs = await FirebaseFirestore.instance.collection('users').where('role',isEqualTo:'secretary').get();
-                                  List<String> w = [];
-                                  for(var x in wings.data()!['wings']){
-                                    w.add(x);
-                                  }
-                                  for(var x in secs.docs){
-                                    w.remove(x['wing']);
-                                  }
-                                  String? _newsecwing;
-                                  showDialog(context: context, builder:(BuildContext context){
-                                    return AlertDialog(
-                                      title: const Text('Choose Wing'),
-                                      content: ListView.builder(
-                                        itemCount: w.length,
-                                        itemBuilder: (context, index) => RadioListTile(title: Text(w[index]),value: w[index], groupValue: _newsecwing, onChanged: (String? value) {
-                                          setState(() {
-                                            _newsecwing = value;
-                                          });
-                                        }),
-                                      ),
-                                      actions: [
-                                        TextButton(onPressed: (){
-                                          if(_newsecwing != null){
-                                             FirebaseFirestore.instance.collection('users').doc(widget.person.id).update({"role": rolechange,"wing": _newsecwing}).then(
-                                              (value) => print("DocumentSnapshot successfully updated!"),
-                                              onError: (e) => print("Error updating document $e"));
-
-                                          }
-                                         Navigator.pop(context);
-                                        }, child: const Text('confirm'))
-                                      ],
-                                    );
-                                  });
-
+                                  Navigator.push(context,MaterialPageRoute(builder: (context) => SecretaryWingChangepage(id: widget.person.id,)));
                                 }
 
                               });

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:nss_project/event_add_page.dart';
 
+import 'package:nss_project/event_add_page.dart';
 import 'package:nss_project/people_page.dart';
 import 'package:nss_project/picprofile_page.dart';
 import 'package:nss_project/wing_piechart.dart';
@@ -21,7 +21,7 @@ class _NewpicHomepageState extends State<NewpicHomepage> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.sizeOf(context).width;
-    //double height = MediaQuery.sizeOf(context).height;
+    double height = MediaQuery.sizeOf(context).height;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pic Home'),
