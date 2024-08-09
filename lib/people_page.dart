@@ -173,56 +173,65 @@ Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person,
     String userRole, BuildContext context) {
   final screenwidth = MediaQuery.sizeOf(context).width;
 
-  return Padding(
-    padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-    child: SizedBox(
-      height: 300,
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => StudentViewPage(person: person)));
-        },
-        child: Card(
-            elevation: 0.5,
-            color: Colors.white70,
-            child: Column(
-              children: [
-                Container(
-                  width: screenwidth,
-                  height: 200,
-                  color: (person['role'] == 'volunteer')
-                      ? Colors.blue
-                      : ((person['role'] == 'mentor'))
-                          ? Colors.red
-                          : Color.fromARGB(255, 255, 204, 1),
-                  child: Icon(
-                    Icons.account_circle,
-                    size: 50,
-                    color: Colors.white,
-                  ),
+  return SizedBox(
+    height:80,
+    child: InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => StudentViewPage(person: person)));
+      },
+      child: Card(
+          elevation: 0.5,
+          color: Colors.white70,
+          child: Row(
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                color: (person['role'] == 'volunteer')
+                    ? Colors.blue
+                    : ((person['role'] == 'mentor'))
+                        ? Colors.red
+                        : const Color.fromARGB(255, 255, 204, 1),
+                child: const Icon(
+                  Icons.account_circle,
+                  size: 50,
+                  color: Colors.white,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 15),
-                  child: Text(
-                    getCapitalizedName(person['full-name']),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 22),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left:8.0),
+                    child: Text(
+                      getCapitalizedName(person['full-name']),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 20),
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Text(
-                    '${person['roll-number']}',
-                    style: const TextStyle(
-                        fontSize: 18,
-                        color: Color.fromARGB(201, 119, 109, 109)),
-                  ),
-                )
-              ],
-            )),
-      ),
+  
+                  Padding(
+                    padding: const EdgeInsets.only(left:10.0),
+                    child: Row(
+                      
+                      children: [
+                        Text( '${person['roll-number']}',style: const TextStyle(fontSize: 18,color: Color.fromARGB(201, 119, 109, 109)),),
+                        (person['role'] == 'volunteer')?Padding(
+                          padding: const EdgeInsets.only(left:10.0),
+                          child: Text( 'Hours: ${person['sem-1-hours']+person['sem-2-hours']}',style: const TextStyle(fontSize: 18,fontWeight:FontWeight.bold,color: Color.fromARGB(201, 119, 109, 109)),),
+                        ):Container()
+                      ],
+                    ),
+                  )
+                ],
+              ),
+  
+            ],
+          )),
     ),
   );
 }

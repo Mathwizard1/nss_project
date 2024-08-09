@@ -11,7 +11,7 @@ import 'mentor_home_page.dart';
 import 'newpic_homepage.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();  
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
