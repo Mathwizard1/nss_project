@@ -278,29 +278,23 @@ class HourDetailPage extends StatefulWidget {
 
 class HourDetailState extends State<HourDetailPage>
     with SingleTickerProviderStateMixin {
+
   Future<void> fetchsemhours() async {
-    int tempsem1hours = await FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('configurables')
         .doc('document')
         .get()
         .then((snapshot) {
-      return snapshot.get('sem1hours');
+      sem1hours=snapshot['sem1hours'];
+      sem2hours=snapshot['sem2hours'];
     });
-    int tempsem2hours = await FirebaseFirestore.instance
-        .collection('configurables')
-        .doc('document')
-        .get()
-        .then((snapshot) {
-      return snapshot.get('sem2hours');
-    });
+
     setState(() {
-      sem1hours = tempsem1hours;
-      sem2hours = tempsem2hours;
     });
   }
 
-  int sem1hours = 60;
-  int sem2hours = 60;
+  double sem1hours = 60;
+  double sem2hours = 60;
 
   @override
   Widget build(BuildContext context) {
@@ -352,8 +346,8 @@ class HourDetailState extends State<HourDetailPage>
                 padding: EdgeInsets.fromLTRB(0, screenwidth / 5, 0, 0),
                 child: Text(
                   'Semester 1:\n     ' +
-                      widget.userDocSnap['sem-1-hours'].toString() +
-                      '/$sem1hours',
+                      widget.userDocSnap['sem-1-hours'].toString()+
+                      '/${sem1hours.toInt()}',
                   style: const TextStyle(fontSize: 20),
                 ),
               ))
@@ -396,7 +390,7 @@ class HourDetailState extends State<HourDetailPage>
                     child: Text(
                         'Semester 2:\n     ' +
                             widget.userDocSnap['sem-2-hours'].toString() +
-                            '/$sem2hours',
+                            '/${sem2hours.toInt()}',
                         style: const TextStyle(fontSize: 20))),
               )
             ]),

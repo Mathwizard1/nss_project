@@ -17,6 +17,64 @@ class StudentViewPage extends StatefulWidget {
 class _StudentViewPageState extends State<StudentViewPage> {
   String rolechange = 'volunteer';
 
+  int sem1buffer=0;
+  int sem2buffer=0;
+
+
+Future openAddDialog()
+{
+  TextEditingController searchcontroller = TextEditingController();
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Enter Hours"),
+            content: SearchBar(
+              keyboardType: TextInputType.number,
+              controller: searchcontroller,
+            ),
+            actions: [
+              FloatingActionButton(
+                  child: const Text("Submit"),
+                  onPressed: () async {
+                    await FirebaseFirestore.instance.collection('users').doc(widget.person.id).update({'sem-1-hours':FieldValue.increment(int.parse(searchcontroller.text))});
+                    setState(() {
+                      Navigator.pop(context);
+                      sem1buffer+=int.parse(searchcontroller.text);
+                    });
+                  })
+            ],
+          );
+        });
+}
+
+Future openRemoveDialog()
+{
+  TextEditingController searchcontroller = TextEditingController();
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Enter Hours"),
+            content: SearchBar(
+              keyboardType: TextInputType.number,
+              controller: searchcontroller,
+            ),
+            actions: [
+              FloatingActionButton(
+                  child: const Text("Submit"),
+                  onPressed: () async {
+                    await FirebaseFirestore.instance.collection('users').doc(widget.person.id).update({'sem-1-hours':FieldValue.increment(-int.parse(searchcontroller.text))});
+                    setState(() {
+                      Navigator.pop(context);
+                      sem1buffer-=int.parse(searchcontroller.text);
+                    });
+                  })
+            ],
+          );
+        });
+}
+
   
   @override
   Widget build(BuildContext context) {
@@ -36,13 +94,6 @@ class _StudentViewPageState extends State<StudentViewPage> {
             },
           ),
 
-          // SIGN OUT DOES NOT WORK
-
-          IconButton(
-              onPressed: () {
-                FirebaseAuth.instance.signOut();
-              },
-              icon: const Icon(Icons.exit_to_app)),
         ],
       ),
       body: Container(
@@ -52,7 +103,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
           builder: (context, snapshot) {
 
             if(!snapshot.hasData)
-            return CircularProgressIndicator();
+            {return const CircularProgressIndicator();}
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -127,7 +178,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                             ),
                       
                             TextSpan(
-                              text: '${widget.person['sem-1-hours']}',
+                              text: '${widget.person['sem-1-hours']+sem1buffer}',
                               style: TextStyle(
                                   color:(widget.person['sem-1-hours']<(snapshot.data!['mandatory-hours'])/2)? Colors.red:Colors.green),
                             ),
@@ -173,7 +224,7 @@ class _StudentViewPageState extends State<StudentViewPage> {
                             ),
                       
                             TextSpan(
-                              text: '${widget.person['sem-2-hours']}',
+                              text: '${widget.person['sem-2-hours']+sem2buffer}',
                               style: TextStyle(
                                   color:(widget.person['sem-2-hours']<(snapshot.data!['mandatory-hours'])/2)? Colors.red:Colors.green),
                             ),
@@ -199,10 +250,42 @@ class _StudentViewPageState extends State<StudentViewPage> {
 
                 ) : const SizedBox(height: 20,),
 
+                    Padding(
+                      padding: const EdgeInsets.only(top:30.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                        InkWell(
+                          onTap: (){openAddDialog();},
 
+                          child: Card.filled(
+                          color: Colors.green,
+                          child: SizedBox(
+                            width:width/2-20,
+                            height: 50,
+                            child: Center(child: Text("Add Hours",style: TextStyle(fontSize: 20,color: Colors.white),))
+                            ),
+                          ),
+                        ),
+
+
+                         InkWell
+                         (
+                          onTap: (){openRemoveDialog();},
+                           child: Card.filled(
+                                                   color: Colors.red,
+                                                   child: SizedBox(
+                            width:width/2-20,
+                            height: 50,
+                            child: Center(child: Text("Remove Hours",style: TextStyle(fontSize: 20,color: Colors.white),))
+                            ),
+                                                   ),
+                         )
+                      ],),
+                    ),
                 
                     Padding(
-                      padding: EdgeInsets.only(top:width/3 - 25),
+                      padding: EdgeInsets.only(top:25),
                       child: SizedBox(
                         width: width-10,
                         child: StreamBuilder(
@@ -265,6 +348,8 @@ class _StudentViewPageState extends State<StudentViewPage> {
     );
   }
 }
+
+
 String getCapitalizedName(String name){
   String ret = '';
   bool doCap = true;
