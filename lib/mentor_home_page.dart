@@ -25,6 +25,7 @@ class MentorHomePageState extends State<MentorHomePage> {
 
   @override
   Widget build(BuildContext context) {
+  final height = MediaQuery.sizeOf(context).height;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.role[0].toUpperCase() + widget.role.substring(1)),
@@ -51,123 +52,127 @@ class MentorHomePageState extends State<MentorHomePage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isFirstTabSelected = true;
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isFirstTabSelected
-                            ? Colors.blue[800]
-                            : Colors.blue[300],
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 24.0),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Attendance or gallery',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8.0),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isFirstTabSelected = false;
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isFirstTabSelected
-                            ? Colors.blue[300]
-                            : Colors.blue[800],
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 24.0),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Edit or Report',
-                        style: TextStyle(color: Colors.white),
+      body: SizedBox(
+        height: height,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isFirstTabSelected = true;
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isFirstTabSelected
+                              ? Colors.blue[800]
+                              : Colors.blue[300],
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 24.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'Attendance or gallery',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8.0),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isFirstTabSelected = false;
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isFirstTabSelected
+                              ? Colors.blue[300]
+                              : Colors.blue[800],
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 24.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'Edit or Report',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('configurables')
-                  .doc("document")
-                  .snapshots(),
-              builder: (context, snapshot) {
-                List<String> WingOptions = ["All"] +
-                    snapshot.data!['wings'].map<String>((wing) {
-                      String ret = wing;
-                      return ret;
-                    }).toList();
-                List<DropdownMenuEntry<String>> WingMenuEntries =
-                    WingOptions.map((option) => DropdownMenuEntry<String>(
-                        value: option, label: option)).toList();
-                return DropdownMenu<String>(
-                  initialSelection: 'All',
-                  requestFocusOnTap: false,
-                  expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  textStyle: const TextStyle(color: Colors.white),
-                  inputDecorationTheme: const InputDecorationTheme(
-                    fillColor: Color.fromARGB(255, 128, 112, 185),
-                    filled: true,
-                  ),
-                  label: const Text(
-                    'NSS Wing',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onSelected: (String? wing) {
-                    setState(() {
-                      if (wing != null) {
-                        selectedWing = wing;
-                      }
-                    });
-                  },
-                  dropdownMenuEntries: WingMenuEntries,
-                );
-              }),
-          StreamBuilder(
-              stream: (selectedWing == 'All')
-                  ? FirebaseFirestore.instance.collection("events").snapshots()
-                  : FirebaseFirestore.instance
-                      .collection("events")
-                      .where('wing', isEqualTo: selectedWing)
-                      .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Flexible(
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          return _buildEvent(snapshot.data!.docs[index],
-                              context, isFirstTabSelected);
-                        }),
+            StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('configurables')
+                    .doc("document")
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  List<String> WingOptions = ["All"] +
+                      snapshot.data!['wings'].map<String>((wing) {
+                        String ret = wing;
+                        return ret;
+                      }).toList();
+                  List<DropdownMenuEntry<String>> WingMenuEntries =
+                      WingOptions.map((option) => DropdownMenuEntry<String>(
+                          value: option, label: option)).toList();
+                  return DropdownMenu<String>(
+                    initialSelection: 'All',
+                    requestFocusOnTap: false,
+                    expandedInsets: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    textStyle: const TextStyle(color: Colors.white),
+                    inputDecorationTheme: const InputDecorationTheme(
+                      fillColor: Color.fromARGB(255, 128, 112, 185),
+                      filled: true,
+                    ),
+                    label: const Text(
+                      'NSS Wing',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onSelected: (String? wing) {
+                      setState(() {
+                        if (wing != null) {
+                          selectedWing = wing;
+                        }
+                      });
+                    },
+                    dropdownMenuEntries: WingMenuEntries,
                   );
-                }
-                return const Text('Working');
-              }),
-        ],
+                }),
+            StreamBuilder(
+                stream: (selectedWing == 'All')
+                    ? FirebaseFirestore.instance.collection("events").snapshots()
+                    : FirebaseFirestore.instance
+                        .collection("events")
+                        .where('wing', isEqualTo: selectedWing)
+                        .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Flexible(
+                      child: ListView.builder(
+                          itemExtent: height*0.1,
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            return _buildEvent(snapshot.data!.docs[index],
+                                context, isFirstTabSelected);
+                          }),
+                    );
+                  }
+                  return const Text('Working');
+                }),
+          ],
+        ),
       ),
     );
   }
