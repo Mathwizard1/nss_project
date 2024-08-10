@@ -36,6 +36,10 @@ class DummyEventPageState extends State<MentorDummyEventPage> {
 
 
     if (!(attendedevents.contains(eventdocument.id)&&eventbuffer==eventdocument.id)) {
+
+      late final String semstatus;
+      await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){if(snapshot['current-semester']==1){semstatus="sem-1-hours";}else{semstatus="sem-2-hours";} });
+      
       await FirebaseFirestore.instance
           .collection('events')
           .doc(eventdocument.id)
@@ -44,7 +48,7 @@ class DummyEventPageState extends State<MentorDummyEventPage> {
       });
       await FirebaseFirestore.instance.collection('users').doc(userId).update({
         "attended-events": FieldValue.arrayUnion([eventdocument.id]),
-        "sem-1-hours": FieldValue.increment(eventdocument.get('hours')),
+        semstatus: FieldValue.increment(eventdocument.get('hours')),
       });
     }
   }
@@ -81,7 +85,7 @@ class DummyEventPageState extends State<MentorDummyEventPage> {
       });
     });
 
-    debugPrint('${rollbuffer} $eventbuffer');
+    debugPrint('${rollbuffer} $eventbuffer \n\n\n\n\n\n\n');
     updateHours(userId,eventbuffer, eventdocument);
   }
 

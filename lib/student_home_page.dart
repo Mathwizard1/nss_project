@@ -439,14 +439,10 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
     return Card(
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EventDetailsPage(
-                eventDocId: eventDocSnap.id,
-              ),
-            ),
-          );
+          if(state!="Finished")
+          {
+            Navigator.push(context,MaterialPageRoute(builder: (context) => EventDetailsPage(eventDocId: eventDocSnap.id,),),);
+          }
         },
         child: Container(
           decoration: BoxDecoration(
