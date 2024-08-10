@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'notification_page.dart';
+import 'leaderboard_page.dart';
 
 // import 'package:nss_project/leaderboard_page.dart';
 
@@ -168,6 +169,30 @@ class _PicProfilePageState extends State<PicProfilePage> {
                     },
                     child: const Text(
                       'Delete all notifications',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blue[900],
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LeaderboardPage()));
+                    },
+                    child: const Text(
+                      'Leaderboard',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

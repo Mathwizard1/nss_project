@@ -535,7 +535,7 @@ class EventPageState extends State<EventPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton(
                   onPressed: _isSubmitButtonEnabled
-                      ? () {
+                      ? () async {
                           Map <String,dynamic> NewEvent = {
                             "title" : _nameController.text.trim(),
                             "timestamp" : Timestamp.fromDate(_selectedDateTime),
@@ -551,8 +551,10 @@ class EventPageState extends State<EventPage> {
                             "are-photos-final": false
                           };
                           try{
-                            FirebaseFirestore.instance.collection("events").add(NewEvent);
+                            await FirebaseFirestore.instance.collection("events").add(NewEvent);
                             addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
+                            
+                            if(!context.mounted){return;}
                             Navigator.pop(context);
                           }
                           on FirebaseException catch(e)

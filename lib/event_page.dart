@@ -7,6 +7,7 @@ import 'package:csv/csv.dart';
 import 'date_time_formatter.dart';
 import 'package:nss_project/notification_page.dart';
 import 'email_page.dart';
+import 'gallery_page.dart';
 
 class DisplayEventPage extends StatefulWidget {
   final QueryDocumentSnapshot<Map<String,dynamic>> document;
@@ -121,7 +122,11 @@ class DisplayEventPageState extends State<DisplayEventPage> {
             event.venue = _venueController.text;
             event.longDescription = _descriptionController.text;
             event.wing = _selectedWing;
-            event.hours = int.parse(_hoursController.text);
+            var tmpHours = int.tryParse(_hoursController.text);
+            if(tmpHours != null && !(_hoursController.text).contains(RegExp(r"[., -]")))
+            {
+              event.hours = tmpHours;
+            }
             updateDoc();
             _isEditing = false;
           });
@@ -536,7 +541,11 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                                           padding: const EdgeInsets.symmetric(vertical: 16.0),
                                         ),
                                         onPressed: _isEditing ? null : () {
-                                          // Implement your onPressed functionality here
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => const GalleryPage(),
+                                              ));
                                         },
                                         child: const Text(
                                           'View Gallery',
@@ -559,18 +568,20 @@ class DisplayEventPageState extends State<DisplayEventPage> {
               ),
               if (widget.selectedRole == "pic" || widget.selectedRole == "mentor")
                 Positioned(
-                  bottom: 190.0,
+                  bottom: 170.0,
                   right: 16.0,
                   child: FloatingActionButton(
+                    heroTag: "Edits",
                     onPressed: _toggleEdit,
                     child: Icon((_isEditing || _ismentorEditing) ? Icons.check : Icons.edit),
                   ),
                 ),
               if (widget.selectedRole == "pic" && _isEditing)
                 Positioned(
-                  bottom: 90.0,
+                  bottom: 170.0,
                   right: 80.0,
                   child: FloatingActionButton(
+                    heroTag: "delete",
                     onPressed: (){ _deleteDocumentByName(context); },
                     backgroundColor: Colors.red,
                     child: const Icon(Icons.delete),
