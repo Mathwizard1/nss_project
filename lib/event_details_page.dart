@@ -189,22 +189,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                           onTap: () {
                             userDocSnap.reference.update({
                               'registered-events':
-                                  userDocSnap['registered-events']
-                                          .map<String>((dyn) {
-                                        String ret = dyn;
-                                        return ret;
-                                      }).toList() +
-                                      [eventDocSnap.id]
+                                  FieldValue.arrayUnion([eventDocSnap.id]),
                             });
 
                             eventDocSnap.reference.update({
                               'registered-volunteers':
-                                  eventDocSnap['registered-volunteers']
-                                          .map<String>((dyn) {
-                                        String ret = dyn;
-                                        return ret;
-                                      }).toList() +
-                                      [userDocSnap.id]
+                                  FieldValue.arrayUnion([userDocSnap.id]),
                             });
                           },
                         ),

@@ -4,10 +4,10 @@
 Welcome to the National Social Service (NSS) App! This application has been developed by a dedicated team of four students from IIT Patna to facilitate the efforts of NSS volunteers, mentors, and officials. Our mission is to empower the NSS community to make meaningful changes in the lives of people in the villages around our campus, improve the environment of our college, and perform various other social services.
 
 ## Team Members
-1. **Tejas Singh** - Role: [Role Description]
-2. **Ayush Bansal** - Role: [Role Description]
-3. **Tejeshwar Singh Minas** - Role: [Role Description]
-4. **Anshurup Gupta** - Role: [Role Description]
+1. **Tejas Tanmay Singh**
+2. **Ayush Bansal**
+3. **Tejeshwar Singh Minhas**
+4. **Anshurup Gupta**
 
 ## Features
 The NSS App offers a range of features to support the NSS community:

@@ -1,0 +1,9 @@
+organising mentor view for selecting images
+    NOT NOW
+gallery view for secretary (of wing of that event) and pic
+    IMPLEMENT ONLY FOR PIC FOR NOW
+qr bugs, finalize interface for volunteer and mentor
+    timing problems (before / after event)
+actually working attended events
+auth: prevent multiple logins
+    FUCKY WUCKY?
