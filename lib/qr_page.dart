@@ -87,10 +87,14 @@ class QrPageState extends State<QrPage> {
                     ? Colors.green
                     : Colors.white,
                 child: Center(
-                  child: QrImageView(
-                    backgroundColor: Colors.white,
-                    padding: EdgeInsets.all(0.05 * screenWidth),
-                    data: userDocSnap['roll-number'],
+                  child: SizedBox(
+                    width:screenWidth/1.5,
+                    height:screenWidth/1.5,
+                    child: QrImageView(
+                      backgroundColor: Colors.white,
+                      padding: EdgeInsets.all(0.05 * screenWidth),
+                      data: '${userDocSnap['roll-number']}~${eventDocSnap.id}',
+                    ),
                   ),
                 ),
               ),

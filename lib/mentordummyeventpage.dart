@@ -23,7 +23,9 @@ int calculateDifferenceInMinutes(Timestamp firebaseTimestamp) {
 }
 
 class DummyEventPageState extends State<MentorDummyEventPage> {
-  void updateHours(String? userId, QueryDocumentSnapshot eventdocument) async {
+
+
+  void updateHours(String? userId,String eventbuffer, QueryDocumentSnapshot eventdocument) async {
     List attendedevents = await FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
@@ -31,7 +33,9 @@ class DummyEventPageState extends State<MentorDummyEventPage> {
         .then((snapshot) {
       return snapshot.get('attended-events');
     });
-    if (!(attendedevents.contains(eventdocument.id))) {
+
+
+    if (!(attendedevents.contains(eventdocument.id)&&eventbuffer==eventdocument.id)) {
       await FirebaseFirestore.instance
           .collection('events')
           .doc(eventdocument.id)
@@ -52,16 +56,33 @@ class DummyEventPageState extends State<MentorDummyEventPage> {
     String? userId;
     QrResult = await FlutterBarcodeScanner.scanBarcode(
         '#ff6666', 'Cancel', true, ScanMode.QR);
+
+    late final int index;
+
+    for(int x=0;x<QrResult.length;x++)
+    {
+      if(QrResult[x]=='~')
+      {
+        index=x;
+      }
+    }
+
+    String rollbuffer=QrResult.substring(0,index);
+    String eventbuffer=QrResult.substring(index+1);
+
+
     await FirebaseFirestore.instance
         .collection('users')
-        .where('roll-number', isEqualTo: QrResult)
+        .where('roll-number', isEqualTo: rollbuffer)
         .get()
         .then((snapshot) {
       snapshot.docs.forEach((document) {
         userId = document.id;
       });
     });
-    updateHours(userId, eventdocument);
+
+    debugPrint('${rollbuffer} $eventbuffer');
+    updateHours(userId,eventbuffer, eventdocument);
   }
 
   @override
