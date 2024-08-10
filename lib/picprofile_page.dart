@@ -29,8 +29,42 @@ class _PicProfilePageState extends State<PicProfilePage> {
     });
   }
 
+  String semstatus='0';
+
+  @override
+  initState()
+  {
+    super.initState();
+    checkSem();
+  }
+
+  Future checkSem() async{
+    await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){setState((){semstatus=snapshot['current-semester'].toString();});});
+  }
+
+  Future changeSem() async{
+
+    setState((){semstatus="Loading";});
+     await FirebaseFirestore.instance.collection('configurables').doc('document').get().then((snapshot){setState(()async{switch(snapshot['current-semester']){
+      case 1:semstatus='2';
+      await FirebaseFirestore.instance.collection('configurables').doc('document').update({'current-semester':2});
+      checkSem();
+      return;
+      case 2:semstatus='1';
+      await FirebaseFirestore.instance.collection('configurables').doc('document').update({'current-semester':1});
+      checkSem();
+      return;
+          }
+         }
+        );
+       }
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
+    checkSem();
+
     double width = MediaQuery.sizeOf(context).width;
     double height = MediaQuery.sizeOf(context).width;
 
@@ -177,6 +211,7 @@ class _PicProfilePageState extends State<PicProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -196,6 +231,31 @@ class _PicProfilePageState extends State<PicProfilePage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.only(top:80.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height:80,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor:(semstatus=='1')?Colors.green:Colors.blue,
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      ),
+                      onPressed: () {
+                       changeSem();
+                      },
+                      child: Text(
+                        'Current Semester: Semester $semstatus',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
