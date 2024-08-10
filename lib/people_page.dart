@@ -154,22 +154,17 @@ class _PeoplePageState extends State<PeoplePage> {
                       .where('role', isEqualTo: 'secretary')
                       .snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.hasData) {
+                    if (snapshot.hasData && snapshot.connectionState == ConnectionState.active) {
                       List<QueryDocumentSnapshot<Map<String, dynamic>>>
                           stdlist = [
                         for (var i in snapshot.data!.docs) i
-                      ]; // FIX CAUSE DEV IS A ASSHOLE  if(i['first name'] != 'dev') if(i['role'] == 'mentor')
-                      //print(stdlist.length);
-                      return Column(
-                        children: [
-                          ListView.builder(
-                              itemCount: stdlist.length,
-                              itemBuilder: (context, index) {
-                                return _buildPerson(
-                                    stdlist[index], widget.userRole, context);
-                              }),
-                        ],
-                      );
+                      ]; 
+                      return ListView.builder(
+                          itemCount: stdlist.length,
+                          itemBuilder: (context, index) {
+                            return _buildPerson(
+                                stdlist[index], widget.userRole, context);
+                          });
                     }
                     return const Text('Hello Darkness my ..');
                   }),
