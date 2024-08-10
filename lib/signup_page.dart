@@ -75,6 +75,7 @@ class SignUpPageState extends State<SignUpPage> {
         'roll-number': rollnumbercontroller.text.trim().toUpperCase(),
         'sem-1-hours': 0,
         'sem-2-hours': 0,
+        'wing':'',
       });
 
       FocusManager.instance.primaryFocus?.unfocus();

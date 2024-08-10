@@ -94,17 +94,7 @@ Future openRemoveDialog()
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text('Student View'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()));
-            },
-          ),
-
-        ],
+        title: const Text('Student View'), 
       ),
       body: Container(
         color: Colors.transparent,
