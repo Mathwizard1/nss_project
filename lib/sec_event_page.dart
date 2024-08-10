@@ -84,9 +84,6 @@ Widget _buildEvent(QueryDocumentSnapshot<Map<String, dynamic>> event,
               ],
             ),
             onTap: () {
-              // ON TAP IS TRIGGERED WHEN A TILE IS CLICKED
-              // PUT THE IF ELSE OF WHICH EVENT PAGE TO GO TO HERE
-              // istaboneselected is aldready a arg in this function
                 Navigator.push(
                     context,
                     MaterialPageRoute(

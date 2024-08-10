@@ -9,7 +9,7 @@ import 'package:nss_project/notification_page.dart';
 import 'email_page.dart';
 
 class DisplayEventPage extends StatefulWidget {
-  final QueryDocumentSnapshot document;
+  final QueryDocumentSnapshot<Map<String,dynamic>> document;
   final String selectedRole ;
 
   const DisplayEventPage({super.key,required this.document,required this.selectedRole});
@@ -96,6 +96,8 @@ class DisplayEventPageState extends State<DisplayEventPage> {
     }
   }
 
+  
+
   Future updateDoc() async
   {
     var docpath=FirebaseFirestore.instance.collection('events').doc(widget.document.reference.id);
@@ -159,12 +161,14 @@ class DisplayEventPageState extends State<DisplayEventPage> {
   }
 
   Future<void> _selectDateTime(BuildContext context) async {
+    
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDateTime,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
+
 
     if (!context.mounted) return;
     if (pickedDate != null) {
@@ -433,11 +437,32 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                                 foregroundColor: Colors.white, backgroundColor: Colors.blue[900],
                                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                               ),
-                              onPressed: () {
-                                // Implement your onPressed functionality here
-                              },
+                              onPressed:
+                                ()async {
+                                  await _selectDateTime(context);
+
+                                  Map<String,dynamic> NewEvent = widget.document.data();
+                                  NewEvent["timestamp"] = Timestamp.fromDate(_selectedDateTime);
+                                  NewEvent["attending-volunteers"] = [];
+                                  NewEvent["registered-volunteers"] = [];
+                                  NewEvent["are-photos-final"] = false;
+                                  try{
+                                      FirebaseFirestore.instance.collection("events").add(NewEvent);
+                                      addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
+                                      Navigator.pop(context);
+                                    }
+                                    on FirebaseException catch(e)
+                                    {
+                                      // Handle errors (e.g., show an error message)
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Failed to add event: $e')),
+                                      );
+                                    }
+                                }
+                                
+                              ,
                               child: const Text(
-                                'Set Event for next time',
+                                'Set Date for Next Event',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
