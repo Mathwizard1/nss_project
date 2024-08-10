@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:nss_project/date_time_formatter.dart';
-import 'package:nss_project/event_add_page.dart';
-
-import 'package:nss_project/event_page.dart';
-import 'package:nss_project/pic_event_list.dart';
 import 'package:nss_project/sprofile_page.dart';
-import 'package:nss_project/mentordummyeventpage.dart';
 import 'package:nss_project/notification_page.dart';
 
 import 'sec_event_page.dart';
