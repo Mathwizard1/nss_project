@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:image_picker/image_picker.dart';
 import 'date_time_formatter.dart';
 
 class EmailSender extends StatefulWidget {
@@ -16,7 +15,6 @@ class EmailSender extends StatefulWidget {
 }
 
 class EmailSenderState extends State<EmailSender> {
-  List<String> attachments = [];
 
   late TextEditingController _recipientController;
   late TextEditingController _subjectController;
@@ -26,8 +24,7 @@ class EmailSenderState extends State<EmailSender> {
     final Email email = Email(
       body: _bodyController.text,
       subject: _subjectController.text,
-      recipients: [_recipientController.text],
-      attachmentPaths: attachments,
+      recipients: (_recipientController.text).split(','),
       isHTML: false,
     );
 
@@ -50,7 +47,8 @@ class EmailSenderState extends State<EmailSender> {
   }
 
   String getEmailid() {
-    return 'anshurup.gupta@gmail.com';
+    return 'anshurup.gupta@gmail.com,tejeshwarsingh1205@gmail.com';
+    //return 'pic_nss@iitp.ac.in,nss_gen_sec@iitp.ac.in';
   }
 
   String generateHtmlEmailBody() {
@@ -64,9 +62,10 @@ This event was conducted by ${widget.document['wing']} wing. It was conducted on
   hours given: ${widget.document['hours']}
 
 The event objective was:
-    ${widget.document['description']}
+  ${widget.document['description']}
 
-    Thank you
+Please check the events photos.
+  Thank you
   ''';
   }
 
@@ -144,33 +143,9 @@ The event objective was:
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: IconButton(
-                      icon: const Icon(Icons.attach_file),
-                      onPressed: _openImagePicker,
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
     );
-  }
-
-  void _openImagePicker() async {
-    final picker = ImagePicker();
-    final pick = await picker.pickImage(source: ImageSource.gallery);
-    if (pick != null) {
-      setState(() {
-        attachments.add(pick.path);
-      });
-    }
   }
 }
