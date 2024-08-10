@@ -551,17 +551,24 @@ class EventPageState extends State<EventPage> {
                             "are-photos-final": false
                           };
                           try{
-                            await FirebaseFirestore.instance.collection("events").add(NewEvent);
-                            addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
+                            FirebaseFirestore.instance.collection("events").add(NewEvent).then((DocumentReference docRef) {
+                                addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
+                              })
+                              .catchError((error) {
+                                // Handle errors (e.g., show an error message)
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Failed to add event: $error')),
+                                );
+                            });
                             
                             if(!context.mounted){return;}
                             Navigator.pop(context);
                           }
-                          on FirebaseException catch(e)
+                          catch(e)
                           {
                             // Handle errors (e.g., show an error message)
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Failed to add event: $e')),
+                              SnackBar(content: Text('Failed to add event locally: $e')),
                             );
                           }                          
                         }

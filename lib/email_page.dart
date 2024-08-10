@@ -16,6 +16,8 @@ class EmailSender extends StatefulWidget {
 
 class EmailSenderState extends State<EmailSender> {
 
+  String fetchedString = "";
+
   late TextEditingController _recipientController;
   late TextEditingController _subjectController;
   late TextEditingController _bodyController;
@@ -46,11 +48,6 @@ class EmailSenderState extends State<EmailSender> {
     );
   }
 
-  String getEmailid() {
-    return 'anshurup.gupta@gmail.com,tejeshwarsingh1205@gmail.com';
-    //return 'pic_nss@iitp.ac.in,nss_gen_sec@iitp.ac.in';
-  }
-
   String generateHtmlEmailBody() {
     return '''
     respected sir/ma'am,
@@ -69,10 +66,26 @@ Please check the events photos.
   ''';
   }
 
-  @override
-  void initState() {
-    super.initState();
-    initEdit();
+
+  Future<void> fetchEmailid(BuildContext context) async {
+  try {  
+    await FirebaseFirestore.instance
+        .collection('configurables')
+        .doc('document')
+        .get().then((snapshot){
+          setState(() {
+              fetchedString = snapshot['emailid'];          
+          });
+        });
+  } on FirebaseException catch (e) {
+
+      if(!context.mounted){ return;}
+      
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete document: $e')),
+      );
+    }
   }
 
   void initEdit() {
@@ -80,7 +93,7 @@ Please check the events photos.
         TextEditingController(text: 'Report on ${widget.document['title']}');
 
     _bodyController = TextEditingController(text: generateHtmlEmailBody());
-    _recipientController = TextEditingController(text: getEmailid());
+    _recipientController = TextEditingController(text: fetchedString);
   }
 
   @override
@@ -93,6 +106,9 @@ Please check the events photos.
 
   @override
   Widget build(BuildContext context) {
+    fetchEmailid(context);
+    initEdit();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Email Page'),
