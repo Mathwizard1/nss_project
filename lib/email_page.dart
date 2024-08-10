@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -50,14 +49,12 @@ class EmailSenderState extends State<EmailSender> {
     );
   }
 
-  String getEmailid()
-  {
+  String getEmailid() {
     return 'anshurup.gupta@gmail.com';
   }
 
   String generateHtmlEmailBody() {
-  return 
-  '''
+    return '''
     respected sir/ma'am,
 We have successfully completed the event ${widget.document['title']}.
 This event was conducted by ${widget.document['wing']} wing. It was conducted on ${DateTimeFormatter.format(widget.document['timestamp'].toDate())} in ${widget.document['venue']}.
@@ -71,18 +68,17 @@ The event objective was:
 
     Thank you
   ''';
-}
+  }
 
-  @override 
-  void initState()
-  {
+  @override
+  void initState() {
     super.initState();
     initEdit();
   }
 
-    void initEdit()
-  {
-    _subjectController = TextEditingController(text: 'Report on ${widget.document['title']}');
+  void initEdit() {
+    _subjectController =
+        TextEditingController(text: 'Report on ${widget.document['title']}');
 
     _bodyController = TextEditingController(text: generateHtmlEmailBody());
     _recipientController = TextEditingController(text: getEmailid());

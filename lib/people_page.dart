@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nss_project/sprofile_page.dart';
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'student_view_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
@@ -48,21 +46,43 @@ class _PeoplePageState extends State<PeoplePage> {
         });
   }
 
-  Future generateCSV() async
-  {
+  Future generateCSV() async {
+    // ignore: non_constant_identifier_names
+    List<List<String>> CSVtemp = [
+      <String>[
+        'Name',
+        'Roll Number',
+        'E-Mail',
+        'Group',
+        'Semester 1',
+        'Semester 2'
+      ]
+    ];
+    await FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'volunteer')
+        .get()
+        .then((snapshot) {
+      snapshot.docs.forEach((document) {
+        CSVtemp.add(<String>[
+          document.get('full-name'),
+          document.get('roll-number'),
+          document.get('email'),
+          document.get('group'),
+          document.get('sem-1-hours').toString(),
+          document.get('sem-2-hours').toString()
+        ]);
+      });
+    });
 
     // ignore: non_constant_identifier_names
-    List<List<String>> CSVtemp=[<String>['Name','Roll Number','E-Mail','Group','Semester 1','Semester 2']];
-    await FirebaseFirestore.instance.collection('users').where('role',isEqualTo: 'volunteer').get().then((snapshot){snapshot.docs.forEach((document){CSVtemp.add(<String>[document.get('full-name'),document.get('roll-number'),document.get('email'),document.get('group'),document.get('sem-1-hours').toString(),document.get('sem-2-hours').toString()]);});});
+    String CSVdata = const ListToCsvConverter().convert(CSVtemp);
 
-    // ignore: non_constant_identifier_names
-    String CSVdata=const ListToCsvConverter().convert(CSVtemp);
+    Directory downloadDirectory = Directory('storage/emulated/0/Download');
 
-    Directory downloadDirectory=Directory('storage/emulated/0/Download');
-
-    final File file=await(File('${downloadDirectory.path}/Students.csv').create());
+    final File file =
+        await (File('${downloadDirectory.path}/Students.csv').create());
     await file.writeAsString(CSVdata);
-
   }
 
   @override
@@ -92,9 +112,10 @@ class _PeoplePageState extends State<PeoplePage> {
                 icon: const Icon(Icons.refresh)),
 
             IconButton(
-              onPressed: (){generateCSV();},
-              icon:const Icon(Icons.edit_document)
-            ),
+                onPressed: () {
+                  generateCSV();
+                },
+                icon: const Icon(Icons.edit_document)),
 
             // SIGN OUT DOES NOT WORK
           ],
@@ -154,11 +175,10 @@ class _PeoplePageState extends State<PeoplePage> {
                       .where('role', isEqualTo: 'secretary')
                       .snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.hasData && snapshot.connectionState == ConnectionState.active) {
+                    if (snapshot.hasData &&
+                        snapshot.connectionState == ConnectionState.active) {
                       List<QueryDocumentSnapshot<Map<String, dynamic>>>
-                          stdlist = [
-                        for (var i in snapshot.data!.docs) i
-                      ]; 
+                          stdlist = [for (var i in snapshot.data!.docs) i];
                       return ListView.builder(
                           itemCount: stdlist.length,
                           itemBuilder: (context, index) {
@@ -178,10 +198,8 @@ class _PeoplePageState extends State<PeoplePage> {
 
 Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person,
     String userRole, BuildContext context) {
-  final screenwidth = MediaQuery.sizeOf(context).width;
-
   return SizedBox(
-    height:80,
+    height: 80,
     child: InkWell(
       onTap: () {
         Navigator.push(
@@ -213,30 +231,41 @@ Widget _buildPerson(QueryDocumentSnapshot<Map<String, dynamic>> person,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left:8.0),
+                    padding: const EdgeInsets.only(left: 8.0),
                     child: Text(
                       getCapitalizedName(person['full-name']),
                       style: const TextStyle(
                           fontWeight: FontWeight.w600, fontSize: 20),
                     ),
                   ),
-  
                   Padding(
-                    padding: const EdgeInsets.only(left:10.0),
+                    padding: const EdgeInsets.only(left: 10.0),
                     child: Row(
-                      
                       children: [
-                        Text( '${person['roll-number']}',style: const TextStyle(fontSize: 18,color: Color.fromARGB(201, 119, 109, 109)),),
-                        (person['role'] == 'volunteer')?Padding(
-                          padding: const EdgeInsets.only(left:10.0),
-                          child: Text( 'Hours: ${person['sem-1-hours']+person['sem-2-hours']}',style: const TextStyle(fontSize: 18,fontWeight:FontWeight.bold,color: Color.fromARGB(201, 119, 109, 109)),),
-                        ):Container()
+                        Text(
+                          '${person['roll-number']}',
+                          style: const TextStyle(
+                              fontSize: 18,
+                              color: Color.fromARGB(201, 119, 109, 109)),
+                        ),
+                        (person['role'] == 'volunteer')
+                            ? Padding(
+                                padding: const EdgeInsets.only(left: 10.0),
+                                child: Text(
+                                  'Hours: ${person['sem-1-hours'] + person['sem-2-hours']}',
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color:
+                                          Color.fromARGB(201, 119, 109, 109)),
+                                ),
+                              )
+                            : Container()
                       ],
                     ),
                   )
                 ],
               ),
-  
             ],
           )),
     ),

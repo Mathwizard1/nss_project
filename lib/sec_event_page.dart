@@ -4,7 +4,6 @@ import 'package:nss_project/date_time_formatter.dart';
 
 import 'package:nss_project/event_page.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SecEventPage extends StatefulWidget {
@@ -28,9 +27,10 @@ class SecEventPageState extends State<SecEventPage> {
           const SizedBox(height: 10),
           StreamBuilder(
               stream: FirebaseFirestore.instance
-                      .collection("events")
-                      .where('wing', isEqualTo: widget.wing).where('recurring', isEqualTo: widget.recurring)
-                      .snapshots(),
+                  .collection("events")
+                  .where('wing', isEqualTo: widget.wing)
+                  .where('recurring', isEqualTo: widget.recurring)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Flexible(
@@ -80,13 +80,15 @@ Widget _buildEvent(QueryDocumentSnapshot<Map<String, dynamic>> event,
               ],
             ),
             onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DisplayEventPage(
-                              document: event,
-                              selectedRole: (recurr == "Non Recurring")? "secretary" : "secretary_edit",
-                            )));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DisplayEventPage(
+                            document: event,
+                            selectedRole: (recurr == "Non Recurring")
+                                ? "secretary"
+                                : "secretary_edit",
+                          )));
             },
           ),
         );
