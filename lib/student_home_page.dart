@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
@@ -110,7 +111,7 @@ class StudentHomePageState extends State<StudentHomePage>
                 UpcomingEventsTab(
                   userDocSnap: snapshot.data!,
                 ),
-                const AttendedEventsTab(),
+                AttendedEventsTab(),
               ],
             );
           }),
@@ -622,13 +623,97 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   }
 }
 
-class AttendedEventsTab extends StatelessWidget {
+class AttendedEventsTab extends StatefulWidget {
   const AttendedEventsTab({super.key});
+  
+  @override
+  State<AttendedEventsTab> createState() => _AttendedEventsTabState();
+}
 
+class _AttendedEventsTabState extends State<AttendedEventsTab> {
+  
+
+  late Future<dynamic> fut;
+  void getInfo(){
+    var user = FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser!.uid).get();
+    var events = FirebaseFirestore.instance.collection('events').get();
+    fut = Future.wait([user,events]);
+  }
+  @override
+  void initState(){
+    super.initState();
+    getInfo();
+
+  }
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Attended Events Content'),
-    );
+    return FutureBuilder(future: fut,builder: (context,snapshot){
+      if (!(snapshot.connectionState == ConnectionState.done && snapshot.hasData)){
+              return Center(child: CircularProgressIndicator());
+      }
+      List<dynamic> eventL = [for(var x in snapshot.data![1]!.docs) if(snapshot.data![0].data()['attended-events'].contains(x.id)) x]; 
+
+      return ListView.builder(itemCount: eventL.length,itemBuilder: (context,index){return _buildEvent(eventL[index], context);});
+
+
+
+    },);
   }
+}
+
+Widget _buildEvent(
+    QueryDocumentSnapshot event, BuildContext context) {
+
+       String state;
+
+    int minutes=calculateDifferenceInMinutes(event.get('timestamp'));
+    if(minutes<0)
+    {state="Upcoming";}
+    else if(minutes>300)
+    {state="Finished";}
+    else
+    {
+      state="Active";
+    }
+
+  return StreamBuilder(
+    stream: FirebaseFirestore.instance.collection('icondata').where('wing',isEqualTo: event['wing']).snapshots(),
+    builder: (context, snapshot) {
+      if(!snapshot.hasData)
+      {return const Center(child: Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Text("loading"),
+      ));}
+
+      return TweenAnimationBuilder(
+        tween: Tween<double>(begin: 0,end: 1),
+        duration:const Duration(seconds: 1),
+        builder: (context, value, child) {
+          return Opacity(opacity: value,child:Card.outlined(
+          elevation: 0.5,
+          margin: const EdgeInsets.fromLTRB(10, 4, 10, 4),
+          color: Colors.white70,
+          child: ListTile(
+            tileColor: const Color.fromARGB(255, 251, 250, 250),
+            title: Text(event['title']),
+            subtitle: Text(DateTimeFormatter.format(event['timestamp'].toDate())),
+            leading: Icon(
+                IconData(snapshot.data!.docs[0]['codepoint'], fontFamily: 'MaterialIcons'),
+                color: Color(snapshot.data!.docs[0]['color'])),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('${event['hours']} Hrs'),
+                Text(state, style: TextStyle(color:(state=="Active")?const Color.fromARGB(255, 151, 236, 154):((state=="Finished")?const Color.fromARGB(255, 224, 57, 45):const Color.fromARGB(255, 109, 189, 255))))
+              ],
+            ),
+            onTap: () {
+            },
+          ),
+        ) ,
+        );
+        },
+      );
+    }
+  );
 }
