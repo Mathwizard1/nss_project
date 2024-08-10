@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:nss_project/date_time_formatter.dart';
-import 'package:nss_project/event_add_page.dart';
 
 import 'package:nss_project/event_page.dart';
 import 'package:nss_project/sprofile_page.dart';

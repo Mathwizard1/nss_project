@@ -419,29 +419,27 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   ExpansionTileController tilecontroller = ExpansionTileController();
 
   int calculateDifferenceInMinutes(Timestamp firebaseTimestamp) {
-  DateTime currentTime = DateTime.now();
-  DateTime firebaseTime = firebaseTimestamp.toDate();
+    DateTime currentTime = DateTime.now();
+    DateTime firebaseTime = firebaseTimestamp.toDate();
 
-  // Calculate the difference in minutes
-  int differenceInMinutes = currentTime.difference(firebaseTime).inMinutes;
-  return differenceInMinutes;
+    // Calculate the difference in minutes
+    int differenceInMinutes = currentTime.difference(firebaseTime).inMinutes;
+    return differenceInMinutes;
   }
 
   Widget _buildUpcomingEvent(BuildContext context,
       {required QueryDocumentSnapshot eventDocSnap,
       required DocumentSnapshot userDocSnap,
       required QueryDocumentSnapshot icondataDocSnap}) {
-
     String state;
 
-    int minutes=calculateDifferenceInMinutes(eventDocSnap.get('timestamp'));
-    if(minutes<0)
-    {state="Upcoming";}
-    else if(minutes>300)
-    {state="Finished";}
-    else
-    {
-      state="Active";
+    int minutes = calculateDifferenceInMinutes(eventDocSnap.get('timestamp'));
+    if (minutes < 0) {
+      state = "Upcoming";
+    } else if (minutes > 300) {
+      state = "Finished";
+    } else {
+      state = "Active";
     }
 
     return Card(
@@ -462,7 +460,11 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                   begin: Alignment.topLeft,
                   end: Alignment.topRight,
                   colors: [
-                (state=="Active")?const Color.fromARGB(255, 151, 236, 154):((state=="Finished")?const Color.fromARGB(255, 254, 202, 198):const Color.fromARGB(255, 109, 189, 255)),
+                (state == "Active")
+                    ? const Color.fromARGB(255, 151, 236, 154)
+                    : ((state == "Finished")
+                        ? const Color.fromARGB(255, 254, 202, 198)
+                        : const Color.fromARGB(255, 109, 189, 255)),
                 Colors.white,
                 Colors.white
               ])),
@@ -479,7 +481,13 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('${eventDocSnap['hours']} Hrs'),
-                Text(state, style: TextStyle(color: (state=="Active")?const Color.fromARGB(255, 151, 236, 154):((state=="Finished")?const Color.fromARGB(255, 246, 109, 100):const Color.fromARGB(255, 109, 189, 255))))
+                Text(state,
+                    style: TextStyle(
+                        color: (state == "Active")
+                            ? const Color.fromARGB(255, 151, 236, 154)
+                            : ((state == "Finished")
+                                ? const Color.fromARGB(255, 246, 109, 100)
+                                : const Color.fromARGB(255, 109, 189, 255))))
               ],
             ),
           ),
@@ -564,7 +572,9 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
 
                       return StreamBuilder(
                         stream: _selectedWing == 'All'
-                            ? events.orderBy('timestamp',descending: true).snapshots()
+                            ? events
+                                .orderBy('timestamp', descending: true)
+                                .snapshots()
                             : events
                                 .where('wing', isEqualTo: _selectedWing)
                                 .snapshots(),
