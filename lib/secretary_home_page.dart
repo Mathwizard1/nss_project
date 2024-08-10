@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:nss_project/date_time_formatter.dart';
-import 'package:nss_project/event_add_page.dart';
-
-import 'package:nss_project/event_page.dart';
-import 'package:nss_project/pic_event_list.dart';
 import 'package:nss_project/sprofile_page.dart';
-import 'package:nss_project/mentordummyeventpage.dart';
 import 'package:nss_project/notification_page.dart';
 
 import 'sec_event_page.dart';
@@ -64,12 +58,12 @@ class _SecretaryHomePageState extends State<SecretaryHomePage> {
                   width: width/2 - 15,
                   height: width/2 -15,
                   child: ElevatedButton(
-                    style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 191, 193, 189)), shape: WidgetStateProperty.all(const ContinuousRectangleBorder())),
+                    style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Color.fromARGB(255, 227, 227, 227)), shape: WidgetStateProperty.all(const ContinuousRectangleBorder())),
                     onPressed: (){
                       Navigator.push(context,MaterialPageRoute(builder: (context) => SecEventPage(wing: widget.wing, recurring: "Non Recurring")));      // PAGE ADD HERE
                     },
                     child: Icon(
-                      Icons.list_alt,size: width/3,color: const Color.fromARGB(255, 59, 62, 61),
+                      Icons.event,size: width/3,color: const Color.fromARGB(255, 59, 62, 61),
                       ),
                   ),
                 ),
@@ -78,12 +72,12 @@ class _SecretaryHomePageState extends State<SecretaryHomePage> {
                   width: width/2 - 15,
                   height: width/2 -15,
                   child: ElevatedButton(
-                    style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 191, 193, 189)), shape: WidgetStateProperty.all(const ContinuousRectangleBorder())),
+                    style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 227, 227, 227)), shape: WidgetStateProperty.all(const ContinuousRectangleBorder())),
                     onPressed: (){
                       Navigator.push(context,MaterialPageRoute(builder: (context) => SecEventPage(wing: widget.wing, recurring: "Recurring"))); // PAGE ADD HEre
                     },
                     child: Icon(
-                      Icons.format_list_bulleted_add,size: width/3,color: const Color.fromARGB(255, 59, 62, 61),
+                      Icons.event_repeat_outlined,size: width/3,color: const Color.fromARGB(255, 59, 62, 61),
                       ),
                   ),
                 )

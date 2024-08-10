@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:nss_project/date_time_formatter.dart';
-import 'package:nss_project/event_add_page.dart';
 
 import 'package:nss_project/event_page.dart';
-import 'package:nss_project/sprofile_page.dart';
-import 'package:nss_project/mentordummyeventpage.dart';
-import 'package:nss_project/notification_page.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,7 +21,7 @@ class SecEventPageState extends State<SecEventPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.recurring),
+        title: Text(widget.recurring + " Events"),
       ),
       body: Column(
         children: [

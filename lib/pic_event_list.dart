@@ -50,13 +50,6 @@ class _PicEventListState extends State<PicEventList> {
         title: Text('Hey $mentorname'),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const PicProfilePage()));
-            },
-          ),
-          IconButton(
               onPressed: () {
                 FirebaseAuth.instance.signOut();
               },
