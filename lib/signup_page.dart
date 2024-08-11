@@ -54,6 +54,23 @@ class SignUpPageState extends State<SignUpPage> {
       return;
     }
 
+    if (!emailcontroller.text.trim().endsWith('@iitp.ac.in')) {
+      setState(() => _errorMessage = 'Please enter an IITP email address.');
+      return;
+    }
+
+    if ((await FirebaseFirestore.instance
+            .collection('users')
+            .where('roll-number',
+                isEqualTo: rollnumbercontroller.text.trim().toUpperCase())
+            .get())
+        .docs
+        .isNotEmpty) {
+      setState(() => _errorMessage =
+          'An existing account is already linked to this roll-number.');
+      return;
+    }
+
     try {
       setState(() => _isLoading = true);
 
@@ -61,6 +78,12 @@ class SignUpPageState extends State<SignUpPage> {
           .createUserWithEmailAndPassword(
               email: emailcontroller.text.trim(),
               password: passwordcontroller.text.trim());
+
+      // Wait for FirebaseAuth to update currentUser; without this FirebaseFirestore might receive a create request with the null user, which will be denied
+      while (FirebaseAuth.instance.currentUser == null) {
+        await Future.delayed(const Duration(seconds: 1));
+      }
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.uid)
@@ -75,7 +98,6 @@ class SignUpPageState extends State<SignUpPage> {
         'roll-number': rollnumbercontroller.text.trim().toUpperCase(),
         'sem-1-hours': 0,
         'sem-2-hours': 0,
-        'wing':'',
       });
 
       FocusManager.instance.primaryFocus?.unfocus();
