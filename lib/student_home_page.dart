@@ -31,8 +31,8 @@ class StudentHomePageState extends State<StudentHomePage>
     with SingleTickerProviderStateMixin {
   late final DocumentSnapshot userDocumentSnapshot;
   late final DocumentSnapshot configurablesSnapshot;
-  late final Stream eventStream;
-  late final Stream icondataStream;
+  late final Future eventStream;
+  late final Future icondataStream;
   late TabController _tabController;
 
   bool initialized=false;
@@ -46,9 +46,9 @@ class StudentHomePageState extends State<StudentHomePage>
 
     configurablesSnapshot=await FirebaseFirestore.instance.collection("configurables").doc('document').get();
 
-    eventStream=FirebaseFirestore.instance.collection('events').orderBy('timestamp', descending: true).snapshots();
+    eventStream=FirebaseFirestore.instance.collection('events').orderBy('timestamp', descending: true).get();
 
-    icondataStream=FirebaseFirestore.instance.collection('icondata').snapshots();
+    icondataStream=FirebaseFirestore.instance.collection('icondata').get();
 
     setState(() {initialized=true;});
 
@@ -429,8 +429,8 @@ class HourDetailState extends State<HourDetailPage>
 class UpcomingEventsTab extends StatefulWidget {
   final DocumentSnapshot userDocSnap;
   final  DocumentSnapshot configurablesSnapshot;
-  final Stream eventStream;
-  final Stream icondataStream;
+  final Future eventStream;
+  final Future icondataStream;
   const UpcomingEventsTab({required this.userDocSnap,required this.configurablesSnapshot,required this.eventStream,required this.icondataStream, super.key});
 
   @override
@@ -539,8 +539,8 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
             return Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: Column(children: <Widget>[
-                  StreamBuilder(
-                    stream:widget.icondataStream, // Incredibly retarded to not unify icon codepoints and colors with their wings
+                  FutureBuilder(
+                    future:widget.icondataStream, // Incredibly retarded to not unify icon codepoints and colors with their wings
                     builder: (context, icondataAsyncSnap) {
                       if (icondataAsyncSnap.data == null) {
                         return const Center(child: CircularProgressIndicator());
@@ -549,8 +549,8 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                       final QuerySnapshot icondataSnap =
                           icondataAsyncSnap.data!;
 
-                      return StreamBuilder(
-                        stream: widget.eventStream,
+                      return FutureBuilder(
+                        future: widget.eventStream,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const Padding(

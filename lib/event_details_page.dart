@@ -169,6 +169,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                             eventDocSnap.reference.update({
                               'registered-volunteers':
                                   FieldValue.arrayUnion([userDocSnap.id]),
+                            
                             });
                           },
                         ),
