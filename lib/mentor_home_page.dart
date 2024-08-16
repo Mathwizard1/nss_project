@@ -5,7 +5,6 @@ import 'package:nss_project/date_time_formatter.dart';
 import 'package:nss_project/event_page.dart';
 import 'package:nss_project/sprofile_page.dart';
 import 'package:nss_project/mentordummyeventpage.dart';
-import 'package:nss_project/notification_page.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,13 +29,7 @@ class MentorHomePageState extends State<MentorHomePage> {
       appBar: AppBar(
         title: Text(widget.role[0].toUpperCase() + widget.role.substring(1)),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => NotificationPage()));
-            },
-          ),
+        
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {

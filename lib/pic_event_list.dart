@@ -13,7 +13,7 @@ void main() {
 }
 
 class PicEventList extends StatefulWidget {
-  const PicEventList({super.key});
+  const PicEventList({super.key}); 
 
   @override
   State<PicEventList> createState() => _PicEventListState();

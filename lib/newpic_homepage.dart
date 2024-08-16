@@ -8,7 +8,6 @@ import 'package:nss_project/pic_event_list.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'notification_page.dart';
 import 'gallery_page.dart';
 
 class NewpicHomepage extends StatefulWidget {
@@ -26,14 +25,6 @@ class _NewpicHomepageState extends State<NewpicHomepage> {
         appBar: AppBar(
           title: const Text('PIC Home'),
           actions: [
-            IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => NotificationPage()));
-                },
-                icon: const Icon(Icons.notifications)),
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {

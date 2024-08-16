@@ -10,16 +10,15 @@ import 'date_time_formatter.dart';
 import 'qr_page.dart';
 
 class EventDetailsPage extends StatefulWidget {
-  final String eventDocId;
-  const EventDetailsPage({super.key, required this.eventDocId});
+  final DocumentSnapshot eventSnapshot;
+  final DocumentSnapshot userSnapshot;
+  const EventDetailsPage({super.key, required this.eventSnapshot,required this.userSnapshot});
 
   @override
   State<EventDetailsPage> createState() => _EventDetailsPageState();
 }
 
 class _EventDetailsPageState extends State<EventDetailsPage> {
-  late final Stream<DocumentSnapshot> eventDocSnapStream;
-  late final Stream<DocumentSnapshot> userDocSnapStream;
 
   // Whether photo was uploaded before this page was init'ed
   late Future<bool> _hasAlreadyUploaded;
@@ -30,18 +29,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   @override
   void initState() {
     super.initState();
-    eventDocSnapStream = FirebaseFirestore.instance
-        .collection('events')
-        .doc(widget.eventDocId)
-        .snapshots();
-    userDocSnapStream = FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .snapshots();
 
     _hasAlreadyUploaded = FirebaseStorage.instance
         .ref()
-        .child(widget.eventDocId)
+        .child(widget.eventSnapshot.id)
         .listAll()
         .then((listRes) {
       return listRes.items
@@ -59,7 +50,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           return ret;
         })
         .toList()
-        .contains(widget.eventDocId);
+        .contains(widget.eventSnapshot.id);
   }
 
   bool _isInAttendedEvents(
@@ -71,7 +62,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           return ret;
         })
         .toList()
-        .contains(widget.eventDocId);
+        .contains(widget.eventSnapshot.id);
   }
 
   Widget getPhotoUploadedWidget() {
@@ -88,27 +79,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: userDocSnapStream,
-      builder: (context, userDocAsyncSnap) {
-        if (!userDocAsyncSnap.hasData) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
 
-        final DocumentSnapshot userDocSnap = userDocAsyncSnap.data!;
+            final DocumentSnapshot userDocSnap = widget.userSnapshot;
 
-        return StreamBuilder(
-          stream: eventDocSnapStream,
-          builder: (context, eventDocAsyncSnap) {
-            if (!eventDocAsyncSnap.hasData) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
-
-            final DocumentSnapshot eventDocSnap = eventDocAsyncSnap.data!;
+            final DocumentSnapshot eventDocSnap = widget.eventSnapshot;
 
             final double screenHeight = MediaQuery.sizeOf(context).height;
             final double appBarHeight = 0.075 * screenHeight;
@@ -219,7 +193,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) {
-                                  return QrPage(eventDocId: eventDocSnap.id);
+                                  return QrPage(eventSnapshot: eventDocSnap);
                                 },
                               ),
                             );
@@ -326,9 +300,5 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 ),
               ),
             );
-          },
-        );
-      },
-    );
   }
 }

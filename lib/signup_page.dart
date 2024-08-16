@@ -59,6 +59,8 @@ class SignUpPageState extends State<SignUpPage> {
       return;
     }
 
+
+    //Roll Number being used
     if ((await FirebaseFirestore.instance
             .collection('users')
             .where('roll-number',

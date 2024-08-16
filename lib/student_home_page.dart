@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import 'package:nss_project/event_details_page.dart';
 import 'package:nss_project/sprofile_page.dart';
 
-import 'package:nss_project/notification_page.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,46 +29,74 @@ int calculateDifferenceInMinutes(Timestamp firebaseTimestamp) {
 
 class StudentHomePageState extends State<StudentHomePage>
     with SingleTickerProviderStateMixin {
-  late final Stream<DocumentSnapshot> userDocumentStream;
-  late final Stream<QuerySnapshot> eventsDocumentStream;
-  late final Stream<QuerySnapshot> configurablesDocumentStream;
-
+  late final DocumentSnapshot userDocumentSnapshot;
+  late final DocumentSnapshot configurablesSnapshot;
+  late final Stream eventStream;
+  late final Stream icondataStream;
   late TabController _tabController;
+
+  bool initialized=false;
+
+
+  void inititalize() async{
+     userDocumentSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    configurablesSnapshot=await FirebaseFirestore.instance.collection("configurables").doc('document').get();
+
+    eventStream=FirebaseFirestore.instance.collection('events').orderBy('timestamp', descending: true).snapshots();
+
+    icondataStream=FirebaseFirestore.instance.collection('icondata').snapshots();
+
+    setState(() {initialized=true;});
+
+  }
 
   @override
   void initState() {
     super.initState();
+    inititalize();
 
-    userDocumentStream = FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .snapshots();
-    eventsDocumentStream =
-        FirebaseFirestore.instance.collection('events').snapshots();
-    configurablesDocumentStream =
-        FirebaseFirestore.instance.collection('configurables').snapshots();
     _tabController = TabController(length: 3, vsync: this);
   }
 
-  @override
+
+
+
+  /*@override
   void dispose() {
     _tabController.dispose();
     super.dispose();
   }
+  */
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    
+    if(initialized==false)
+    {
+      return Scaffold(body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                height: 100,
+                width: 100,
+                child: const CircularProgressIndicator()),
+            ],
+          ),
+        ],
+      ));
+    }
+    else {
+      return Scaffold(
       appBar: AppBar(
         title: const Text('Student'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => NotificationPage()));
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -95,27 +121,20 @@ class StudentHomePageState extends State<StudentHomePage>
           ],
         ),
       ),
-      body: StreamBuilder(
-          stream: userDocumentStream,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            return TabBarView(
+      body: TabBarView(
               controller: _tabController,
               children: [
                 HoursCompletedTab(
-                  userDocSnap: snapshot.data!,
+                  userDocSnap: userDocumentSnapshot,
                 ),
                 UpcomingEventsTab(
-                  userDocSnap: snapshot.data!,
+                  userDocSnap: userDocumentSnapshot,configurablesSnapshot: configurablesSnapshot,eventStream:eventStream,icondataStream:icondataStream
                 ),
-                AttendedEventsTab(),
+                const AttendedEventsTab(),
               ],
-            );
-          }),
+            ),
     );
+    }
   }
 }
 
@@ -147,12 +166,15 @@ class HoursCompletedState extends State<HoursCompletedTab> {
     });
   }
 
+  HoursCompletedState()
+  {
+    setmaximumhours();
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.sizeOf(context).width;
     final screenheight = MediaQuery.sizeOf(context).height;
-
-    setmaximumhours();
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -280,6 +302,11 @@ class HourDetailPage extends StatefulWidget {
 class HourDetailState extends State<HourDetailPage>
     with SingleTickerProviderStateMixin {
 
+      HourDetailState()
+      {
+        fetchsemhours();
+      }
+
   Future<void> fetchsemhours() async {
     await FirebaseFirestore.instance
         .collection('configurables')
@@ -299,7 +326,6 @@ class HourDetailState extends State<HourDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    fetchsemhours();
 
     final screenwidth = MediaQuery.sizeOf(context).width;
     final screenheight = MediaQuery.sizeOf(context).height;
@@ -402,14 +428,18 @@ class HourDetailState extends State<HourDetailPage>
 
 class UpcomingEventsTab extends StatefulWidget {
   final DocumentSnapshot userDocSnap;
-  const UpcomingEventsTab({required this.userDocSnap, super.key});
+  final  DocumentSnapshot configurablesSnapshot;
+  final Stream eventStream;
+  final Stream icondataStream;
+  const UpcomingEventsTab({required this.userDocSnap,required this.configurablesSnapshot,required this.eventStream,required this.icondataStream, super.key});
 
   @override
   State<UpcomingEventsTab> createState() => _UpcomingEventsTabState();
 }
 
 class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
-  String _selectedWing = 'All';
+
+  late final double screenheight;
 
   ExpansionTileController tilecontroller = ExpansionTileController();
 
@@ -423,7 +453,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   }
 
   Widget _buildUpcomingEvent(BuildContext context,
-      {required QueryDocumentSnapshot eventDocSnap,
+      {required DocumentSnapshot eventDocSnap,
       required DocumentSnapshot userDocSnap,
       required QueryDocumentSnapshot icondataDocSnap}) {
     String state;
@@ -436,13 +466,12 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
     } else {
       state = "Active";
     }
-
-    return Card(
+      return Card(
       child: InkWell(
         onTap: () {
           if(state!="Finished")
           {
-            Navigator.push(context,MaterialPageRoute(builder: (context) => EventDetailsPage(eventDocId: eventDocSnap.id,),),);
+            Navigator.push(context,MaterialPageRoute(builder: (context) => EventDetailsPage(eventSnapshot: eventDocSnap,userSnapshot: widget.userDocSnap,),),);
           }
         },
         child: Container(
@@ -487,11 +516,13 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
-    final screenheight = MediaQuery.sizeOf(context).height;
+    screenheight=MediaQuery.sizeOf(context).height;
 
-    return Column(
+      return Column(
       children: <Widget>[
         StreamBuilder(
           stream: FirebaseFirestore.instance
@@ -505,54 +536,11 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
               );
             }
 
-            final wingOptions = ['All'] +
-                snapshot.data!['wings'].map<String>((dyn) {
-                  String ret = dyn;
-                  return ret;
-                }).toList();
-            final events = FirebaseFirestore.instance.collection('events');
-
             return Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: Column(children: <Widget>[
-                  Card(
-                      borderOnForeground: false,
-                      child: DropdownMenu<String>(
-                          textStyle: const TextStyle(color: Colors.white),
-                          label: const Padding(
-                            padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                            child: Text(
-                              'NSS Wing',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          leadingIcon:
-                              const Icon(Icons.category, color: Colors.white),
-                          expandedInsets:
-                              const EdgeInsets.only(top: 64.0, bottom: 8.0),
-                          inputDecorationTheme: const InputDecorationTheme(
-                            fillColor: Color.fromARGB(255, 128, 112, 185),
-                            filled: true,
-                          ),
-                          initialSelection: 'All',
-                          onSelected: (selectedWing) {
-                            setState(() {
-                              if (selectedWing != null) {
-                                _selectedWing = selectedWing;
-                              }
-                            });
-                          },
-                          dropdownMenuEntries: wingOptions
-                              .map<DropdownMenuEntry<String>>((option) {
-                            return DropdownMenuEntry<String>(
-                              value: option,
-                              label: option,
-                            );
-                          }).toList())),
                   StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('icondata')
-                        .snapshots(), // Incredibly retarded to not unify icon codepoints and colors with their wings
+                    stream:widget.icondataStream, // Incredibly retarded to not unify icon codepoints and colors with their wings
                     builder: (context, icondataAsyncSnap) {
                       if (icondataAsyncSnap.data == null) {
                         return const Center(child: CircularProgressIndicator());
@@ -562,13 +550,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
                           icondataAsyncSnap.data!;
 
                       return StreamBuilder(
-                        stream: _selectedWing == 'All'
-                            ? events
-                                .orderBy('timestamp', descending: true)
-                                .snapshots()
-                            : events
-                                .where('wing', isEqualTo: _selectedWing)
-                                .snapshots(),
+                        stream: widget.eventStream,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const Padding(
@@ -639,6 +621,7 @@ class _AttendedEventsTabState extends State<AttendedEventsTab> {
     var events = FirebaseFirestore.instance.collection('events').get();
     fut = Future.wait([user,events]);
   }
+  
   @override
   void initState(){
     super.initState();

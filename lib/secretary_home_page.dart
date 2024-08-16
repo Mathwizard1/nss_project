@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:nss_project/sprofile_page.dart';
-import 'package:nss_project/notification_page.dart';
 
 import 'sec_event_page.dart';
 
@@ -26,13 +25,6 @@ class _SecretaryHomePageState extends State<SecretaryHomePage> {
           child: Text('Secretary View'),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => NotificationPage()));
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {

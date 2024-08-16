@@ -4,8 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'leaderboard_page.dart';
-
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -155,28 +153,6 @@ class _ProfilePageState extends State<ProfilePage> {
                               'Change Name',
                               style: TextStyle(fontSize: 17.0),
                             )),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: Colors.white, 
-                                    backgroundColor: Colors.blue[900],
-                                  ),
-                                  onPressed: (){
-                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>LeaderboardPage()));
-                                  },
-                                  child: const Text(
-                                    'Leaderboard',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
                         ),
                         ]
                       ),

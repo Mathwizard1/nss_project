@@ -85,9 +85,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
         );
 
       // Pop the page
-      addNotification("${widget.document['title']} event as been deleted.");
-      if(!context.mounted){ return; }
-      Navigator.of(context).pop();
+
 
     } catch (e) {
       // Handle errors (e.g., show an error message)
@@ -453,7 +451,7 @@ class DisplayEventPageState extends State<DisplayEventPage> {
                                   NewEvent["are-photos-final"] = false;
                                   try{
                                       FirebaseFirestore.instance.collection("events").add(NewEvent);
-                                      addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
+                                      //addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
                                       Navigator.pop(context);
                                     }
                                     on FirebaseException catch(e)

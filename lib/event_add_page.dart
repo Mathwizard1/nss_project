@@ -552,7 +552,7 @@ class EventPageState extends State<EventPage> {
                           };
                           try{
                             FirebaseFirestore.instance.collection("events").add(NewEvent).then((DocumentReference docRef) {
-                                addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
+                                //addNotification("${_nameController.text.trim()} Event added. Event on ${DateTimeFormatter.format(_selectedDateTime)}");
                               })
                               .catchError((error) {
                                 // Handle errors (e.g., show an error message)
