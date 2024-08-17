@@ -69,7 +69,18 @@ class SignUpPageState extends State<SignUpPage> {
         .docs
         .isNotEmpty) {
       setState(() => _errorMessage =
-          'An existing account is already linked to this roll-number.');
+          'An existing account is already linked with this roll-number.');
+      return;
+    }
+
+    if ((await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: emailcontroller.text.trim())
+            .get())
+        .docs
+        .isNotEmpty) {
+      setState(() => _errorMessage =
+          'An existing account is already linked with this Email ID.');
       return;
     }
 
@@ -214,7 +225,7 @@ class SignUpPageState extends State<SignUpPage> {
                   width: screenwidth / 3,
                   height: 50,
                   child: TextButton(
-                    onPressed: _trySignUp,
+                    onPressed: !_isLoading ? _trySignUp : null,
                     style: const ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(Colors.indigo),
                       foregroundColor: WidgetStatePropertyAll(Colors.white),
