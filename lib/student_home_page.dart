@@ -471,7 +471,7 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
         onTap: () {
           if(state!="Finished")
           {
-            Navigator.push(context,MaterialPageRoute(builder: (context) => EventDetailsPage(eventSnapshot: eventDocSnap,userSnapshot: widget.userDocSnap,),),);
+            Navigator.push(context,MaterialPageRoute(builder: (context) => EventDetailsPage(eventSnapshot: eventDocSnap,userSnapshot: userDocSnap,),),);
           }
         },
         child: Container(
@@ -522,86 +522,92 @@ class _UpcomingEventsTabState extends State<UpcomingEventsTab> {
   Widget build(BuildContext context) {
     screenheight=MediaQuery.sizeOf(context).height;
 
-      return Column(
-      children: <Widget>[
-        StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection('configurables')
-              .doc("document")
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Expanded(
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-
-            return Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Column(children: <Widget>[
-                  FutureBuilder(
-                    future:widget.icondataStream, // Incredibly retarded to not unify icon codepoints and colors with their wings
-                    builder: (context, icondataAsyncSnap) {
-                      if (icondataAsyncSnap.data == null) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      final QuerySnapshot icondataSnap =
-                          icondataAsyncSnap.data!;
-
-                      return FutureBuilder(
-                        future: widget.eventStream,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Padding(
-                                padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
-                                child: CircularProgressIndicator());
+      return StreamBuilder(
+        stream: FirebaseFirestore.instance.collection('users').doc(widget.userDocSnap.id).snapshots(),
+        builder: (context, userStreamSnap) {
+          
+          return Column(
+          children: <Widget>[
+            StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('configurables')
+                  .doc("document")
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+          
+                return Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Column(children: <Widget>[
+                      FutureBuilder(
+                        future:widget.icondataStream, // Incredibly retarded to not unify icon codepoints and colors with their wings
+                        builder: (context, icondataAsyncSnap) {
+                          if (icondataAsyncSnap.data == null) {
+                            return const Center(child: CircularProgressIndicator());
                           }
-
-                          if (snapshot.data!.docs.isEmpty) {
-                            return const Padding(
-                                padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
-                                child: Text('Nothing to see here ._.'));
-                          }
-
-                          return SizedBox(
-                            height: screenheight - 207,
-                            child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: snapshot.data!.docs.length,
-                                itemBuilder: (context, index) {
-                                  return TweenAnimationBuilder(
-                                    tween: Tween<double>(begin: 0, end: 1),
-                                    duration: const Duration(seconds: 1),
-                                    child: _buildUpcomingEvent(
-                                      context,
-                                      eventDocSnap: snapshot.data!.docs[index],
-                                      userDocSnap: widget.userDocSnap,
-                                      icondataDocSnap: icondataSnap.docs
-                                          .singleWhere((docSnap) =>
-                                              docSnap['wing'] ==
-                                              snapshot.data!.docs[index]
-                                                  ['wing']),
-                                    ),
-                                    builder: (BuildContext context,
-                                        double value, Widget? child) {
-                                      return Opacity(
-                                        opacity: value,
-                                        child: child,
+          
+                          final QuerySnapshot icondataSnap =
+                              icondataAsyncSnap.data!;
+          
+                          return FutureBuilder(
+                            future: widget.eventStream,
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return const Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                    child: CircularProgressIndicator());
+                              }
+          
+                              if (snapshot.data!.docs.isEmpty) {
+                                return const Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                    child: Text('Nothing to see here ._.'));
+                              }
+                              DocumentSnapshot<Object?> temp = userStreamSnap.data!;
+                              return SizedBox(
+                                height: screenheight - 207,
+                                child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: snapshot.data!.docs.length,
+                                    itemBuilder: (context, index) {
+                                      return TweenAnimationBuilder(
+                                        tween: Tween<double>(begin: 0, end: 1),
+                                        duration: const Duration(seconds: 1),
+                                        child: _buildUpcomingEvent(
+                                          context,
+                                          eventDocSnap: snapshot.data!.docs[index],
+                                          userDocSnap: temp,
+                                          icondataDocSnap: icondataSnap.docs
+                                              .singleWhere((docSnap) =>
+                                                  docSnap['wing'] ==
+                                                  snapshot.data!.docs[index]
+                                                      ['wing']),
+                                        ),
+                                        builder: (BuildContext context,
+                                            double value, Widget? child) {
+                                          return Opacity(
+                                            opacity: value,
+                                            child: child,
+                                          );
+                                        },
                                       );
-                                    },
-                                  );
-                                }),
+                                    }),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-                  ),
-                ]));
-          },
-        ),
-      ],
-    );
+                      ),
+                    ]));
+              },
+            ),
+          ],
+              );
+        }
+      );
   }
 }
 

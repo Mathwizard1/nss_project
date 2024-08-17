@@ -26,10 +26,18 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   final ImagePicker _imagePicker = ImagePicker();
   Stream<TaskSnapshot>? _uploadTaskSnapStream;
 
+  late final DocumentSnapshot userDocSnap;
+  late final DocumentSnapshot eventDocSnap;
+  bool hasRegistered = false;
+
   @override
   void initState() {
     super.initState();
-
+    userDocSnap = widget.userSnapshot;
+    eventDocSnap = widget.eventSnapshot;
+    
+    hasRegistered = _isInRegisteredEvents(
+                eventDocSnap: eventDocSnap, userDocSnap: userDocSnap);
     _hasAlreadyUploaded = FirebaseStorage.instance
         .ref()
         .child(widget.eventSnapshot.id)
@@ -80,16 +88,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   @override
   Widget build(BuildContext context) {
 
-            final DocumentSnapshot userDocSnap = widget.userSnapshot;
-
-            final DocumentSnapshot eventDocSnap = widget.eventSnapshot;
-
+            
             final double screenHeight = MediaQuery.sizeOf(context).height;
             final double appBarHeight = 0.075 * screenHeight;
             final double bottomPadding = 0.05 * screenHeight;
 
-            final bool hasRegistered = _isInRegisteredEvents(
-                eventDocSnap: eventDocSnap, userDocSnap: userDocSnap);
+            
             final bool hasMarkedAttendance = hasRegistered &&
                 _isInAttendedEvents(
                     eventDocSnap: eventDocSnap, userDocSnap: userDocSnap);
@@ -164,7 +168,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                             userDocSnap.reference.update({
                               'registered-events':
                                   FieldValue.arrayUnion([eventDocSnap.id]),
-                            });
+                            }).then((value){setState(() {
+                              hasRegistered = true;
+                            });});
 
                             eventDocSnap.reference.update({
                               'registered-volunteers':
