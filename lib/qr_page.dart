@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QrPage extends StatefulWidget {
-  final DocumentSnapshot eventSnapshot;
-  const QrPage({super.key, required this.eventSnapshot});
+  final DocumentSnapshot oldEventDocSnap;
+  final VoidCallback attendanceMarkedCallback;
+  const QrPage(
+      {super.key,
+      required this.oldEventDocSnap,
+      required this.attendanceMarkedCallback});
 
   @override
   State createState() {
@@ -34,57 +38,69 @@ class QrPageState extends State<QrPage> {
           return ret;
         })
         .toList()
-        .contains(widget.eventSnapshot.id);
+        .contains(widget.oldEventDocSnap.id);
   }
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.sizeOf(context).height;
+    final double screenWidth = MediaQuery.sizeOf(context).width;
 
-            final double screenHeight = MediaQuery.sizeOf(context).height;
-            final double screenWidth = MediaQuery.sizeOf(context).width;
+    final double appBarHeight = 0.075 * screenHeight;
 
-            final double appBarHeight = 0.075 * screenHeight;
-
-    return StreamBuilder(
-      stream: userDocSnapStream,
-      builder: (context, userDocAsyncSnap) {
-        if (!userDocAsyncSnap.hasData) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
+    return PopScope(
+      onPopInvoked: (bool didPop) {
+        if (didPop) {
+          widget.attendanceMarkedCallback();
         }
+      },
+      child: StreamBuilder(
+        stream: userDocSnapStream,
+        builder: (context, userDocAsyncSnap) {
+          if (!userDocAsyncSnap.hasData) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
 
-        final DocumentSnapshot userDocSnap = userDocAsyncSnap.data!;
+          final DocumentSnapshot userDocSnap = userDocAsyncSnap.data!;
 
-            return Scaffold(
-              appBar: AppBar(
-                toolbarHeight: appBarHeight,
-                backgroundColor: Colors.deepPurple[400],
-                title: Text(
-                  widget.eventSnapshot['title'],
-                  style: const TextStyle(color: Colors.white),
-                ),
+          late final Color bgColor;
+          if (_hasMarkedAttendance(
+              eventDocSnap: widget.oldEventDocSnap, userDocSnap: userDocSnap)) {
+            bgColor = Colors.green;
+          } else {
+            bgColor = Colors.white;
+          }
+
+          return Scaffold(
+            appBar: AppBar(
+              toolbarHeight: appBarHeight,
+              backgroundColor: Colors.deepPurple[400],
+              title: Text(
+                widget.oldEventDocSnap['title'],
+                style: const TextStyle(color: Colors.white),
               ),
-              body: AnimatedContainer(
-                duration: const Duration(seconds: 1),
-                color: _hasMarkedAttendance(
-                        eventDocSnap: widget.eventSnapshot, userDocSnap: userDocSnap)
-                    ? Colors.green
-                    : Colors.white,
-                child: Center(
-                  child: SizedBox(
-                    width:screenWidth/1.5,
-                    height:screenWidth/1.5,
-                    child: QrImageView(
-                      backgroundColor: Colors.white,
-                      padding: EdgeInsets.all(0.05 * screenWidth),
-                      data: '${userDocSnap['roll-number']}~${widget.eventSnapshot.id}',
-                    ),
+            ),
+            body: AnimatedContainer(
+              duration: const Duration(seconds: 1),
+              color: bgColor,
+              child: Center(
+                child: SizedBox(
+                  width: screenWidth / 1.5,
+                  height: screenWidth / 1.5,
+                  child: QrImageView(
+                    backgroundColor: Colors.white,
+                    padding: EdgeInsets.all(0.05 * screenWidth),
+                    data:
+                        '${userDocSnap['roll-number']}~${widget.oldEventDocSnap.id}',
                   ),
                 ),
               ),
-            );
-      },
+            ),
+          );
+        },
+      ),
     );
   }
 }
