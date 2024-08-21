@@ -36,31 +36,38 @@ class SignUpPageState extends State<SignUpPage> {
   TextEditingController confirmpasswordcontroller = TextEditingController();
 
   Future<void> _trySignUp() async {
-    if (_isLoading) {
-      return;
-    }
+    // Prevent multiple presses
+    setState(() => _isLoading = true);
 
     if (emailcontroller.text.trim() == '' ||
         rollnumbercontroller.text.trim() == '' ||
         fullnamecontroller.text.trim() == '' ||
         passwordcontroller.text.trim() == '') {
-      setState(() => _errorMessage = 'Can\'t leave one or more fields empty.');
+      setState(() {
+        _errorMessage = 'Can\'t leave one or more fields empty.';
+        _isLoading = false;
+      });
       return;
     }
 
     if (passwordcontroller.text.trim() !=
         confirmpasswordcontroller.text.trim()) {
-      setState(() => _errorMessage = 'Passwords don\'t match.');
+      setState(() {
+        _errorMessage = 'Passwords don\'t match.';
+        _isLoading = false;
+      });
       return;
     }
 
     if (!emailcontroller.text.trim().endsWith('@iitp.ac.in')) {
-      setState(() => _errorMessage = 'Please enter an IITP email address.');
+      setState(() {
+        _errorMessage = 'Please enter an IITP email address.';
+        _isLoading = false;
+      });
       return;
     }
 
-
-    //Roll Number being used
+    // Roll Number being used
     if ((await FirebaseFirestore.instance
             .collection('users')
             .where('roll-number',
@@ -68,8 +75,11 @@ class SignUpPageState extends State<SignUpPage> {
             .get())
         .docs
         .isNotEmpty) {
-      setState(() => _errorMessage =
-          'An existing account is already linked with this roll-number.');
+      setState(() {
+        _errorMessage =
+            'An existing account is already linked with this roll-number.';
+        _isLoading = false;
+      });
       return;
     }
 
@@ -79,14 +89,15 @@ class SignUpPageState extends State<SignUpPage> {
             .get())
         .docs
         .isNotEmpty) {
-      setState(() => _errorMessage =
-          'An existing account is already linked with this Email ID.');
+      setState(() {
+        _errorMessage =
+            'An existing account is already linked with this Email ID.';
+        _isLoading = false;
+      });
       return;
     }
 
     try {
-      setState(() => _isLoading = true);
-
       final userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
               email: emailcontroller.text.trim(),
@@ -225,14 +236,14 @@ class SignUpPageState extends State<SignUpPage> {
                   width: screenwidth / 3,
                   height: 50,
                   child: TextButton(
-                    onPressed: !_isLoading ? _trySignUp : null,
+                    onPressed: _isLoading ? null : _trySignUp,
                     style: const ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(Colors.indigo),
                       foregroundColor: WidgetStatePropertyAll(Colors.white),
                     ),
-                    child: (_isLoading
+                    child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Submit')),
+                        : const Text('Submit'),
                   )),
             ),
             Padding(
